@@ -1,0 +1,12 @@
+#logic;;
+
+axiom relu_phases f b aux =
+    ( is_active [(aux, 0., UPPER); (b, 0., LOWER)] b aux ||  is_active [ (b, 0., LOWER); (aux, 0., UPPER)] b aux ) &&
+    ( is_inactive [(b, 0., UPPER); (f, 0., UPPER)] b f || is_inactive [(f, 0., UPPER); (b, 0., UPPER)] b f)
+    [@@auto]
+
+
+(*
+theorem constraint_verification splits constraint  =
+   if the constraint is a relu constraint, and we find it among a list it containts, then (check_relu_split splits [constraint]) will return true
+*)

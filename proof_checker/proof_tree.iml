@@ -1,0 +1,14 @@
+(* 
+[@@@import "proof_checker/split.iml"]
+[@@@import "proof_checker/bound_lemma.iml"] 
+
+open Split
+open Bound_lemma *)
+
+module ProofTree = struct
+    type t = 
+      (* split, bounds lemmas, children *)
+      | Node of Split.t list * BoundLemma.t list * t list
+      (* split, bounds lemmas, contradiction vector *)
+      | Leaf of Split.t list * BoundLemma.t list * real list
+end
