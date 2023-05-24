@@ -1,0 +1,20 @@
+module SparseMatrix = struct
+
+  (* 
+  nicola's suggestion:
+
+  type arg =
+    | Rows
+    | Cols
+    | Value of int * int
+
+  type 'a u = { i : int option ; x : 'a option; default : 'a  }
+
+  type 'a t = arg -> 'a u 
+  *)
+
+  type entry = (int * real)
+
+  type t = entry list
+
+end

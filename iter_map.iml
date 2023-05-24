@@ -1,0 +1,81 @@
+module Iter_map = struct
+
+  type ('a,'b) t = {
+    map: ('a,'b) Map.t;
+    keys: 'a list;
+  }
+
+  let rec insert k ks =
+    match ks with
+    | [] -> [k]
+    | k' :: ks' ->
+      if k=k' then ks
+      else if k < k' then k :: ks
+      else k' :: insert k ks'
+
+  let add k v m =
+    { map = Map.add k v m.map;
+      keys = insert k m.keys }
+
+  let get k m = Map.get k m.map
+
+  let get_default m = Map.get_default m.map
+
+  let rec of_list xs =
+    match xs with
+    | [] -> { map = Map.const 0.;
+              keys = [] }
+    | (k,v)::xs ->
+      let m = of_list xs in
+      add k v m
+
+  let empty = of_list []
+
+  let non_zero_keys ((m: ('a, real) t)) k =
+   (not (m.keys = []) && get_default m = 0.) && (List.mem k m.keys <==> get k m <> 0.)
+
+   let print (m: (int, real) t) = List.map (fun k -> let () = Printf.printf "(%d, %f); " (Z.to_int k) (Q.to_float @@ get k m) in k) m.keys
+end
+
+module Iter_map_lemmas = struct
+
+  module M = Iter_map
+
+  lemma map_get_add_id m k v =
+    M.get k (M.add k v m) = v
+  [@@auto] [@@rw]
+
+  lemma insert_stable k x ks =
+    List.mem x ks ==> List.mem x (M.insert k ks)
+  [@@auto] [@@rw]
+
+  lemma insert_inserts k ks =
+    List.mem k (M.insert k ks)
+  [@@auto] [@@rw]
+
+  lemma map_key_mem m k v =
+    List.mem k (Iter_map.add k v m).keys
+  [@@auto] [@@rw]
+
+
+  lemma empty_keys' = 
+  M.empty.keys = []
+  [@@auto] [@@rw]
+
+  lemma empty_map'= 
+  M.empty.map = Map.const 0.
+  [@@auto] [@@rw]
+
+  lemma empty_keys (m: ('a, 'b) M.t) = 
+    m = M.empty ==> m.keys = []
+  [@@auto] [@@rw]
+
+  lemma empty_map (m: ('a, 'b) M.t) = 
+    m = M.empty ==> m.map = Map.const 0.
+  [@@auto] [@@rw]
+
+  lemma default_zero_empty (m: ('a, 'b) M.t) k =
+    m = M.empty ==> M.get k m = 0.
+  [@@auto] [@@rw]
+
+end
