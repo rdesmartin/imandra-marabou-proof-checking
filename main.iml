@@ -1,0 +1,50 @@
+let () = System.use "result.iml";;
+let () = System.use "iter_map.iml";;
+let () = System.use "utils.iml";;
+
+let () = System.use "split.iml";;
+let () = System.use "matrix.iml";;
+let () = System.use "constraint.iml";;
+let () = System.use "bound_lemma.iml";;
+let () = System.use "proof_tree.iml";;
+let () = System.use "json_proof_parser.iml";;
+let () = System.use "checker.iml";;
+
+let small = "json/smallJsonProof.json"
+let small_lemma = "json/smallJsonProof_Lemmas.json" (* ~70 Mb *)
+
+let small2 = "json/smallJsonProof2.json"
+let small2_lemma = "json/smallJsonProof2_Lemmas.json" (* ~800 Mb *)
+
+let small3 = "json/smallJsonProof3.json"
+let small3_lemma = "json/smallJsonProof3_Lemmas.json" (* ~500 Mb *)
+
+let small4 = "json/smallJsonProof4.json"
+let small4_lemma = "json/smallJsonProof4_Lemmas.json" (* ~800 Mb *)
+
+let small5 = "json/smallJsonProof5.json"
+let small5_lemma = "json/smallJsonProof5_Lemmas.json" (* ~800 Mb *)
+
+let small6 = "json/smallJsonProof6.json"
+let small6_lemma = "json/smallJsonProof6_Lemmas.json" (* ~800 Mb *)
+
+
+let medium = "json/mediumJsonProof.json"
+let medium2 = "json/mediumJsonProof2.json"
+
+let large = "json/largeJsonProof.json"
+
+(* let load_proof file_name =
+    let proof_json = YJ.from_file file_name in
+    JSONProofParser.parse_proof proof_json
+    [@@program];; *)
+
+(* let proof_res = load_proof small [@@reflect];; *)
+
+
+(* let main () =
+(* create function parametrised on file name *)
+    match proof_res with
+    | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
+        check_root tableau upper_bounds lower_bounds constraints proof_tree
+    | Error e -> false *)
