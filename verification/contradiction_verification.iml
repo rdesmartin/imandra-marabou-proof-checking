@@ -61,14 +61,32 @@ lemma update_combination_zero_vec c x =
 [@@auto]
 
 
-(* let update_combination_eq x y z = 
+lemma update_combination_nonempty y z n = 
+    List.length y = List.length z && y <> []
+    ==>
+    (update_combination n y z) <> []
+[@@auto]
+
+let rec pred y z r = match y, z, r with
+| [], [], [] -> true   
+| y_hd::y_tl, z_hd::z_tl, r_hd::r_tl -> y_hd +. z_hd = r_hd && pred y_tl z_tl r_tl
+| _, _, _ -> false
+
+lemma update_combination_coeff_1 y z =
+    let r = update_combination 1. y z in
+    List.length y = List.length z 
+    ==>
+    pred y z r
+[@@auto]
+    
+lemma update_combination_eq x y z = 
     dot_product x y = 0. &&
     dot_product x z = 0. &&
     List.length x = List.length y &&
     List.length x = List.length z
     ==> 
     dot_product x (update_combination 1. y z) = 0.
-verify update_combination_eq [@@disable dot_product, List.length, update_combination][@@auto] *)
+[@@auto]
 
 (* lemma zero_dot_product_add row1 row2 x  =
     dot_product x row1 = 0. && dot_product x row2 = 0.

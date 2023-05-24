@@ -47,10 +47,10 @@ let medium2 = "json/mediumJsonProof2.json"
 
 let large = "json/largeJsonProof.json"
 
-let proof_res = JSON_decoder.decode_proof_file_refl tiny1 [@@reflect];;
+(* let proof_res = JSON_decoder.decode_proof_file_refl tiny1 [@@reflect];;
 
 let main () =
     match proof_res with
     | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
         check_root tableau upper_bounds lower_bounds constraints proof_tree
-    | Error e -> false
+    | Error e -> false *)
