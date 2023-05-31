@@ -14,11 +14,6 @@ let rec dot_product x  y =
         | x1::xs, y1::ys -> x1 *. y1 +. (dot_product xs ys)
         | _ -> 0. (* TODO handle error case *)
 
-let rec list_add x y = 
-    match x, y with
-    | [], [] -> []
-    | x1::xs, y1::ys -> (x1 +. y1) :: (list_add xs ys)
-    | _ -> []
 
 axiom dot_product_symmetry x y =
     dot_product x y = dot_product y x
@@ -78,42 +73,56 @@ lemma update_combination_coeff_1 y z =
     ==>
     pred y z r
 [@@auto]
-    
-lemma update_combination_eq x y z = 
-    dot_product x y = 0. &&
-    dot_product x z = 0. &&
-    List.length x = List.length y &&
-    List.length x = List.length z
-    ==> 
-    dot_product x (update_combination 1. y z) = 0.
+   
+lemma list_mult_length_preservation y c = 
+    List.length y = List.length (list_mult y c)
 [@@auto]
 
-(* lemma zero_dot_product_add row1 row2 x  =
-    dot_product x row1 = 0. && dot_product x row2 = 0.
+lemma vectors_distrib x y c = 
+    list_add (list_mult x c) (list_mult y c) = list_mult (list_add x y) c
+[@@auto]
+
+lemma list_add_identity x =
+    let zeros = repeat 0. (List.length x) in
+    list_add x zeros = x
+[@@auto]
+
+lemma dot_product_zero x = 
+    let zeros = repeat 0. (List.length x) in
+    dot_product x zeros = 0.
+[@@auto]
+
+lemma dot_product_coeff x y c =
+    dot_product x (list_mult y c) = c *. dot_product x y
+[@@auto]
+
+
+lemma dot_prod_coeff_eq x y c = 
+    dot_product x y = 0.
     ==>
-    dot_product x (list_add row1 row2) = 0.
-[@@auto][@@rw]
+    dot_product x (list_mult y c) = 0.
+[@@auto][@@apply dot_product_coeff x y c]
 
-lemma dot_product_zero_vector x = 
-    dot_product x (repeat 0. (List.length x)) = 0.
-[@@disable repeat][@@auto]
-
-lemma dot_product_linear_combination x y z c1 c2 =
-    dot_product x y = 0. && dot_product x z = 0.
+lemma dot_product_add x y z  =
+    List.length x = List.length y &&
+    List.length x = List.length z
     ==>
-    dot_product x (List.map ) 
+    (dot_product x y) +. (dot_product x z) = dot_product x (list_add y z)
+[@@auto]
 
-let kernel_vector_for_any_row tableau x row =
+lemma kernel_vector_for_any_row tableau x row =
     null_product tableau x && List.mem row tableau
     ==> dot_product row x = 0.
-verify kernel_vector_for_any_row
 [@@disable null_product, dot_product][@@auto]
 
-lemma kernel_vector_for_any_combination tableau x y =
+let kernel_vector_for_any_combination tableau x y =
     null_product tableau x
     ==> dot_product x (compute_combination y tableau) = 0.
+
+verify kernel_vector_for_any_combination
 [@@disable null_product, dot_product][@@auto]
 
+(*
 lemma bounds_combination row x upper_bounds lower_bounds c =
     compute_row_upper_bound row upper_bounds lower_bounds = c
     <==> (is_bounded x upper_bounds lower_bounds

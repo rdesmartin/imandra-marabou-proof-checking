@@ -118,13 +118,16 @@ let rec update_combination' (coeff: real) (row: real list) (handled: real list) 
     (* TODO: handle error case *)
     | _ -> []
 
-let rec update_combination (coeff: real) (row: real list) (lc: real list) =
+(* let rec update_combination (coeff: real) (row: real list) (lc: real list) =
     match row, lc with
     | [], [] -> []
     | row_hd::row_tl, lc_hd::lc_tl -> 
         (lc_hd +. coeff *. row_hd) :: update_combination coeff row_tl lc_tl
     (* TODO: handle error case *)
-    | _ -> []
+    | _ -> [] *)
+
+let update_combination (coeff: real) (row: real list) (lc: real list) = 
+    list_add lc (list_mult row coeff)
 
 (* verify (fun coeff row lc -> List.length row = List.length lc ==> update_combination coeff row lc = update_combination' coeff row [] lc) *)
 

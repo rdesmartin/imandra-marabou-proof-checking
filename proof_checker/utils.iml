@@ -58,3 +58,14 @@ let rec increment_elem (l: real list) (n: int) =
         match l with
         | [] -> []
         | hd::tl -> hd::(increment_elem tl (n-1))
+
+let rec list_add x y = 
+    match x, y with
+    | [], [] -> []
+    | x1::xs, y1::ys -> (x1 +. y1) :: (list_add xs ys)
+    | _ -> []
+
+let rec list_mult x c = 
+    match x with
+    | [] -> []
+    | x1::xs -> (x1 *. c) :: (list_mult xs c)
