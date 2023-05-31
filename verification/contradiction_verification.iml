@@ -80,7 +80,7 @@ lemma dot_product_zero x =
 
 lemma dot_product_coeff x y c =
     dot_product x (list_mult y c) = c *. dot_product x y
-[@@auto]
+[@@auto][@@rw]
 
 lemma dot_product_coeff_eq x y c =
     dot_product x y = 0.
@@ -104,13 +104,22 @@ lemma dot_product_add_eq x y z =
     dot_product x (list_add y z) = 0.
 [@@auto][@@apply dot_product_add x y z]
 
+lemma zero_dot_product_for_linear_combination_helper x y z c1 c2 =
+  List.length x = List.length y &&
+  List.length x = List.length z &&
+  dot_product x y = 0. &&
+  dot_product x z = 0.
+  ==> (dot_product x  (list_mult y c1)) +. (dot_product x (list_mult z c2)) = 0.
+[@@disable dot_product, List.length][@@apply dot_product_coeff_eq x y c1, dot_product_coeff_eq x z c2 ][@@auto]
+
 lemma zero_dot_product_for_linear_combination x y z c1 c2 =
   List.length x = List.length y &&
   List.length x = List.length z &&
   dot_product x y = 0. &&
   dot_product x z = 0.
   ==> dot_product x (list_add (list_mult y c1) (list_mult z c2)) = 0.
-[@@disable dot_product, list_add, list_mult, List.length][@@apply dot_product_add x (list_mult y c1) (list_mult z c2), dot_product_coeff_eq x y c1, dot_product_coeff_eq x z c2][@@auto]
+  [@@disable dot_product, list_mult, List.length][@@apply dot_product_add x (list_mult y c1) (list_mult z c2), zero_dot_product_for_linear_combination_helper x y z c1 c2][@@auto]
+
 
 
 (*lemma kernel_vector_for_any_row tableau x row =
