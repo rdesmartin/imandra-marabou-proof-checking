@@ -113,10 +113,13 @@ lemma zero_dot_product_for_linear_combination_helper x y z c1 c2 =
 [@@disable dot_product, List.length][@@apply dot_product_coeff_eq x y c1, dot_product_coeff_eq x z c2 ][@@auto][@@rw]
 
 lemma zero_dot_product_for_linear_combination_helper_2 x y z c1 c2 =
+  let u = (list_mult y c1) in
+  let v = (list_mult z c2) in
   List.length x = List.length y &&
   List.length x = List.length z
-  ==> dot_product x (list_add (list_mult y c1) (list_mult z c2) ) = (dot_product x  (list_mult y c1)) +. (dot_product x (list_mult z c2))
-  [@@disable dot_product, list_mult, List.length][@@apply dot_product_add x (list_mult y c1) (list_mult z c2)][@@auto]
+  ==>
+  dot_product x (list_add u v) = (dot_product x u) +. (dot_product x v)
+  [@@disable dot_product, list_add, List.length][@@apply dot_product_add x (list_mult y c1) (list_mult z c2),  list_mult_length_preservation z c2,  list_mult_length_preservation y c1][@@auto]
 
 lemma zero_dot_product_for_linear_combination x y z c1 c2 =
   List.length x = List.length y &&
@@ -124,19 +127,18 @@ lemma zero_dot_product_for_linear_combination x y z c1 c2 =
   dot_product x y = 0. &&
   dot_product x z = 0.
   ==> dot_product x (list_add (list_mult y c1) (list_mult z c2) ) = 0.
-  [@@disable dot_product, list_mult, List.length][@@apply zero_dot_product_for_linear_combination_helper x y z c1 c2, dot_product_add x (list_mult y c1) (list_mult z c2)][@@auto]
+  [@@disable dot_product, list_mult, List.length][@@apply zero_dot_product_for_linear_combination_helper_2 x y z c1 c2, dot_product_add x (list_mult y c1) (list_mult z c2)][@@auto]
 
-(*lemma kernel_vector_for_any_row tableau x row =
+lemma kernel_vector_for_any_row tableau x row =
     null_product tableau x && List.mem row tableau
     ==> dot_product row x = 0.
-[@@disable null_product, dot_product][@@auto] *)
+[@@disable null_product, dot_product][@@auto]
 
-(* let kernel_vector_for_any_combination tableau x y =
-    null_product tableau x
+lemma kernel_vector_for_any_combination tableau x y =
+    null_product tableau x &&
+    List.length (compute_combination y tableau) = List.length x
     ==> dot_product x (compute_combination y tableau) = 0.
-
-verify kernel_vector_for_any_combination
-[@@disable null_product, dot_product][@@auto] *)
+[@@disable null_product, dot_product][@@induct structural y]
 
 (*
 lemma bounds_combination row x upper_bounds lower_bounds c =
