@@ -37,4 +37,5 @@ module Result = struct
         | Error e -> Error e
         
 
-end [@@program]
+end 
+(* [@@program] *)

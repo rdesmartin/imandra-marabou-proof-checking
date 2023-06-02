@@ -1,3 +1,5 @@
+open Imandra
+
 Imandra.add_plugin_yojson ();;
 
 module MarabouProofRecord = struct

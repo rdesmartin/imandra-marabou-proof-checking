@@ -1,11 +1,9 @@
-(* 
-[@@@import "proof_checker/utils.iml"]
-[@@@import "proof_checker/constraints.iml"]
-[@@@import "proof_checker/split.iml"]
-[@@@import "proof_checker/bound_lemma.iml"]
-[@@@import "proof_checker/proof_tree.iml"]
-[@@@import "proof_checker/iter_map.iml"]
- *)
+open Iter_map
+open Utils
+open Constraint
+open Split
+open Bound_lemma
+open Proof_tree
 
 module JSON_decoder = struct
   module Basic = Decoders_yojson.Basic;;
@@ -147,5 +145,6 @@ module JSON_decoder = struct
   let decode_proof_file_refl file_name= match D.decode_file proof_decoder file_name with
     | Ok res -> Result.return res
     | Error e -> Result.fail @@ "error"
-  [@@program]
-end [@@program]
+  (* [@@program] *)
+end 
+(* [@@program] *)

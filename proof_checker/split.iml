@@ -1,7 +1,4 @@
-(* 
-[@@@import "proof_checker/utils.iml"]
 open Utils 
-*)
 
 (* todo: refactor to Tightening *)
 module Split = struct

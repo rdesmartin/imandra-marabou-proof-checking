@@ -1,5 +1,6 @@
-(executable
- (name main_program)
- (public_name proof_checker)
+(library
+ (name proof_checker)
+ (wrapped false)
+ (public_name imandra-marabou.proof_checker)
  (flags :standard -open Imandra_prelude -warn-error -A+8+39 -w -27-33-58)
  (libraries decoders-yojson decoders yojson imandra-prelude))

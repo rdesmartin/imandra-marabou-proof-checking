@@ -1,5 +1,5 @@
 (lang dune 2.2)
-(name imandra-marabou-proof-checker)
+(name imandra-marabou)
 
 (dialect
  (name imandra)

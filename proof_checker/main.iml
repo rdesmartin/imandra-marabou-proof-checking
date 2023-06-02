@@ -1,4 +1,4 @@
-[@@@use "proof_checker/result.iml"];;
+(* [@@@use "proof_checker/result.iml"];;
 [@@@use "proof_checker/iter_map.iml"];;
 [@@@use "proof_checker/utils.iml"];;
 [@@@use "proof_checker/split.iml"];;
@@ -6,7 +6,7 @@
 [@@@use "proof_checker/bound_lemma.iml"];;
 [@@@use "proof_checker/proof_tree.iml"];;
 [@@@use "proof_checker/json_decoder.ml"];;
-[@@@use "proof_checker/checker.iml"];;
+[@@@use "proof_checker/checker.iml"];; *)
 
 let tiny1 = "json/tinyJsonProof1.json"
 let tiny1_lemma = "json/tinyJsonProof1_Lemmas.json" (* ~800 Mb *)

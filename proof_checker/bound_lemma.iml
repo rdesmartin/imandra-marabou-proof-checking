@@ -1,7 +1,4 @@
-(* 
-[@@@import "proof_checker/utils.iml"]
 open Utils
-*)
 
 module BoundLemma = struct
     (* affected variable, affected bound type, bound value, causing variable, causing bound type, constraint type, explanation *)     

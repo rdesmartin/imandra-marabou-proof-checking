@@ -1,7 +1,4 @@
-(* 
-[@@@import "proof_checker/utils.iml"]
-
-open Utils *)
+open Utils
 
 module Constraint = struct    
     let constraint_type_of_int = function 
