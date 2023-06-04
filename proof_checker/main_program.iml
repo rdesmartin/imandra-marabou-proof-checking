@@ -1,14 +1,3 @@
-(* #program;;
-[@@@use "proof_checker/utils.iml"];;
-[@@@use "proof_checker/result.iml"];;
-[@@@use "proof_checker/iter_map.iml"];;
-[@@@use "proof_checker/split.iml"];;
-[@@@use "proof_checker/constraint.iml"];;
-[@@@use "proof_checker/bound_lemma.iml"];;
-[@@@use "proof_checker/proof_tree.iml"];;
-[@@@use "proof_checker/json_decoder.ml"];;
-[@@@use "proof_checker/checker.iml"];; *)
-
 open Json_decoder
 open Proof_tree
 open Checker
@@ -52,19 +41,21 @@ let medium2 = "json/mediumJsonProof2.json"
 
 let large = "json/largeJsonProof.json"
 
-let load_proof = JSON_decoder.decode_proof_file 
+let load_proof = JSON_decoder.decode_proof_file [@@program]
 
 let rec print_leaf' (n: ProofTree.t) = 
     match n with
     | ProofTree.Node (_, _, (child::_)) -> print_leaf' child
     | ProofTree.Node (_, _, []) -> []
     | ProofTree.Leaf (_, _, contradiction) -> contradiction
+    [@@program]
 
 let print_leaf file_name = 
     let proof_res = load_proof file_name in
     match proof_res with
     | Ok (_, _, _, _, proof_tree) -> print_leaf' proof_tree        
     | Error e -> []
+    [@@program]
 
 
 let get_tableau file_name = 
@@ -72,17 +63,19 @@ let get_tableau file_name =
     match proof_res with
     | Ok (tableau, _, _, _, _) -> tableau        
     | Error e -> []
-
+    [@@program]
 
 let main file_name =
     let proof_res = load_proof file_name in
     match proof_res with
     | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
         check_root tableau upper_bounds lower_bounds constraints proof_tree
-    | Error e -> false
+    | Error e -> let () = Printf.printf "Error opening proof file %s\n" file_name in
+                 false
+    [@@program]
 
 let current_proof = Sys.argv.(1)
+[@@program]
 
-let () = Printf.printf "current_proof"
-
-let () = Printf.printf "Result for %s: %b\n" current_proof (main current_proof)
+let () = Printf.printf "Result for %s: %b\n" current_proof (main current_proof) 
+[@@program]

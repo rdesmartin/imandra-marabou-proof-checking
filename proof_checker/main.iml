@@ -1,12 +1,6 @@
-(* [@@@use "proof_checker/result.iml"];;
-[@@@use "proof_checker/iter_map.iml"];;
-[@@@use "proof_checker/utils.iml"];;
-[@@@use "proof_checker/split.iml"];;
-[@@@use "proof_checker/constraint.iml"];;
-[@@@use "proof_checker/bound_lemma.iml"];;
-[@@@use "proof_checker/proof_tree.iml"];;
-[@@@use "proof_checker/json_decoder.ml"];;
-[@@@use "proof_checker/checker.iml"];; *)
+open Json_decoder
+open Proof_tree
+open Checker
 
 let tiny1 = "json/tinyJsonProof1.json"
 let tiny1_lemma = "json/tinyJsonProof1_Lemmas.json" (* ~800 Mb *)
@@ -47,10 +41,10 @@ let medium2 = "json/mediumJsonProof2.json"
 
 let large = "json/largeJsonProof.json"
 
-(* let proof_res = JSON_decoder.decode_proof_file_refl tiny1 [@@reflect];;
+let proof_res = JSON_decoder.decode_proof_file_refl tiny1 [@@reflect];;
 
 let main () =
     match proof_res with
     | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
         check_root tableau upper_bounds lower_bounds constraints proof_tree
-    | Error e -> false *)
+    | Error e -> false

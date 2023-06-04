@@ -38,4 +38,4 @@ module Result = struct
         
 
 end 
-(* [@@program] *)
+[@@program]

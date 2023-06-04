@@ -1,0 +1,9 @@
+[@@@import "proof_checker/utils.iml"];;
+[@@@import "proof_checker/result.iml"];;
+[@@@import "proof_checker/iter_map.iml"];;
+[@@@import "proof_checker/split.iml"];;
+[@@@import "proof_checker/constraint.iml"];;
+[@@@import "proof_checker/bound_lemma.iml"];;
+[@@@import "proof_checker/proof_tree.iml"];;
+[@@@import "proof_checker/json_decoder.ml"];;
+[@@@import "proof_checker/checker.iml"];;

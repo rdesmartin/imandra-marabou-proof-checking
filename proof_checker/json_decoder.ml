@@ -4,6 +4,7 @@ open Constraint
 open Split
 open Bound_lemma
 open Proof_tree
+open Result
 
 module JSON_decoder = struct
   module Basic = Decoders_yojson.Basic;;
@@ -140,11 +141,14 @@ module JSON_decoder = struct
     let* proof_tree = field "proof" proof_root_decoder in
     succeed (tableau, upper_bounds, lower_bounds, constraints, proof_tree)
 
-  let decode_proof_file file_name= D.decode_file proof_decoder file_name [@@program]
+  let decode_proof_file file_name= D.decode_file proof_decoder file_name 
+  [@@program]
 
-  let decode_proof_file_refl file_name= match D.decode_file proof_decoder file_name with
+  let decode_proof_file_refl (file_name: string): (real list list * real list * Constraint.Constraint.t list * ProofTree.t, string) result = 
+    match D.decode_file proof_decoder file_name with
     | Ok res -> Result.return res
     | Error e -> Result.fail @@ "error"
-  (* [@@program] *)
+  [@@program]
+
 end 
-(* [@@program] *)
+[@@program]

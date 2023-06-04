@@ -7,7 +7,7 @@ let bound_type_to_bool = function
 let bound_type_to_int = function
     | UPPER -> 1i
     | LOWER -> 0i 
-    (* [@@program] *)
+    [@@program]
 
 type constraint_type =
     | RELU
