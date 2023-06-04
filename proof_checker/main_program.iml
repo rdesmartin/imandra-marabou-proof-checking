@@ -74,7 +74,8 @@ let main file_name =
                  false
     [@@program]
 
-let current_proof = Sys.argv.(1)
+(* let current_proof = Sys.argv.(1) *)
+let current_proof = tiny2
 [@@program]
 
 let () = Printf.printf "Result for %s: %b\n" current_proof (main current_proof) 

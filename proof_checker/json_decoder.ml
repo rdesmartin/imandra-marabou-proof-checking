@@ -144,7 +144,7 @@ module JSON_decoder = struct
   let decode_proof_file file_name= D.decode_file proof_decoder file_name 
   [@@program]
 
-  let decode_proof_file_refl (file_name: string): (real list list * real list * Constraint.Constraint.t list * ProofTree.t, string) result = 
+  let decode_proof_file_refl file_name = 
     match D.decode_file proof_decoder file_name with
     | Ok res -> Result.return res
     | Error e -> Result.fail @@ "error"

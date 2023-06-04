@@ -41,7 +41,7 @@ let medium2 = "json/mediumJsonProof2.json"
 
 let large = "json/largeJsonProof.json"
 
-let proof_res = JSON_decoder.decode_proof_file_refl tiny1 [@@reflect];;
+let proof_res = JSON_decoder.decode_proof_file_refl tiny2 [@@reflect];;
 
 let main () =
     match proof_res with
