@@ -39,9 +39,9 @@ module JSON_decoder = struct
         el |> (fun (k, v) -> M.add k v x)
       ) M.empty
 
-  let sparse_matrix_decoder (matrix_width: int): ((real list list) D.decoder) =
+  let sparse_matrix_decoder (matrix_width: int): (((int, real) M.t list) D.decoder) =
     let open D in
-    list @@ map (M.to_list (matrix_width - (Z.of_int 1))) sparse_row_decoder
+    list @@ sparse_row_decoder
   (* Constraints decoder *)
 
   let constraint_type_decoder: constraint_type D.decoder =
@@ -84,7 +84,7 @@ module JSON_decoder = struct
         let* caus_var = field "causVar" int_decoder in
         let* caus_bound = field "causBound" bound_decoder in
         let* constrnt = field "constraint" constraint_type_decoder in
-        let* expl = field "expl" (list float_decoder) in
+        let* expl = field "expl" (map M.of_flat_list (list float_decoder)) in
         succeed @@ BoundLemma.Full (aff_var, aff_bound, bound, caus_var, caus_bound, constrnt, expl)
       );
       ( "short_lemma",
@@ -108,7 +108,7 @@ module JSON_decoder = struct
           ( "leaf",
             let* splits = field "split" (list split_decoder) in
             let* lemmas = field_opt_or ~default:[] "lemmas" (list lemma_decoder) in
-            let* contradiction = field "contradiction" (list float_decoder) in
+            let* contradiction = field "contradiction" (map M.of_flat_list (list float_decoder)) in
             succeed (ProofTree.Leaf (splits, lemmas, contradiction))
           )
         ]
@@ -124,7 +124,7 @@ module JSON_decoder = struct
       );
       ( "leaf",
         let* lemmas = field_opt_or ~default:[] "lemmas" (list lemma_decoder) in
-        let* contradiction = field "contradiction" (list float_decoder) in
+        let* contradiction = field "contradiction" (map M.of_flat_list (list float_decoder)) in
         succeed (ProofTree.Leaf ([], lemmas, contradiction))
       )
     ]
@@ -136,10 +136,12 @@ module JSON_decoder = struct
     let* upper_bounds = field "upperBounds" @@ list (map Q.of_float float) in
     let* lower_bounds = field "lowerBounds" @@ list (map Q.of_float float) in
     let* tableau_width = succeed @@ List.length upper_bounds in
+    let* upper_bounds_sparse = succeed @@ M.of_flat_list upper_bounds in
+    let* lower_bounds_sparse = succeed @@ M.of_flat_list lower_bounds in
     let* tableau = field "tableau" (sparse_matrix_decoder tableau_width) in
     let* constraints = field "constraints" (list constraint_decoder) in
     let* proof_tree = field "proof" proof_root_decoder in
-    succeed (tableau, upper_bounds, lower_bounds, constraints, proof_tree)
+    succeed (tableau, upper_bounds_sparse, lower_bounds_sparse, constraints, proof_tree)
 
   let decode_proof_file file_name= D.decode_file proof_decoder file_name 
   [@@program]

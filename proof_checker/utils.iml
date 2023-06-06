@@ -19,3 +19,4 @@ type constraint_type =
 let all (l: bool list) = List.fold_left (fun x y -> x && y) true l
 
 let print_list l = List.map (fun el -> let () = Printf.printf "%f; " (Q.to_float el) in el) l
+[@@program]

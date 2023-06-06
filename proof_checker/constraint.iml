@@ -1,3 +1,5 @@
+open Utils
+
 module Constraint = struct    
     let constraint_type_of_int = function 
     | 0 -> RELU

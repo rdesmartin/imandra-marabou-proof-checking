@@ -1,3 +1,6 @@
+open Utils
+open Iter_map
+
 module BoundLemma = struct
     (* affected variable, affected bound type, bound value, causing variable, causing bound type, constraint type, explanation *)     
     type t = 

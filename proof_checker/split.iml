@@ -1,3 +1,5 @@
+open Utils
+
 (* todo: refactor to Tightening *)
 module Split = struct
     type t = (int * real * bound_type)

@@ -29,12 +29,29 @@ module Iter_map = struct
       let m = of_list xs in
       add k v m
 
+  let of_flat_list (xs: 'a list): (int, 'a) t = 
+    let rec of_flat_list' xs k =
+      match xs with
+      | [] -> { map = Map.const 0.;
+                keys = [] }
+      | v::xs ->
+        let m = of_flat_list' xs (k + 1) in
+        add k v m
+    in
+    of_flat_list' xs 0
+
   let empty = of_list []
 
   let non_zero_keys ((m: ('a, real) t)) k =
    (not (m.keys = []) && get_default m = 0.) && (List.mem k m.keys <==> get k m <> 0.)
 
+   let rec to_list len m =
+    if len < 0 then []
+    else
+    (to_list (len - 1) m) @ [(get len m)]
+
    let print (m: (int, real) t) = List.map (fun k -> let () = Printf.printf "(%d, %f); " (Z.to_int k) (Q.to_float @@ get k m) in k) m.keys
+   [@@program]
 end
 
 module Iter_map_lemmas = struct

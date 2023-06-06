@@ -1,3 +1,7 @@
+open Split
+open Bound_lemma
+open Iter_map
+
 module ProofTree = struct
     type t = 
       (* split, bounds lemmas, children *)
