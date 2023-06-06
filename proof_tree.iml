@@ -1,7 +1,0 @@
-module ProofTree = struct
-    type t = 
-      (* split, bounds lemmas, children *)
-      | Node of Split.t list * BoundLemma.t list * t list
-      (* split, bounds lemmas, contradiction vector *)
-      | Leaf of Split.t list * BoundLemma.t list * (int, real) Iter_map.t
-end

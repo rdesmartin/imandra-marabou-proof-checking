@@ -1,8 +1,3 @@
-open Utils
-open Proof_tree
-open Split
-open Bound_lemma
-
 module M = Iter_map
 
 (* let return_debug s b = if b then true else (Printf.printf s; false) *)
@@ -160,6 +155,24 @@ let match_relu_lemmas b f aux bound_lemma tableau upper_bounds lower_bounds =
         let updated_linear_combination = M.add caus_var (ci+.1.) linear_combination in
         let row_bound = if caus_bound_t = UPPER then compute_row_upper_bound updated_linear_combination upper_bounds lower_bounds else
             compute_row_lower_bound updated_linear_combination upper_bounds lower_bounds in
+        (* let eps = 0.000001 in
+        let (>=~) a b = a >=. b -. eps in
+        let (<=~) a b = a <=. b +. eps in
+        let (=~) a b =  (a >=~ b && a <=~ b) || (b >=~ a && b <=~ a) in
+        let (<~) = (<=~) in
+        let (>~) = (>=~) in *)
+        if 
+        (* all possible bound tightening lemmas for ReLU constraint *)
+            (* (caus_var = b && caus_bound_t = LOWER && row_bound >~ 0. && aff_var = aux && aff_bound_t = UPPER && value =~ 0.) 
+            (caus_var = f && caus_bound_t = LOWER && row_bound >=~ 0. && aff_var = aux && aff_bound_t = UPPER && value =~ 0.) ||
+            (caus_var = b && caus_bound_t = LOWER && row_bound >=~ (-. value) && aff_var = aux && aff_bound_t = UPPER && value >=~ 0.) ||
+            (caus_var = aux && caus_bound_t = LOWER && row_bound >~ 0. && aff_var = f && aff_bound_t = UPPER && value =~ 0.) ||
+            (caus_var = f && caus_bound_t = LOWER && row_bound <. 0. && aff_var = f && aff_bound_t = LOWER && value =~ 0.) ||        
+            (caus_var = f && caus_bound_t = UPPER && row_bound <=~ value && aff_var = b && aff_bound_t = UPPER) ||
+            (caus_var = b && caus_bound_t = UPPER && row_bound <=~ 0.  && aff_var = f && aff_bound_t = UPPER && value >=~ 0.) ||
+            (caus_var = b && caus_bound_t = UPPER && row_bound <=~ 0.  && aff_var = aux && aff_bound_t = LOWER && row_bound <=~ (-. value)) ||
+            (caus_var = b && caus_bound_t = UPPER && row_bound >~ 0. && aff_var = f && aff_bound_t = UPPER && row_bound <=~ value) ||
+            (caus_var = aux && caus_bound_t = UPPER && row_bound <=~ (-. value) && aff_var = b && aff_bound_t = LOWER) *)
 
             (caus_var = b && caus_bound_t = LOWER && row_bound >. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
             (caus_var = f && caus_bound_t = LOWER && row_bound >=. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
@@ -213,7 +226,12 @@ let check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraint
 (* check that the contradiction is a valid Farkas lemma vector *)
 let check_contradiction contradiction tableau upper_bounds lower_bounds = 
     let linear_combination = compute_combination contradiction tableau (M.empty) 0 in
-    compute_row_upper_bound  linear_combination upper_bounds lower_bounds <. 0.
+    let result = compute_row_upper_bound  linear_combination upper_bounds lower_bounds in 
+    let _ = M.print linear_combination in let () = Printf.printf "\n" in
+    let _ = M.print upper_bounds in let () = Printf.printf "\n" in
+    let _ = M.print lower_bounds in let () = Printf.printf "\n" in
+    let () = Printf.printf "contradiction; bound is %f\n" (Q.to_float result) in
+    ( result <. 0.)
 
 (* recursively check nodes in the proof tree *)
 let rec check_node tableau upper_bounds lower_bounds constraints proof_node =

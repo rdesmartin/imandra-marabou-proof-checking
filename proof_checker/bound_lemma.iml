@@ -1,9 +1,7 @@
-open Utils
-
 module BoundLemma = struct
     (* affected variable, affected bound type, bound value, causing variable, causing bound type, constraint type, explanation *)     
     type t = 
-    | Full of int * bound_type * real * int * bound_type * constraint_type * real list
+    | Full of int * bound_type * real * int * bound_type * constraint_type * (int, real) Iter_map.t
     | Short of int * bound_type * real
 
     let to_tightening l = match l with

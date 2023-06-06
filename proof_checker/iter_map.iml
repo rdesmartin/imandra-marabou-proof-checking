@@ -31,12 +31,10 @@ module Iter_map = struct
 
   let empty = of_list []
 
-   let rec to_list len m =
-   if len < 0 then []
-   else
-   (to_list (len - 1) m) @ [(get len m)]
+  let non_zero_keys ((m: ('a, real) t)) k =
+   (not (m.keys = []) && get_default m = 0.) && (List.mem k m.keys <==> get k m <> 0.)
 
-   (* let print (m: (int, real) t) = List.map (fun k -> let () = Printf.printf "(%d, %f); " (Z.to_int k) (Q.to_float @@ get k m) in k) m.keys *)
+   let print (m: (int, real) t) = List.map (fun k -> let () = Printf.printf "(%d, %f); " (Z.to_int k) (Q.to_float @@ get k m) in k) m.keys
 end
 
 module Iter_map_lemmas = struct
@@ -60,19 +58,19 @@ module Iter_map_lemmas = struct
   [@@auto] [@@rw]
 
 
-  lemma empty_keys' =
+  lemma empty_keys' = 
   M.empty.keys = []
   [@@auto] [@@rw]
 
-  lemma empty_map'=
+  lemma empty_map'= 
   M.empty.map = Map.const 0.
   [@@auto] [@@rw]
 
-  lemma empty_keys (m: ('a, 'b) M.t) =
+  lemma empty_keys (m: ('a, 'b) M.t) = 
     m = M.empty ==> m.keys = []
   [@@auto] [@@rw]
 
-  lemma empty_map (m: ('a, 'b) M.t) =
+  lemma empty_map (m: ('a, 'b) M.t) = 
     m = M.empty ==> m.map = Map.const 0.
   [@@auto] [@@rw]
 
