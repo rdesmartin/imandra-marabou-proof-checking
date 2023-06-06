@@ -1,4 +1,8 @@
 #logic;;
+
+open Utils 
+open Checker
+
 let rec is_bounded (vars: real list) (upper_bounds: real list) (lower_bounds: real list) =
   match vars, upper_bounds, lower_bounds with
         | [], [], [] -> true
@@ -16,7 +20,7 @@ let rec dot_product x y =
 
 axiom dot_product_symmetry x y =
     dot_product x y = dot_product y x
-    [@@auto][@@rw]
+    [@@auto]
 
 let rec null_product (tableau: real list list) (x: real list) =
     match tableau, x with
@@ -34,13 +38,7 @@ lemma zero_dot_product_l x tableau row =
     ==> null_product (row::tableau) x = true
 [@@auto][@@rw]
 
-(* axiom zero_dot_product_mult row x c =
-    dot_product x row = 0.
-    ==>
-    dot_product x (List.map (fun a -> c *. a) row) = 0. *)
-(*[@@disable List.map, dot_product][@@auto]*)
-
-lemma l1 x =
+lemma repeat_len_non_empty x =
     x <> []
     ==>
     repeat 0. (List.length x) <> []
@@ -48,11 +46,22 @@ lemma l1 x =
 
 lemma update_combination_id x =
     update_combination 1. x (repeat 0. (List.length x)) = x
-[@@auto][@@apply l1 x]
+[@@auto][@@apply repeat_len_non_empty x]
 
 lemma update_combination_zero_vec c x =
     update_combination c x (repeat 0. (List.length x)) = List.map (( *. ) c) x
 [@@auto]
+
+lemma list_add_len_preservation x y =
+    List.length (list_add x y) = List.length x ||
+    List.length (list_add x y) = List.length y  
+[@@auto]
+
+lemma list_mul_len_preservation x c =
+    List.length (list_mult x c) = List.length x  
+[@@auto]
+
+lemma cons_not_empty x y = x :: y <> [] [@@auto]
 
 lemma update_combination_nonempty y z n =
     List.length y = List.length z && y <> []
@@ -119,7 +128,9 @@ lemma zero_dot_product_for_linear_combination_helper_2 x y z c1 c2 =
   List.length x = List.length z
   ==>
   dot_product x (list_add u v) = (dot_product x u) +. (dot_product x v)
-  [@@disable dot_product, list_add, List.length][@@apply dot_product_add x (list_mult y c1) (list_mult z c2),  list_mult_length_preservation z c2,  list_mult_length_preservation y c1][@@auto]
+  [@@disable dot_product, list_add, List.length]
+  [@@apply dot_product_add x (list_mult y c1) (list_mult z c2),  list_mult_length_preservation z c2,  list_mult_length_preservation y c1]
+  [@@auto]
 
 lemma zero_dot_product_for_linear_combination x y z c1 c2 =
   List.length x = List.length y &&
@@ -127,18 +138,17 @@ lemma zero_dot_product_for_linear_combination x y z c1 c2 =
   dot_product x y = 0. &&
   dot_product x z = 0.
   ==> dot_product x (list_add (list_mult y c1) (list_mult z c2) ) = 0.
-  [@@disable dot_product, list_mult, List.length][@@apply zero_dot_product_for_linear_combination_helper_2 x y z c1 c2, dot_product_add x (list_mult y c1) (list_mult z c2)][@@auto]
+  [@@disable dot_product, list_mult, List.length]
+  [@@apply zero_dot_product_for_linear_combination_helper_2 x y z c1 c2, dot_product_add x (list_mult y c1) (list_mult z c2)]
+  [@@auto]
 
 lemma kernel_vector_for_any_row tableau x row =
-    null_product tableau x && List.mem row tableau
-    ==> dot_product row x = 0.
+    null_product tableau x && 
+    List.mem row tableau
+    ==> 
+    dot_product row x = 0.
 [@@disable null_product, dot_product][@@auto]
 
-lemma kernel_vector_for_any_combination tableau x y =
-    null_product tableau x &&
-    List.length (compute_combination y tableau) = List.length x
-    ==> dot_product x (compute_combination y tableau) = 0.
-[@@disable null_product, dot_product][@@induct structural y]
 
 (*
 lemma bounds_combination row x upper_bounds lower_bounds c =
@@ -167,7 +177,8 @@ axiom dot_product_check_contradiction_eq x y tableau upper_bounds lower_bounds =
 
 theorem contradiction_verification x contradiction tableau upper_bounds lower_bounds =
     is_bounded x upper_bounds lower_bounds &&
-    check_contradiction contradiction tableau upper_bounds lower_bounds ==>
+    check_contradiction contradiction tableau upper_bounds lower_bounds
+    ==>
     not (null_product tableau x)
 [@@auto][@@apply dot_product_check_contradiction_eq x contradiction tableau upper_bounds lower_bounds]
 [@@disable dot_product, is_bounded, check_contradiction]

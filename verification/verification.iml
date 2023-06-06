@@ -1,0 +1,8 @@
+let kernel_vector_for_any_combination tableau x y =
+    null_product tableau x &&
+    List.length (compute_combination y tableau) = List.length x
+    ==> 
+    dot_product x (compute_combination y tableau) = 0.
+
+verify kernel_vector_for_any_combination
+    [@@disable null_product, dot_product][@@induct structural y]
