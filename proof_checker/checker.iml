@@ -3,34 +3,34 @@ open Proof_tree
 open Split
 open Bound_lemma
 
-(* let return_debug s b = if b then b else let () = Printf.printf "%s\n" s in b *)
+module M = Iter_map
+
+(* let return_debug s b = if b then true else (Printf.printf s; false) *)
 
 let return_debug _ b = b
 
-
-
 (* check that some split corresponds to a single variable split *)
-let check_single_var_split children_splits =
-    match children_splits with
+let check_single_var_split children_splits = 
+    match children_splits with 
     | [[(var1, value1, bound_type1)]; [(var2, value2, bound_type2)]] -> var1 = var2 && value1 = value2 && bound_type1 <> bound_type2
     | _ -> false
-
+    
 (* find a ReLU constraint given some splits *)
 let rec match_relu_constraint children_splits constraints =
     match constraints with
     | [] -> []
     | (RELU, l)::tl-> (
         match children_splits with
-        | [[(var1, _, _); (var2, _, _)]; [(var3, _, _); (var4, _, _)]] ->
+        | [[(var1, _, _); (var2, _, _)]; [(var3, _, _); (var4, _, _)]] -> 
             if
                 List.exists (fun x -> x = var1) l &&
                 List.exists (fun x -> x = var2) l &&
                 List.exists (fun x -> x = var3) l &&
-                List.exists (fun x -> x = var4) l
+                List.exists (fun x -> x = var4) l 
             then
                 l
             else
-                match_relu_constraint children_splits tl
+                match_relu_constraint children_splits tl 
         | _ -> match_relu_constraint children_splits tl
     )
     | (_::tl) -> match_relu_constraint children_splits tl
@@ -42,11 +42,11 @@ let rec match_constraint var1 var2 constraints =
     | (c, l)::tl->
             if List.exists (fun x -> x = var1) l && List.exists (fun x -> x = var2) l
             then (c, l)
-            else match_constraint var1 var2 tl
+            else match_constraint var1 var2 tl 
 
 (* check that the split corresponds to the active phase of a ReLU constraint *)
 let is_active split b aux = match split with
-    | [(var1, 0., UPPER); (var2, 0., LOWER)] -> var1 = aux && var2 = b
+    | [(var1, 0., UPPER); (var2, 0., LOWER)] -> var1 = aux && var2 = b 
     | [(var1, 0., LOWER); (var2, 0., UPPER)] -> var1 = b && var2 = aux
     | _ -> false
 
@@ -63,12 +63,12 @@ let check_relu_split children_splits constraints =
         | _ -> false
 
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
-let check_children_splits children constraints =
-    let check_non_empty_split c = match c with
+let check_children_splits children constraints = 
+    let check_non_empty_split c = match c with 
         | ProofTree.Node ([], _, _) | ProofTree.Leaf ([], _, _) -> false
         | _ -> true
     in
-    let get_child_split c = match c with
+    let get_child_split c = match c with 
         | ProofTree.Node (s, _, _) | ProofTree.Leaf (s, _, _) -> s
     in
     let children_splits = List.map get_child_split children in
@@ -79,13 +79,13 @@ let check_children_splits children constraints =
 
 (* update a single bound according to a list of tightenings *)
 let rec update_bounds_by_tightenings tightenings bounds =
-    match tightenings with
+    match tightenings with 
         | [] -> bounds
-        | (var, value, _)::tl -> let updated_bounds = set_nth bounds var value in(* find more elegant/efficient way to update *)
+        | (var, value, _)::tl -> let updated_bounds = M.add var value bounds  in(* find more elegant/efficient way to update *)
             update_bounds_by_tightenings tl updated_bounds
 
 (* update the bounds according to a list of tightenings *)
-let update_bounds tightenings upper_bounds lower_bounds =
+let update_bounds tightenings upper_bounds lower_bounds = 
     let upper_tightenings = List.filter Split.is_upper tightenings in
     let lower_tightenings = List.filter (fun a -> not (Split.is_upper a)) tightenings in
     let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in
@@ -93,127 +93,105 @@ let update_bounds tightenings upper_bounds lower_bounds =
     (updated_upper, updated_lower)
 
 (* updates the bounds according to the tightenings in the lemmas *)
-let update_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints =
+let update_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints = 
     let tightenings = List.map BoundLemma.to_tightening bound_lemmas in
     let (upper_bounds', lower_bounds') = update_bounds tightenings upper_bounds lower_bounds in
     (true, upper_bounds', lower_bounds')
 
 
 (* auxilliary function for compute_combination *)
-(* TODO: could this be expressed as a List.map? *)
-let rec update_combination' (coeff: real) (row: real list) (handled: real list) (to_handle: real list) =
-    match row, to_handle with
-    | [], [] -> handled
-    | value::tl, current_value::comb_tl ->
-        let handled' = handled @ [(current_value +. (coeff *. value))] in
-        update_combination' coeff tl handled' comb_tl
-    (* TODO: handle error case *)
-    | _ -> []
+let rec update_combination coeff keys row linear_combination = 
+    match keys with
+    | [] -> linear_combination
+    | var::tl ->
+        let value = M.get var row in
+        let current_val = M.get var linear_combination in 
+        let linear_combination' = M.add var (current_val +. coeff *. value) linear_combination in
+        update_combination coeff tl row linear_combination'
 
-(* let rec update_combination (coeff: real) (row: real list) (lc: real list) =
-    match row, lc with
-    | [], [] -> []
-    | row_hd::row_tl, lc_hd::lc_tl -> 
-        (lc_hd +. coeff *. row_hd) :: update_combination coeff row_tl lc_tl
-    (* TODO: handle error case *)
-    | _ -> [] *)
-
-let update_combination (coeff: real) (row: real list) (lc: real list) = 
-    list_add lc (list_mult row coeff)
-
-(* verify (fun coeff row lc -> List.length row = List.length lc ==> update_combination coeff row lc = update_combination' coeff row [] lc) *)
 
 (* compute a linear combination of tableau rows with coefficients from an explanation vector (corresponding to a Leaf's contradiction or a lemma in any node) *)
-let rec compute_combination' (expl: real list) (tableau: real list list) (linear_combination : real list)  =
-    match expl, tableau with
-    | [], [] -> linear_combination
-    | coeff::expl_tl, row::rows ->
-        if coeff <> 0.
-        then
-            let linear_combination' = update_combination coeff row linear_combination in
-            compute_combination' expl_tl rows linear_combination'
-        else
-            compute_combination' expl_tl rows linear_combination
-    (* TODO: handle error case *)
-    | [],_::_ | _::_, [] -> []
-
-let compute_combination (expl: real list) (tableau: real list list) =
+let rec compute_combination (expl: (int, real) M.t) (tableau: ('a, 'b) M.t list) linear_combination count =
     match tableau with
-    | [] -> []
-    | row::_ ->
-        compute_combination' expl tableau (repeat 0. (List.length row))
+    | [] -> linear_combination
+    | row::tableau_tl -> 
+        let coeff = M.get count expl in
+        let linear_combination' = update_combination coeff row.keys row linear_combination in
+        compute_combination expl tableau_tl linear_combination' (count + 1)
+    (* TODO: handle error case *)
+    | _ -> M.empty
 
 
-(* compute the upper bound for a tableau row represented as list of reals *)
-let compute_row_upper_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
-    let rec compute_row_upper_bound' inner_row ub lb res =
-        match inner_row, ub, lb with
-        | [], [], [] -> res
-        | r::rs, u::us, l::ls -> if r <. 0.
-            then
-                compute_row_upper_bound' rs us ls (res +. (l *. r) )
-            else
-                compute_row_upper_bound' rs us ls (res +. (u *. r))
-        (* TODO: handle error cases (list length mismatch) *)
-        | _::_, [], [] | [], _::_, [] | [], [], _::_ | [], _::_, _::_ | _::_, [], _::_ | _::_, _::_, [] ->
-            res
-    in
-    compute_row_upper_bound' row upper_bounds lower_bounds 0.
-
-(* compute the lower bound for a tableau row represented as list of reals *)
-let compute_row_lower_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
-    let rec compute_row_lower_bound' inner_row ub lb res =
-        match inner_row, ub, lb with
-        | [], [], [] -> res
-        | r::rs, u::us, l::ls -> if r <. 0.
+(* compute the upper bound for a tableau row represented as a M.t / sparse vector *)
+let compute_row_upper_bound (row: ('a, 'b) M.t) upper_bounds lower_bounds =
+    let linear_comb_keys = row.keys in 
+    let acc_func acc var =
+        let value = M.get var row in 
+        if value <. 0.
         then
-            compute_row_lower_bound' rs us ls (res +. u *. r)
+            acc +. (M.get var lower_bounds) *. value
         else
-            compute_row_lower_bound' rs us ls (res +. l *. r)
-        (* TODO: handle error cases (list length mismatch) *)
-        | _::_, [], [] | [], _::_, [] | [], [], _::_ | [], _::_, _::_ | _::_, [], _::_ | _::_, _::_, [] -> res
+            acc +. (M.get var upper_bounds) *. value
     in
-    compute_row_lower_bound' row upper_bounds lower_bounds 0.
-
+    let sum = List.fold_left acc_func 0. linear_comb_keys in
+    sum
+    
+(* compute the lower bound for a tableau row represented as a M.t / sparse vector *)
+let compute_row_lower_bound (row: ('a, 'b) M.t) upper_bounds lower_bounds =
+    (* TODO: Map.extract is not supported in logic mode, find workaround *)
+    let linear_comb_keys = row.keys in 
+    let acc_func acc var =
+        let value = M.get var row in 
+    if value <. 0.
+    then
+        acc +. (M.get var upper_bounds) *. value
+    else
+        acc +. (M.get var lower_bounds) *. value
+    in
+    let sum = List.fold_left acc_func 0. linear_comb_keys in
+    sum 
 
 (* Check that the bound lemmas correspond to a known ReLU bound tightening lemma *)
 let match_relu_lemmas b f aux bound_lemma tableau upper_bounds lower_bounds =
     match bound_lemma with
     | BoundLemma.Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
-        let linear_combination = compute_combination expl tableau in
-        let updated_linear_combination = increment_elem linear_combination caus_var in
+        let linear_combination = compute_combination expl tableau (M.empty) 0 in
+        let ci = M.get caus_var linear_combination in
+        let updated_linear_combination = M.add caus_var (ci+.1.) linear_combination in
         let row_bound = if caus_bound_t = UPPER then compute_row_upper_bound updated_linear_combination upper_bounds lower_bounds else
             compute_row_lower_bound updated_linear_combination upper_bounds lower_bounds in
-        if
+
             (caus_var = b && caus_bound_t = LOWER && row_bound >. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
             (caus_var = f && caus_bound_t = LOWER && row_bound >=. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
             (caus_var = aux && caus_bound_t = LOWER && row_bound >. 0. && aff_var = f && aff_bound_t = UPPER && value = 0.) ||
-            (caus_var = f && caus_bound_t = LOWER && row_bound <. 0. && aff_var = f && aff_bound_t = LOWER && value = 0.) ||
+            (caus_var = f && caus_bound_t = LOWER && row_bound <. 0. && aff_var = f && aff_bound_t = LOWER && value = 0.) ||        
             (caus_var = b && caus_bound_t = UPPER && row_bound <=. 0.  && aff_var = f && aff_bound_t = UPPER && value >=. 0.)
         then
             (true, value)
         else if
             (caus_var = f && caus_bound_t = UPPER && aff_var = b && aff_bound_t = UPPER) ||
             (caus_var = b && caus_bound_t = UPPER && row_bound >. 0. && aff_var = f && aff_bound_t = UPPER)
-        then
+        then 
         (true, row_bound)
-        else if
+        else if 
            (caus_var = aux && caus_bound_t = UPPER && aff_var = b && aff_bound_t = LOWER) ||
            (caus_var = b && caus_bound_t = LOWER && aff_var = aux && aff_bound_t = UPPER && value >=. 0.)
-        then
+        then 
             (true, -. row_bound)
-        else
+        else 
+            (* let () = BoundLemma.print bound_lemma in 
+            let () = Printf.printf "b: %d, f: %d, aux: %d, row_bound: %f\n\n" (Z.to_int b) (Z.to_int f) (Z.to_int aux) (Q.to_float row_bound) in *)
             (false, 0.)
     | _ -> (false, 0.)
 
 
 (* complete check of bound lemmas, and updates the bounds between two lemma checkings *)
 let rec check_full_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints =
-    match bound_lemmas with
+    match bound_lemmas with  
         | [] -> (true, upper_bounds, lower_bounds)
         | ((BoundLemma.Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, _)) as bound_lemma)::tl ->
             let matched_constraint = match_constraint aff_var caus_var constraints in
-            ( match matched_constraint with
+            ( match matched_constraint with 
                 | (RELU, [b; f; aux; _]) -> let (matched_lemma, to_update) = match_relu_lemmas b f aux bound_lemma tableau upper_bounds lower_bounds in
                     if matched_lemma
                     then
@@ -233,8 +211,8 @@ let check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraint
         | [] -> (true, upper_bounds, lower_bounds)
 
 (* check that the contradiction is a valid Farkas lemma vector *)
-let check_contradiction contradiction tableau upper_bounds lower_bounds =
-    let linear_combination = compute_combination contradiction tableau in
+let check_contradiction contradiction tableau upper_bounds lower_bounds = 
+    let linear_combination = compute_combination contradiction tableau (M.empty) 0 in
     compute_row_upper_bound  linear_combination upper_bounds lower_bounds <. 0.
 
 (* recursively check nodes in the proof tree *)
@@ -252,21 +230,21 @@ let rec check_node tableau upper_bounds lower_bounds constraints proof_node =
         let valid_contradiction = check_contradiction contradiction tableau upper_bounds'' lower_bounds'' in
         valid_bounds && valid_contradiction
 
-let sanity_checks tableau upper_bounds lower_bounds =
+let sanity_checks tableau upper_bounds lower_bounds = 
     let valid_bounds_sizes = List.length upper_bounds = List.length lower_bounds && List.length lower_bounds <> 0 in
     let check_tableau_size = List.length upper_bounds > List.length tableau in
-    check_tableau_size && valid_bounds_sizes
+    return_debug "invalid tableau or bound size" (check_tableau_size && valid_bounds_sizes)
+    
 
-
-let check_root tableau upper_bounds lower_bounds constraints proof_node =
-    let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
+let check_root tableau upper_bounds lower_bounds constraints proof_node = 
+    (* let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in *)
     let main_check =
     match proof_node with
-    | ProofTree.Node ([], bound_lemmas, children) ->
+    | ProofTree.Node ([], bound_lemmas, children) -> 
         check_node tableau upper_bounds lower_bounds constraints proof_node
     | ProofTree.Leaf ([], bound_lemmas, contradiction) ->
         check_node tableau upper_bounds lower_bounds constraints proof_node
     | _ -> return_debug "root check" false
     in
 
-    sanity_check_res && main_check
+    main_check
