@@ -12,15 +12,15 @@ import necessary files
 
 ## Run in program mode
 
-Define the proof you want to use in `main_program.iml` then import the file:
+Define the proof you want to use in `main_repl.iml` then import the file:
 
 ```ocaml
-(* in proof_checker/main_program.iml *)
+(* in proof_checker/main_repl.iml *)
 let current_proof = tiny2
 ```
 
 ```
-# use "proof_checker/main_program.iml";;
+# use "proof_checker/main_repl.iml";;
 ```
 
 ## Run in logic mode
@@ -50,9 +50,9 @@ It is possible to extract and run OCaml code using the dune build system:
 
 From the project's root directory:
 ```
-$ dune build ./proof_checker/main_program.exe
+$ dune build ./proof_checker/main_extract.exe
 ```
 ```
-$ dune exec -- ./main_program.exe ./json/tinyJsonProof2.json
+$ dune exec -- ./proof_checker/main_extract.exe ./json/tinyJsonProof2.json
 ```
 

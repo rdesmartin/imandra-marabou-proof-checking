@@ -65,7 +65,7 @@ let get_tableau file_name =
     | Error e -> []
     [@@program]
 
-let main file_name =
+let check_proof_file file_name =
     let proof_res = load_proof file_name in
     match proof_res with
     | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
@@ -74,9 +74,9 @@ let main file_name =
                  false
     [@@program]
 
-let current_proof = Sys.argv.(1)
-(* let current_proof = "json/acasxu_5_7_p3_NL.json" *)
+(* change below to the desired proof file *)
+let current_proof = "json/acasxu_5_7_p3_NL.json"
 [@@program]
 
-let () = Printf.printf "Result for %s: %b\n" current_proof (main current_proof) 
+let () = Printf.printf "Result for %s: %b\n" current_proof (check_proof_file current_proof) 
 [@@program]

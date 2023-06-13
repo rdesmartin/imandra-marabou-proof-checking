@@ -1,3 +1,5 @@
 json/
 _build/
 .imandra_init.log
+*.log
+__pycache__/
