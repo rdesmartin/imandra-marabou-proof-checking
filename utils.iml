@@ -1,0 +1,21 @@
+type bound_type = UPPER | LOWER
+
+let bound_type_to_bool = function
+    | UPPER -> true
+    | LOWER -> false
+
+let bound_type_to_int = function
+    | UPPER -> 1i
+    | LOWER -> 0i [@@program]
+
+type constraint_type = 
+    | RELU 
+    | MAX  
+    | SIGN
+    | DISJUNCTION
+    | ABSOLUTE_VALUE 
+    | UNDEFINED
+
+let all (l: bool list) = List.fold_left (fun x y -> x && y) true l
+
+let print_list l = List.map (fun el -> let () = Printf.printf "%f; " (Q.to_float el) in el) l

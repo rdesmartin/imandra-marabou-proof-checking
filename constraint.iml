@@ -1,0 +1,12 @@
+module Constraint = struct    
+    let constraint_type_of_int = function 
+    | 0 -> RELU
+    | 1 -> ABSOLUTE_VALUE
+    | 2 -> MAX
+    | 3 -> DISJUNCTION
+    | 4 -> SIGN
+    | _ -> UNDEFINED
+
+    (* constraint type, variables *)
+    type t = constraint_type * int list
+end
