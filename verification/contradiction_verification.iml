@@ -1,7 +1,10 @@
 #logic;;
 
-open Utils 
 open Checker
+
+let list_add = Utils.list_add
+let list_mult = Utils.list_mult
+let repeat = Utils.repeat
 
 let rec is_bounded (vars: real list) (upper_bounds: real list) (lower_bounds: real list) =
   match vars, upper_bounds, lower_bounds with
@@ -63,12 +66,12 @@ lemma list_mul_len_preservation x c =
 
 lemma cons_not_empty x y = x :: y <> [] [@@auto]
 
-lemma update_combination_nonempty y z n =
+(* lemma update_combination_nonempty y z n =
     List.length y = List.length z && y <> []
     ==>
     (update_combination n y z) <> []
 [@@auto]
-
+ *)
 lemma list_mult_length_preservation y c =
     List.length y = List.length (list_mult y c)
 [@@auto]
