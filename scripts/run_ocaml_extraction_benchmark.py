@@ -12,16 +12,16 @@ RESULT_FILE = "./timing.csv"
 TIMEOUT=5*3600  # in seconds
 
 TEST_FILES = [
-    "json/acasxu_2_9_3_LEMMAS.json",
-    "json/acasxu_3_7_3_LEMMAS.json", 
-    "json/acasxu_5_7_3_LEMMAS.json",  
-    "json/acasxu_5_9_3_LEMMAS.json",
-    "json/acasxu_2_9_4_LEMMAS.json",  
     # "json/acasxu_2_9_p3_NL.json",
     # "json/acasxu_2_9_p4_NL.json",
     # "json/acasxu_3_7_p3_NL.json",  
     # "json/acasxu_5_7_p3_NL.json",  
     # "json/acasxu_5_9_p3_NL.json",
+    "json/acasxu_2_9_3_LEMMAS.json",
+    "json/acasxu_3_7_3_LEMMAS.json", 
+    "json/acasxu_5_7_3_LEMMAS.json",  
+    "json/acasxu_5_9_3_LEMMAS.json",
+    "json/acasxu_2_9_4_LEMMAS.json",  
 ]
 
 def log(msg):
