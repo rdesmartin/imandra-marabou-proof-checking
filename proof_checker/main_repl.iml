@@ -1,0 +1,33 @@
+open Json_decoder
+open Proof_tree
+open Checker
+
+#program;;
+
+let load_proof = JSON_decoder.decode_proof_file [@@program]
+
+
+let check_proof_file file_name =
+    let proof_res = load_proof file_name in
+    match proof_res with
+    | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
+        check_root tableau upper_bounds lower_bounds constraints proof_tree
+    | Error e -> let () = Printf.printf "Error opening proof file %s\n" file_name in
+                 false
+    [@@program]
+
+<<<<<<< HEAD:proof_checker/main_program.iml
+(* let current_proof = Sys.argv.(1) *)
+let current_proof = "json/acasxu_5_7_p3_NL.json"
+[@@program]
+
+let () = Printf.printf "Result for %s: %b\n" current_proof (main current_proof) 
+[@@program]
+=======
+(* change below to the desired proof file *)
+let current_proof = "json/acasxu_5_7_p3_NL.json"
+[@@program]
+
+let () = Printf.printf "Result for %s: %b\n" current_proof (check_proof_file current_proof) 
+[@@program]
+>>>>>>> master:proof_checker/main_repl.iml
