@@ -57,11 +57,11 @@ lemma update_combination_zero_vec c x =
 
 lemma list_add_len_preservation x y =
     List.length (list_add x y) = List.length x ||
-    List.length (list_add x y) = List.length y  
+    List.length (list_add x y) = List.length y
 [@@auto]
 
 lemma list_mul_len_preservation x c =
-    List.length (list_mult x c) = List.length x  
+    List.length (list_mult x c) = List.length x
 [@@auto]
 
 lemma cons_not_empty x y = x :: y <> [] [@@auto]
@@ -146,14 +146,40 @@ lemma zero_dot_product_for_linear_combination x y z c1 c2 =
   [@@auto]
 
 lemma kernel_vector_for_any_row tableau x row =
-    null_product tableau x && 
-    List.mem row tableau
-    ==> 
-    dot_product row x = 0.
-[@@disable null_product, dot_product][@@auto]
+      null_product tableau x &&
+      List.mem row tableau
+      ==>
+      dot_product x row = 0.
+  [@@disable null_product, dot_product][@@auto]
+
+lemma kernel_vector_for_any_row_linear_combination tableau x row1 c1 row2 c2 =
+    null_product tableau x &&
+    List.mem row1 tableau &&
+    List.mem row2 tableau &&
+    List.length x = List.length row1 &&
+    List.length x = List.length row2
+    ==>
+    dot_product x (list_add (list_mult row1 c1) (list_mult row2 c2)) = 0.
+[@@disable null_product, dot_product, List.mem, List.length, list_add, list_mult][@@apply kernel_vector_for_any_row tableau x row1, kernel_vector_for_any_row tableau x row2, zero_dot_product_for_linear_combination x row1 row2 c1 c2]
+[@@auto]
+
+lemma kernel_vector_for_empty_combination tableau x =
+    null_product tableau x
+    ==> dot_product x (compute_combination [] tableau) = 0.
+[@@disable null_product, dot_product, List.length]
+
+lemma kernel_vector_for_combination_size_1 tableau x c =
+    null_product tableau x
+    ==> dot_product x (compute_combination [c] tableau) = 0.
+[@@disable null_product, dot_product, List.length]
 
 
-(*
+(* lemma kernel_vector_for_any_combination tableau x y =
+    null_product tableau x &&
+    List.length (compute_combination y tableau) = List.length x
+    ==> dot_product x (compute_combination y tableau) = 0.
+[@@disable null_product, dot_product, List.length, List.mem][@@induct structural y][@@apply kernel_vector_for_empty_combination tableau x, kernel_vector_for_combination_size_1 tableau x (List.hd y)]
+
 lemma bounds_combination row x upper_bounds lower_bounds c =
     compute_row_upper_bound row upper_bounds lower_bounds = c
     <==> (is_bounded x upper_bounds lower_bounds
