@@ -85,10 +85,10 @@ lemma list_add_identity x =
     list_add x zeros = x
 [@@auto]
 
-lemma dot_product_zero x =
+lemma dot_product_zero x=
     let zeros = repeat 0. (List.length x) in
     dot_product x zeros = 0.
-[@@auto]
+[@@auto][@@rw]
 
 lemma dot_product_coeff x y c =
     dot_product x (list_mult y c) = c *. dot_product x y
@@ -163,22 +163,35 @@ lemma kernel_vector_for_any_row_linear_combination tableau x row1 c1 row2 c2 =
 [@@disable null_product, dot_product, List.mem, List.length, list_add, list_mult][@@apply kernel_vector_for_any_row tableau x row1, kernel_vector_for_any_row tableau x row2, zero_dot_product_for_linear_combination x row1 row2 c1 c2]
 [@@auto]
 
+lemma compute_empty_combination tableau x =
+  tableau <> [] &&
+  x = []
+  ==> compute_combination x tableau = repeat 0. (List.length (List.hd tableau))
+[@@auto][@@rw]
+
 lemma kernel_vector_for_empty_combination tableau x =
-    null_product tableau x
+    null_product tableau x &&
+    tableau <> [] &&
+    List.length x = List.length (List.hd tableau)
     ==> dot_product x (compute_combination [] tableau) = 0.
-[@@disable null_product, dot_product, List.length]
+[@@disable null_product, dot_product, List.length][@@auto][@@apply dot_product_zero x]
+
 
 lemma kernel_vector_for_combination_size_1 tableau x c =
-    null_product tableau x
+    null_product tableau x &&
+    tableau <> [] &&
+    List.length x = List.length (List.hd tableau)
     ==> dot_product x (compute_combination [c] tableau) = 0.
-[@@disable null_product, dot_product, List.length]
+[@@disable null_product, dot_product, List.length][@@auto]
 
 
-(* lemma kernel_vector_for_any_combination tableau x y =
+(*
+lemma kernel_vector_for_any_combination tableau x y =
     null_product tableau x &&
     List.length (compute_combination y tableau) = List.length x
     ==> dot_product x (compute_combination y tableau) = 0.
 [@@disable null_product, dot_product, List.length, List.mem][@@induct structural y][@@apply kernel_vector_for_empty_combination tableau x, kernel_vector_for_combination_size_1 tableau x (List.hd y)]
+
 
 lemma bounds_combination row x upper_bounds lower_bounds c =
     compute_row_upper_bound row upper_bounds lower_bounds = c

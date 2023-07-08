@@ -113,12 +113,12 @@ let rec update_combination' (coeff: real) (row: real list) (handled: real list) 
 (* let rec update_combination (coeff: real) (row: real list) (lc: real list) =
     match row, lc with
     | [], [] -> []
-    | row_hd::row_tl, lc_hd::lc_tl -> 
+    | row_hd::row_tl, lc_hd::lc_tl ->
         (lc_hd +. coeff *. row_hd) :: update_combination coeff row_tl lc_tl
     (* TODO: handle error case *)
     | _ -> [] *)
 
-let update_combination (coeff: real) (row: real list) (lc: real list) = 
+let update_combination (coeff: real) (row: real list) (lc: real list) =
     list_add lc (list_mult row coeff)
 
 (* verify (fun coeff row lc -> List.length row = List.length lc ==> update_combination coeff row lc = update_combination' coeff row [] lc) *)
@@ -135,7 +135,7 @@ let rec compute_combination' (expl: real list) (tableau: real list list) (linear
         else
             compute_combination' expl_tl rows linear_combination
     (* TODO: handle error case *)
-    | [],_::_ | _::_, [] -> []
+    | [],_::_ | _::_, [] -> linear_combination
 
 let compute_combination (expl: real list) (tableau: real list list) =
     match tableau with
