@@ -2,7 +2,7 @@ module M = Iter_map
 
 let is_bounded (x: (int, real) M.t) upper_bounds lower_bounds = 
     let rec f keys =
-        match keys with 
+        match keys with
         | [] -> true
         | k::ks -> let value = M.get k x in
             let upper_bound = M.get k upper_bounds in   
@@ -33,7 +33,7 @@ lemma verify_node_checking x tableau upper_bounds lower_bounds constraints proof
        (check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints &&
        check_children_splits children constraints &&
        all (List.map (check_node tableau upper_bounds'' lower_bounds'' constraints) children) ) ==>
-     
+
        not (is_bounded x upper_bounds lower_bounds && 
        null_prod tableau x &&
        satisfies_constraints x constraints)

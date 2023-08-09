@@ -1,8 +1,10 @@
 [@@@import "proof_checker/utils.iml"];;
 [@@@import "proof_checker/result.iml"];;
 [@@@import "proof_checker/iter_map.iml"];;
-[@@@import "proof_checker/split.iml"];;
+[@@@import "proof_checker/tightening.iml"];;
 [@@@import "proof_checker/constraint.iml"];;
+[@@@import "proof_checker/arithmetic.iml"];;
+[@@@import "proof_checker/check_splits.iml"];;
 [@@@import "proof_checker/bound_lemma.iml"];;
 [@@@import "proof_checker/proof_tree.iml"];;
 [@@@import "proof_checker/json_decoder.ml"];;
