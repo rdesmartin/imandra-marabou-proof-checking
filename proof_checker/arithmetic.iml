@@ -2,75 +2,40 @@ open Utils
 
 module LinArith = struct
 
-    (* auxilliary function for compute_combination *)
-    (* TODO: could this be expressed as a List.map? *)
-    let rec update_combination' (coeff: real) (row: real list) (handled: real list) (to_handle: real list) =
-        match row, to_handle with
-        | [], [] -> handled
-        | value::tl, current_value::comb_tl ->
-            let handled' = handled @ [(current_value +. (coeff *. value))] in
-            update_combination' coeff tl handled' comb_tl
-        (* TODO: handle error case *)
-        | _ -> []
-
-    let update_combination (coeff: real) (row: real list) (lc: real list) = 
+    let update_combination (lc: real list) ((coeff, row): real * real list): real list = 
         list_add lc (list_mult row coeff)
 
     (* compute a linear combination of tableau rows with coefficients from an explanation vector 
     (i.e. a lemma vector or a contradiction in a Leaf node) *)
-    let rec compute_combination' (expl: real list) (tableau: real list list) (linear_combination : real list)  =
-        match expl, tableau with
-        | [], [] -> linear_combination
-        | coeff::expl_tl, row::rows ->
-            if coeff <> 0.
-            then
-                let linear_combination' = update_combination coeff row linear_combination in
-                compute_combination' expl_tl rows linear_combination'
-            else
-                compute_combination' expl_tl rows linear_combination
-        (* TODO: handle different lengths error; for now we just truncate to the shortest *)
-        | [],_::_ | _::_, [] -> linear_combination
-
-    let compute_combination (expl: real list) (tableau: real list list) =
+    let compute_combination (expl: real list) (tableau: real list list): real list =
         if tableau = []
         then
             []
         else
-            compute_combination' expl tableau (repeat 0. (List.length (List.hd tableau)))
+            let linear_combination = (repeat 0. (List.length (List.hd tableau))) in
+            List.fold_left update_combination linear_combination (zip expl tableau)
 
+    let upper_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
+        if coeff <. 0. 
+        then 
+            bound +. (lower_bound *. coeff)
+        else
+            bound +. (upper_bound *. coeff)
 
     (* compute the upper bound for a tableau row represented as list of reals *)
     let compute_row_upper_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
-        let rec compute_row_upper_bound' inner_row ub lb res =
-            match inner_row, ub, lb with
-            | [], [], [] -> res
-            | r::rs, u::us, l::ls -> if r <. 0.
-                then
-                    compute_row_upper_bound' rs us ls (res +. (l *. r) )
-                else
-                    compute_row_upper_bound' rs us ls (res +. (u *. r))
-            (* TODO: handle different lengths error (for now we just truncate to the shortest) 
-               TODO: investigate why wildcard gives error
-            *)
-            | _::_, [], [] | [], _::_, [] | [], [], _::_ | [], _::_, _::_ | _::_, [], _::_ | _::_, _::_, [] ->
-                res
-        in
-        compute_row_upper_bound' row upper_bounds lower_bounds 0.
+        List.fold_left upper_bound_acc_fun 0. (zip row (zip upper_bounds lower_bounds))
 
 
-    (* compute the lower bound for a tableau row represented as list of reals *)
+    let lower_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
+        if coeff <. 0. 
+        then 
+            bound +. (upper_bound *. coeff)
+        else
+            bound +. (lower_bound *. coeff)
+
+    (* compute the upper bound for a tableau row represented as list of reals *)
     let compute_row_lower_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
-        let rec compute_row_lower_bound' inner_row ub lb res =
-            match inner_row, ub, lb with
-            | [], [], [] -> res
-            | r::rs, u::us, l::ls -> if r <. 0.
-            then
-                compute_row_lower_bound' rs us ls (res +. u *. r)
-            else
-                compute_row_lower_bound' rs us ls (res +. l *. r)
-            (* TODO: handle error cases (list length mismatch) *)
-            | _::_, [], [] | [], _::_, [] | [], [], _::_ | [], _::_, _::_ | _::_, [], _::_ | _::_, _::_, [] -> res
-        in
-        compute_row_lower_bound' row upper_bounds lower_bounds 0.
+        List.fold_left lower_bound_acc_fun 0. (zip row (zip upper_bounds lower_bounds))
 
 end

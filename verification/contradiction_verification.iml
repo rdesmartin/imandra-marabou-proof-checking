@@ -1,4 +1,5 @@
 open Checker
+open Arithmetic.LinArith
 
 let list_add = Utils.list_add
 let list_mult = Utils.list_mult
@@ -44,11 +45,11 @@ lemma repeat_len_non_empty x =
 [@@auto]
 
 lemma update_combination_id x =
-    update_combination 1. x (repeat 0. (List.length x)) = x
+    update_combination (repeat 0. (List.length x)) (1., x) = x
 [@@auto][@@apply repeat_len_non_empty x]
 
 lemma update_combination_zero_vec c x =
-    update_combination c x (repeat 0. (List.length x)) = List.map (( *. ) c) x
+    update_combination (repeat 0. (List.length x)) (c, x) = List.map (( *. ) c) x
 [@@auto]
 
 lemma list_add_len_preservation x y =
@@ -183,21 +184,22 @@ lemma kernel_vector_for_empty_combination tableau x =
 [@@auto]
  *)
 
-axiom kernel_vector_for_any_combination tableau x y =
+(* axiom kernel_vector_for_any_combination tableau x y =
     null_product tableau x &&
     List.length (compute_combination y tableau) = List.length x
     ==> 
     dot_product x (compute_combination y tableau) = 0.
-(* [@@disable null_product, dot_product, List.length, List.mem][@@induct structural y][@@apply kernel_vector_for_empty_combination tableau x, kernel_vector_for_combination_size_1 tableau x (List.hd y)] *)
+[@@disable null_product, dot_product, List.length, List.mem][@@induct structural y][@@apply kernel_vector_for_empty_combination tableau x, kernel_vector_for_combination_size_1 tableau x (List.hd y)] *)
 
+(*
 axiom bounds_combination row x upper_bounds lower_bounds c =
     compute_row_upper_bound row upper_bounds lower_bounds = c &&
     is_bounded x upper_bounds lower_bounds
     ==> 
     dot_product x row <=. c
 [@@auto]
-         (*
- lemma contradiction_implies_negative_row x y tableau upper_bounds lower_bounds =
+
+lemma contradiction_implies_negative_row x y tableau upper_bounds lower_bounds =
          check_contradiction y tableau upper_bounds lower_bounds
          <==> (is_bounded x upper_bounds lower_bounds
          && dot_product x y <. 0.) = true
@@ -208,14 +210,15 @@ lemma contradiction_implies_negative_row x y tableau upper_bounds lower_bounds =
      is_bounded x upper_bounds lower_bounds) ==>
     dot_product x (compute_combination y tableau (M.empty)) <. 0. = true
 [@@auto] [@@rw]
-
-
-axiom dot_product_check_contradiction_eq x y tableau upper_bounds lower_bounds =
-    is_bounded x upper_bounds lower_bounds &&
-    dot_product x (compute_combination y tableau) <. 0. ==>
-    check_contradiction y tableau upper_bounds lower_bounds = true
-;;
 *)
+(* 
+lemma dot_product_check_contradiction_eq x y tableau upper_bounds lower_bounds =
+    is_bounded x upper_bounds lower_bounds &&
+    dot_product x (compute_combination y tableau) <. 0.
+    ==>
+    check_contradiction y tableau upper_bounds lower_bounds = true
+[@@auto]
+;;
 
 theorem contradiction_verification x contradiction tableau upper_bounds lower_bounds =
     is_bounded x upper_bounds lower_bounds &&
@@ -223,5 +226,4 @@ theorem contradiction_verification x contradiction tableau upper_bounds lower_bo
     ==>
     not (null_product tableau x)
 [@@auto][@@apply dot_product_check_contradiction_eq x contradiction tableau upper_bounds lower_bounds]
-[@@disable dot_product, is_bounded, check_contradiction]
-;;
+;; *)
