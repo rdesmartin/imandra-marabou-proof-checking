@@ -192,7 +192,7 @@ lemma kernel_vector_for_empty_combination tableau x =
 [@@disable null_product, dot_product, List.length, List.mem][@@induct structural y][@@apply kernel_vector_for_empty_combination tableau x, kernel_vector_for_combination_size_1 tableau x (List.hd y)] *)
 
 (*
-axiom bounds_combination row x upper_bounds lower_bounds c =
+lemma bounds_combination row x upper_bounds lower_bounds c =
     compute_row_upper_bound row upper_bounds lower_bounds = c &&
     is_bounded x upper_bounds lower_bounds
     ==> 

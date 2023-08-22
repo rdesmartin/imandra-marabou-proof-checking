@@ -27,7 +27,7 @@ let rec repeat x n =
         x::(repeat x (n - 1))
 
 (* set list element at given index to x *)
-let rec set_nth (l: real list) (n: int) (x: real): real list =
+let rec set_nth' (l: 'a list) (n: int) (x: 'a): 'a list =
     if n < 0 || n >= List.length l then 
         l
     else if n = 0 then
@@ -37,7 +37,14 @@ let rec set_nth (l: real list) (n: int) (x: real): real list =
     else
         match l with
         | [] -> []
-        | hd::tl -> hd::(set_nth tl (n-1) x)
+        | hd::tl -> hd::(set_nth' tl (n-1) x)
+
+let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =
+    match l with
+    | [] -> [] 
+    | hd::tl -> if n >= 0 
+                then hd :: (set_nth l (n - 1) x)
+                else x :: tl
 
 (* increment list element at given index by 1 *)
 let increment_elem (l: real list) (n: int): real list =
@@ -58,3 +65,33 @@ let list_add (x: real list) (y: real list): real list =
 (* Multiply all elements in a list of reals by a constant *)
 let list_mult (x: real list) (c: real): real list = 
     List.map (fun a -> a *. c) x
+
+module Utils_theorems = struct
+    lemma repeat_length x n =
+        n >= 0 
+        ==>
+        List.length (repeat x n) = n
+    [@@auto]
+
+    lemma zip_size1 (x: 'a list) (y: 'b list) =
+        List.length x <= List.length y 
+        ==>
+        List.length (zip x y) = List.length x
+    [@@auto]
+
+    lemma zip_size2 (x: 'a list) (y: 'b list) =
+        List.length y <= List.length x 
+        ==>
+        List.length (zip x y) = List.length y
+    [@@auto]
+
+    lemma zip_cons x1 x2 y1 y2 =
+        zip (x1 :: x2) (y1 :: y2) = (x1, y1) :: (zip x2 y2)
+    [@@auto]
+
+    lemma zip_cat x1 x2 y1 y2 =
+        List.length x1 = List.length y1
+        ==> 
+        zip (x1 @ x2) (y1 @ y2) = (zip x1 y1) @ (zip x2 y2)
+    [@@auto]        
+end
