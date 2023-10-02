@@ -8,7 +8,7 @@ let check_proof_file file_name =
     let proof_res = load_proof file_name in
     match proof_res with
     | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
-        check_root tableau upper_bounds lower_bounds constraints proof_tree
+      check_proof_tree tableau upper_bounds lower_bounds constraints proof_tree
     | Error e -> let () = Printf.printf "Error opening proof file %s\n" file_name in
                  false
     [@@program]

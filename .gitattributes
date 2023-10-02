@@ -1,0 +1,2 @@
+# hightlight iml files as OCaml on Github
+*.iml linguist-language=ocaml

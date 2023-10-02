@@ -1,0 +1,12 @@
+open ""
+
+
+let mk_geq_constraints_upper upper_bounds =
+    
+
+let mk_cert tableau upper_bounds lower_bounds =
+    let eq_constraints = mk_eq_constraints tableau in
+    let upper_bounds_constraints = mk_geq_constraints_upper upper_bounds in
+    let lower_bounds_constraints = mk_geq_constraints_lower lower_bounds in
+    eq_constraints ++ upper_bounds_constraints ++ lower_bounds_constraints
+    

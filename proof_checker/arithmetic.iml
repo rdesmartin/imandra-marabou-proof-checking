@@ -1,0 +1,99 @@
+module LinArith = struct
+    (* is_bounded returns true is the vector xs is bounded by us and ls, i.e. for each corresponding
+       elements x_i, l_i, u_i, l_i <= x <= u_i *)
+    (* let is_bounded xs us ls = 
+       all @@ List.map (fun (x, (u, l)) -> l <=. x && x <=. u) (zip xs (zip us ls))
+ *)
+
+    let is_upper_bounded x u = all @@ List.map (fun (a, b) -> a <=. b) (zip x u)
+
+    lemma is_upper_bounded_elem x u n = 
+        is_upper_bounded x u
+        ==>
+        match (List.nth n x), (List.nth n u) with
+        | (Some x), (Some u) -> x <=. u
+        | _ -> true
+    [@@auto]
+
+    let is_bounded x u l = is_upper_bounded l x && is_upper_bounded x u
+
+    lemma is_bounded_elem x u l n =
+        is_bounded x u l
+        ==>
+        match (List.nth n x), (List.nth n u), (List.nth n l) with
+        | (Some x), (Some u), (Some l) -> l <=. x && x <=. u
+        | _ -> true
+    [@@auto][@@apply is_upper_bounded_elem l x n, is_upper_bounded_elem x u n]
+
+
+    (* let rec is_bounded_list (vars: real list) (upper_bounds: real list) (lower_bounds: real list) =
+    match vars, upper_bounds, lower_bounds with
+            | [], [], [] -> true
+            | x::xs, u::us, l::ls ->
+                x >=. l && x <=. u && is_bounded_list xs us ls
+            | _ -> false *)
+
+    let dot_product x y = List.fold_left (+.) 0. (List.map (fun (a, b) -> a *. b) (zip x y))
+    
+    let rec dot_product' x y =
+        match x, y with
+        | [], [] -> 0.
+        | x1::xs, y1::ys -> x1 *. y1 +. (dot_product' xs ys)
+        | _ -> 0.
+    
+    let update_combination (lc: real list) ((coeff, row): real * real list): real list = 
+        list_add lc (list_scale row coeff)
+
+    (* compute a linear combination of tableau rows with coefficients from an explanation vector 
+    (i.e. a lemma vector or a contradiction in a Leaf node) *)
+    let compute_combination (expl: real list) (tableau: real list list): real list =
+        if tableau = []
+        then
+            []
+        else
+            let linear_combination = (repeat 0. (List.length (List.hd tableau))) in
+            List.fold_left update_combination linear_combination (zip expl tableau)
+
+    let upper_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
+        if coeff <. 0. 
+        then 
+            bound +. (lower_bound *. coeff)
+        else
+            bound +. (upper_bound *. coeff)
+
+    (* compute the upper bound for a tableau row represented as list of reals *)
+    (* let compute_row_upper_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
+        List.fold_left upper_bound_acc_fun 0. (zip row (zip upper_bounds lower_bounds)) *)
+
+    let rec compute_row_upper_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list): real =
+        match row, upper_bounds, lower_bounds with
+        | row_h :: row_t, upp_h :: upp_t, low_h :: low_t -> 
+            if row_h >. 0. 
+            then row_h *. upp_h +. (compute_row_upper_bound row_t upp_t low_t)
+            else row_h *. low_h +. (compute_row_upper_bound row_t upp_t low_t)
+        | _ -> 0.
+
+    let rec upper_bound_induct_scheme x row = 
+        match x, row with
+        | x_h :: x_t, row_h :: row_t -> upper_bound_induct_scheme x_t row_t
+        | _ -> true
+
+    (* lemma upper_bound_for_bounded_row x row us ls u =
+        is_bounded x us ls &&
+        compute_row_upper_bound row us ls = u
+        ==>
+        dot_product x row <=. u
+    [@@induct functional upper_bound_induct_scheme] *)
+
+    let lower_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
+        if coeff <. 0. 
+        then 
+            bound +. (upper_bound *. coeff)
+        else
+            bound +. (lower_bound *. coeff)
+
+    (* compute the upper bound for a tableau row represented as list of reals *)
+    let compute_row_lower_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
+        List.fold_left lower_bound_acc_fun 0. (zip row (zip upper_bounds lower_bounds))
+
+end

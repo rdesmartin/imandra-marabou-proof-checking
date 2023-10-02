@@ -1,10 +1,10 @@
-open Split
+open Tightening
 open Bound_lemma
 
 module ProofTree = struct
     type t = 
       (* split, bounds lemmas, children *)
-      | Node of Split.t list * BoundLemma.t list * t list
+      | Node of Tightening.t list * BoundLemma.t list * t list
       (* split, bounds lemmas, contradiction vector *)
-      | Leaf of Split.t list * BoundLemma.t list * real list
+      | Leaf of Tightening.t list * BoundLemma.t list * real list
 end

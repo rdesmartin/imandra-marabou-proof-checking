@@ -1,7 +1,7 @@
 open Iter_map
 open Utils
 open Constraint
-open Split
+open Tightening
 open Bound_lemma
 open Proof_tree
 open Result
@@ -67,7 +67,7 @@ module JSON_decoder = struct
         | _ -> fail "invalid bound type"
       )
 
-  let split_decoder: Split.t D.decoder =
+  let split_decoder: Tightening.t D.decoder =
     let open D in
     let* var = field "var" int_decoder in
     let* value = field "val" float_decoder in
