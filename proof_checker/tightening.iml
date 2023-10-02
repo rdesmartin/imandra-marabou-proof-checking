@@ -28,6 +28,4 @@ module Tightening = struct
         let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in
         let updated_lower = update_bounds_by_tightenings lower_tightenings lower_bounds in
         (updated_upper, updated_lower)
-
- 
     end

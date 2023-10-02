@@ -1,0 +1,66 @@
+(* Correctness of a simple Farkas lemma proof checker in 1 variable *)
+(* G.Passmore, Imandra *)
+
+(* Here's the main idea illustrated with a concrete example:
+
+   Consider the constraint system S
+
+    X-2>=0
+    X-1=0
+
+   with certificate (-1,1).
+
+   This certificate proves infeasibility of S because
+
+    (-1)(X-1) + (X-2) = -1 by polynomial arithmetic,
+
+   while assuming X is a solution to the constraint
+   system implies that
+
+    (-1)(X-1) + (X-2) >= 0.
+          |       |
+         =0   +  >=0
+
+   Thus assuming X is a solution implies -1 >= 0,
+   which is a contradiction.
+
+ TODO: Generalize to more variables and systems with more than 2 constraints!
+*)
+
+type poly = Real.t * Real.t
+
+type system = {
+  geq: poly; (* >= 0 *)
+  eq: poly;  (* = 0 *)
+}
+
+type cert = {
+  c_geq: Real.t;
+  c_eq: Real.t;
+}
+
+let eval_poly ((a,b):poly) (x:Real.t) : Real.t =
+  Real.(a * x + b)
+
+let eval_system (s:system) (x:Real.t) : bool =
+  Real.(eval_poly s.geq x >= 0.0)
+  && Real.(eval_poly s.eq x = 0.0)
+
+let p_add ((a,b):poly) ((c,d):poly) : poly =
+  Real.(a+c, b+d)
+
+let p_scale ((a,b):poly) (r:Real.t) : poly =
+  Real.(r*a, r*b)
+
+let check_cert (cert:cert) (s:system) : bool =
+  Real.(cert.c_geq >= 0.0)
+  &&
+  let c_1 = p_scale s.geq cert.c_geq in
+  let c_2 = p_scale s.eq cert.c_eq in
+  let c_3 = p_add c_1 c_2 in
+  c_3 = (0.0, -1.0)
+
+lemma check_cert_correct cert s x =
+  check_cert cert s
+  ==>
+  eval_system s x = false
