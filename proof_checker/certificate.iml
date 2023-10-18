@@ -1,12 +1,47 @@
-open ""
+type poly = real list
 
+type expr = 
+  | Eq of poly
+  | Geq of int * poly
+
+(*
+  Create a polynomial that represents the bound of variable i:
+  all coefficients are 0, except at index i where it is 1 for lower bound
+  and -1 for upper bounds. The constant factor is the value of the bound
+  The polynomial has a length of (size + 1)
+*)
+let rec mk_bound_poly size i coeff bound =
+  if size <= 0 then []
+  else if size = 1 then [bound]
+  else (
+    let el = if i = 0 then coeff else 0. in
+    el :: mk_bound_poly (size - 1) (i - 1) coeff bound
+  )
+
+let rec mk_geq_constraints_lower' lower_bounds i size = 
+  match lower_bounds with 
+  | [] -> []
+  | b :: bs -> Geq (i, mk_bound_poly size i 1. Real.(-b)) :: mk_geq_constraints_lower' bs (i + 1) size
+
+let mk_geq_constraints_lower lower_bounds =
+  let size = List.length lower_bounds in
+  mk_geq_constraints_lower' lower_bounds 0 size
+
+let rec mk_geq_constraints_upper' upper_bounds i size = 
+  match upper_bounds with 
+  | [] -> []
+  | b :: bs -> Geq (i, mk_bound_poly size i Real.(-1.) b) :: mk_geq_constraints_upper' bs (i + 1) size
 
 let mk_geq_constraints_upper upper_bounds =
-    
+  let size = List.length upper_bounds in
+  mk_geq_constraints_upper' upper_bounds 0 size
+
+let mk_eq_constraints tableau = 
+  List.map (fun x -> Eq x) tableau
 
 let mk_cert tableau upper_bounds lower_bounds =
     let eq_constraints = mk_eq_constraints tableau in
     let upper_bounds_constraints = mk_geq_constraints_upper upper_bounds in
     let lower_bounds_constraints = mk_geq_constraints_lower lower_bounds in
-    eq_constraints ++ upper_bounds_constraints ++ lower_bounds_constraints
+    eq_constraints @ upper_bounds_constraints @ lower_bounds_constraints
     
