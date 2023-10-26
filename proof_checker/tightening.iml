@@ -15,14 +15,14 @@ module Tightening = struct
         | _ -> false
 
     (* update a single bound according to a list of tightenings *)
-    let rec update_bounds_by_tightenings tightenings bounds =
-    match tightenings with
-        | [] -> bounds
-        | (var, value, _)::tl -> let updated_bounds = set_nth bounds var value in(* find more elegant/efficient way to update *)
-            update_bounds_by_tightenings tl updated_bounds
+    let rec update_bounds_by_tightenings (tightenings: t list) (bounds: real list): real list =
+        match tightenings with
+            | []                    -> bounds
+            | (var, value, _) :: tl -> let updated_bounds = set_nth bounds var value in
+                    update_bounds_by_tightenings tl updated_bounds
 
     (* update the bounds according to a list of tightenings *)
-    let update_bounds tightenings upper_bounds lower_bounds =
+    let update_bounds (tightenings: t list) (upper_bounds: real list) (lower_bounds: real list): (real list * real list) =
         let upper_tightenings = List.filter is_upper tightenings in
         let lower_tightenings = List.filter (fun a -> not (is_upper a)) tightenings in
         let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in

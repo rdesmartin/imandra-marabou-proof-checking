@@ -26,6 +26,10 @@ let rec repeat x n =
     else
         x::(repeat x (n - 1))
 
+lemma repeat_preserve_pos_length x n =
+    n >= 0 ==> List.length (repeat x n) = n
+[@@auto]
+
 (* set list element at given index to x *)
 let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =    
     if n < 0 then l

@@ -4,11 +4,20 @@ open Arithmetic
 open Check_splits
 open Tightening
 open Bound_lemma
+open Constraint
+open Farkas_lemma
+open Certificate
 
 (* check that the contradiction is a valid Farkas lemma vector *)
-let check_contradiction contradiction tableau upper_bounds lower_bounds =
+let check_contradiction' contradiction (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool =
     let linear_combination = LinArith.compute_combination contradiction tableau in
     LinArith.compute_row_upper_bound linear_combination upper_bounds lower_bounds <. 0.
+
+(* check contradiction with new representation *)
+let check_contradiction (contradiction: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool = 
+    let sys = mk_system tableau upper_bounds lower_bounds in
+    let c = contradiction @ (repeat 1. (List.length upper_bounds)) in
+    check_cert sys c
 
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
 let check_children_splits children constraints =
@@ -68,13 +77,12 @@ let sanity_checks tableau upper_bounds lower_bounds =
    it means that the proof is valid, i.e.all the bound tightenings are correct and 
    all the contradiction vectors correpond to a contradiction. 
 *)
-let check_proof_tree tableau upper_bounds lower_bounds constraints proof_root =
+let check_proof_tree (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) (constraints: Constraint.t list) (proof_root: ProofTree.t) =
     let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
     let check_tree = 
         match proof_root with
         | ProofTree.Node ([], bound_lemmas, _) | ProofTree.Leaf ([], bound_lemmas, _) ->
             check_node tableau upper_bounds lower_bounds constraints proof_root
         | _ -> false
-
     in
     sanity_check_res && check_tree

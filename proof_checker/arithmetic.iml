@@ -1,3 +1,5 @@
+open Utils
+
 module LinArith = struct
     (* is_bounded returns true is the vector xs is bounded by us and ls, i.e. for each corresponding
        elements x_i, l_i, u_i, l_i <= x <= u_i *)

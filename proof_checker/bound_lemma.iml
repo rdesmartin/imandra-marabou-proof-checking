@@ -28,23 +28,6 @@ module BoundLemma = struct
                 (Q.to_float value) 
     [@@program]
 
-
-    (* TODO: remove redundancy *)
-    let print l = match l with
-        | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) -> 
-            Printf.printf "aff_var: %d, aff_bound_t: %d, value: %f, caus_var: %d, caus_bound_t: %d \n" 
-                (Z.to_int aff_var) 
-                (bound_type_to_int aff_bound_t) 
-                (Q.to_float value) 
-                (Z.to_int caus_var)
-                (bound_type_to_int caus_bound_t)
-        | Short (var, bound_t, value) ->
-            Printf.printf "aff_var: %d, aff_bound_t: %d, value: %f \n"
-                (Z.to_int var) 
-                (bound_type_to_int bound_t) 
-                (Q.to_float value) 
-    [@@program]
-
     (* Check that the bound lemmas correspond to a known ReLU bound tightening lemma *)
     let match_relu_lemmas b f aux bound_lemma tableau upper_bounds lower_bounds =
     match bound_lemma with

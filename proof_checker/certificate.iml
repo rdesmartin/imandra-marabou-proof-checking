@@ -1,8 +1,4 @@
-type poly = real list
-
-type expr = 
-  | Eq of poly
-  | Geq of int * poly
+open Farkas_lemma
 
 (*
   Create a polynomial that represents the bound of variable i:
@@ -10,38 +6,55 @@ type expr =
   and -1 for upper bounds. The constant factor is the value of the bound
   The polynomial has a length of (size + 1)
 *)
-let rec mk_bound_poly size i coeff bound =
-  if size <= 0 then []
-  else if size = 1 then [bound]
+let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real) =
+  if size < 0 then []
+  else if size = 0 then [bound]
   else (
     let el = if i = 0 then coeff else 0. in
     el :: mk_bound_poly (size - 1) (i - 1) coeff bound
   )
 
-let rec mk_geq_constraints_lower' lower_bounds i size = 
-  match lower_bounds with 
-  | [] -> []
-  | b :: bs -> Geq (i, mk_bound_poly size i 1. Real.(-b)) :: mk_geq_constraints_lower' bs (i + 1) size
+let extract_poly (e: exp) =
+  match e with
+  | Geq (i, e) -> e
+  | Eq e -> e
 
-let mk_geq_constraints_lower lower_bounds =
-  let size = List.length lower_bounds in
-  mk_geq_constraints_lower' lower_bounds 0 size
+let mk_eq_constraints (tableau: real list list): exp list = 
+  List.map (fun x -> Eq (x @ [0.])) tableau
 
-let rec mk_geq_constraints_upper' upper_bounds i size = 
-  match upper_bounds with 
-  | [] -> []
-  | b :: bs -> Geq (i, mk_bound_poly size i Real.(-1.) b) :: mk_geq_constraints_upper' bs (i + 1) size
+let rec mk_geq_constraints' (cs: real list) (upper_bounds: real list) (lower_bounds: real list) (i: int) (size: int): exp list =
+  match cs, upper_bounds, lower_bounds with
+  | [], [], [] -> []
+  | c :: cs, u :: us, l :: ls -> 
+      let p = if (c >=. 0.)
+              then (
+                mk_bound_poly size i Real.(-1. * c) Real.(u * c)
+              ) else (
+                mk_bound_poly size i Real.(1. * -c) Real.(-l * -c)
+              )
+      in 
+      Geq (i, p) :: mk_geq_constraints' cs us ls (i + 1) size
+  | _ -> []
 
-let mk_geq_constraints_upper upper_bounds =
-  let size = List.length upper_bounds in
-  mk_geq_constraints_upper' upper_bounds 0 size
+let mk_geq_constraints (cs: real list) (upper_bounds: real list) (lower_bounds: real list): exp list =
+  let size = List.length cs in
+  mk_geq_constraints' cs upper_bounds lower_bounds 0 size
 
-let mk_eq_constraints tableau = 
-  List.map (fun x -> Eq x) tableau
-
-let mk_cert tableau upper_bounds lower_bounds =
+let mk_system (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
     let eq_constraints = mk_eq_constraints tableau in
-    let upper_bounds_constraints = mk_geq_constraints_upper upper_bounds in
-    let lower_bounds_constraints = mk_geq_constraints_lower lower_bounds in
-    eq_constraints @ upper_bounds_constraints @ lower_bounds_constraints
+    let tableau_linear_combination = sum_polys tableau in
+    let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
+    eq_constraints @ geq_constraints
     
+let rec poly_to_string p = 
+  match p with 
+  | [] -> "\n"
+  | p :: ps -> Printf.sprintf "%f; " (Q.to_float p) ^ poly_to_string ps
+[@@program]
+
+let rec system_to_string system = 
+  match system with 
+  | [] -> "\n"
+  | Geq (var, e) :: es -> "Geq " ^ poly_to_string e ^ system_to_string es
+  | Eq e :: es -> "Eq " ^ poly_to_string e ^ system_to_string es
+[@@program]
