@@ -15,7 +15,7 @@ let check_contradiction' contradiction (tableau: real list list) (upper_bounds: 
 
 (* check contradiction with new representation *)
 let check_contradiction (contradiction: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool = 
-    let sys = mk_system tableau upper_bounds lower_bounds in
+    let sys = mk_system contradiction tableau upper_bounds lower_bounds in
     let c = contradiction @ (repeat 1. (List.length upper_bounds)) in
     check_cert sys c
 

@@ -1,10 +1,10 @@
 open Farkas_lemma
+open Arithmetic
 
 (*
-  Create a polynomial that represents the bound of variable i:
+  Create a polynomial of (size + 1) that represents the bound of variable i:
   all coefficients are 0, except at index i where it is 1 for lower bound
-  and -1 for upper bounds. The constant factor is the value of the bound
-  The polynomial has a length of (size + 1)
+  and -1 for upper bounds. The constant is the value of the bound.
 *)
 let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real) =
   if size < 0 then []
@@ -14,14 +14,27 @@ let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real) =
     el :: mk_bound_poly (size - 1) (i - 1) coeff bound
   )
 
+(* return the polynomial from the expression (just the coefficients) *)
 let extract_poly (e: exp) =
   match e with
   | Geq (i, e) -> e
   | Eq e -> e
 
+(* 
+  transform the tableau into a list of Eq expressions, with 
+  an added 0. for the constant at the end 
+*)
 let mk_eq_constraints (tableau: real list list): exp list = 
   List.map (fun x -> Eq (x @ [0.])) tableau
 
+(* 
+  recursively iterate over the coeffs computed with w^T . A. 
+  For each coeff, create a Geq expr for the upper bounds if positive, 
+  Geq expr for the lower bound if negative.
+  For now, we scale by the coeff here and add 1 to the final 
+  certificate coefficients vector.
+  size = number of variables
+*)
 let rec mk_geq_constraints' (cs: real list) (upper_bounds: real list) (lower_bounds: real list) (i: int) (size: int): exp list =
   match cs, upper_bounds, lower_bounds with
   | [], [], [] -> []
@@ -32,20 +45,25 @@ let rec mk_geq_constraints' (cs: real list) (upper_bounds: real list) (lower_bou
               ) else (
                 mk_bound_poly size i Real.(1. * -c) Real.(-l * -c)
               )
-      in 
+      in
       Geq (i, p) :: mk_geq_constraints' cs us ls (i + 1) size
   | _ -> []
 
+(*
+  Create Geq constraints corresponding to the variable bounds.
+*)
 let mk_geq_constraints (cs: real list) (upper_bounds: real list) (lower_bounds: real list): exp list =
   let size = List.length cs in
   mk_geq_constraints' cs upper_bounds lower_bounds 0 size
 
-let mk_system (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
+(* Create the polynomial representation of the linear constraints from the matrix representation *)
+let mk_system (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
     let eq_constraints = mk_eq_constraints tableau in
-    let tableau_linear_combination = sum_polys tableau in
+    let tableau_linear_combination = LinArith.compute_combination expl tableau in
     let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
     eq_constraints @ geq_constraints
     
+(* Utils to_string functions for debugging *)
 let rec poly_to_string p = 
   match p with 
   | [] -> "\n"

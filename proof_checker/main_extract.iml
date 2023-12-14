@@ -24,7 +24,7 @@ let mk_cert_test () =
   let upper_bounds = [- 1.; 2.] in
   let lower_bounds = [- 2.; - 1.] in
   let contradiction = [1.; 1.] in
-  let sys = mk_system tableau upper_bounds lower_bounds in
+  let sys = mk_system contradiction tableau upper_bounds lower_bounds in
   let () = Printf.printf "%s" (system_to_string sys) in 
   let c = contradiction @ (Utils.repeat 1. (List.length upper_bounds)) in
   Printf.printf "%b\n" (Farkas_lemma.check_cert sys c)

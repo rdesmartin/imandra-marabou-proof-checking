@@ -1,0 +1,2812 @@
+# lemma positive_solution_certificate_strict s c x =     well_formed s x &&     s <> [] &&     has_strict_ineq s &&     eval_system s x     ==>     eval_poly (mk_certificate s c) x >. 0.     [@@auto];;
+val positive_solution_certificate_strict :
+  system -> real list -> var_vect -> bool = <fun>
+Goal:
+
+well_formed s x && ((s <> []) && (has_strict_ineq s && eval_system s x))
+==> eval_poly (mk_certificate s c) x >. 0.
+
+1 nontautological subgoal.
+
+Subgoal 1:
+
+ H0. well_formed s x
+ H1. not (s = [])
+ H2. has_strict_ineq s
+ H3. eval_system s x
+ H4. eval_poly (sum_polys (scale_system s c)) x <= 0
+|---------------------------------------------------------------------------
+ false
+
+
+Must try induction.
+
+The recursive terms in the conjecture suggest 4 inductions.
+Subsumption and merging reduces this to 1.
+
+We shall induct according to a scheme derived from scale_system.
+
+Induction scheme:
+
+ (not
+  (not Is_a(Geq, List.hd s)
+   && (not Is_a(Eq, List.hd s) && (not (c <> []) && s <> [])))
+  && (not (Is_a(Eq, List.hd s) && (not (c <> []) && s <> []))
+      && (not
+          ((List.hd c >. 0)
+           && (not Is_a(Geq, List.hd s)
+               && (not Is_a(Eq, List.hd s) && (c <> [] && s <> []))))
+          && (not
+              ((List.hd c >=. 0)
+               && (Is_a(Geq, List.hd s)
+                   && (not Is_a(Eq, List.hd s) && (c <> [] && s <> []))))
+              && (not (Is_a(Eq, List.hd s) && (c <> [] && s <> []))
+                  && (not
+                      (not (List.hd c >. 0)
+                       && (not Is_a(Geq, List.hd s)
+                           && (not Is_a(Eq, List.hd s)
+                               && (c <> [] && s <> []))))
+                      && (not
+                          (not (List.hd c >=. 0)
+                           && (Is_a(Geq, List.hd s)
+                               && (not Is_a(Eq, List.hd s)
+                                   && (c <> [] && s <> []))))
+                          && not
+                             (Is_a(Geq, List.hd s)
+                              && (not Is_a(Eq, List.hd s)
+                                  && (not (c <> []) && s <> [])))))))))
+  ==> φ c s x)
+ && ((s <> []
+      && (not (c <> [])
+          && (not Is_a(Eq, List.hd s)
+              && (Is_a(Geq, List.hd s) && φ c (List.tl s) x)))
+      ==> φ c s x)
+     && ((s <> []
+          && (c <> []
+              && (not Is_a(Eq, List.hd s)
+                  && (Is_a(Geq, List.hd s)
+                      && (not (List.hd c >=. 0)
+                          && φ (List.tl c) (List.tl s) x))))
+          ==> φ c s x)
+         && ((s <> []
+              && (c <> []
+                  && (not Is_a(Eq, List.hd s)
+                      && (not Is_a(Geq, List.hd s)
+                          && (not (List.hd c >. 0)
+                              && φ (List.tl c) (List.tl s) x))))
+              ==> φ c s x)
+             && ((s <> []
+                  && (c <> []
+                      && (Is_a(Eq, List.hd s) && φ (List.tl c) (List.tl s) x))
+                  ==> φ c s x)
+                 && ((s <> []
+                      && (c <> []
+                          && (not Is_a(Eq, List.hd s)
+                              && (Is_a(Geq, List.hd s)
+                                  && ((List.hd c >=. 0)
+                                      && φ (List.tl c) (List.tl s) x))))
+                      ==> φ c s x)
+                     && ((s <> []
+                          && (c <> []
+                              && (not Is_a(Eq, List.hd s)
+                                  && (not Is_a(Geq, List.hd s)
+                                      && ((List.hd c >. 0)
+                                          && φ (List.tl c) (List.tl s) x))))
+                          ==> φ c s x)
+                         && ((s <> []
+                              && (not (c <> [])
+                                  && (Is_a(Eq, List.hd s)
+                                      && φ c (List.tl s) x))
+                              ==> φ c s x)
+                             && (s <> []
+                                 && (not (c <> [])
+                                     && (not Is_a(Eq, List.hd s)
+                                         && (not Is_a(Geq, List.hd s)
+                                             && φ c (List.tl s) x)))
+                                 ==> φ c s x)))))))).
+
+9 nontautological subgoals.
+
+Subgoal 1.9:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H4. not
+     (not Is_a(Geq, List.hd s) && not Is_a(Eq, List.hd s) && not (c <> [])
+      && s <> [])
+ H5. not (Is_a(Eq, List.hd s) && not (c <> []) && s <> [])
+ H6. not
+     (not (List.hd c <= 0) && not Is_a(Geq, List.hd s)
+      && not Is_a(Eq, List.hd s) && c <> [] && s <> [])
+ H7. not
+     ((List.hd c >= 0) && Is_a(Geq, List.hd s) && not Is_a(Eq, List.hd s)
+      && c <> [] && s <> [])
+ H8. not (Is_a(Eq, List.hd s) && c <> [] && s <> [])
+ H9. not
+     ((List.hd c <= 0) && not Is_a(Geq, List.hd s) && not Is_a(Eq, List.hd s)
+      && c <> [] && s <> [])
+ H10. not
+      (not (List.hd c >= 0) && Is_a(Geq, List.hd s)
+       && not Is_a(Eq, List.hd s) && c <> [] && s <> [])
+ H11. not
+      (Is_a(Geq, List.hd s) && not Is_a(Eq, List.hd s) && not (c <> [])
+       && s <> [])
+ H12. has_strict_ineq s
+|---------------------------------------------------------------------------
+ false
+
+But simplification reduces this to true, using the forward-chaining rules
+scale_system_not_empty and scale_system_not_empty.
+
+Subgoal 1.8:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H4. has_strict_ineq s
+ H5. s <> []
+ H6. not (c <> [])
+ H7. not Is_a(Eq, List.hd s)
+ H8. Is_a(Geq, List.hd s)
+ H9. (List.tl s = []) || not (well_formed (List.tl s) x)
+     || not (eval_system (List.tl s) x)
+     || not (eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0)
+     || not (has_strict_ineq (List.tl s))
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_poly, eval_system,
+has_strict_ineq, scale_system, sum_polys and well_formed to the following 3
+subgoals:
+
+Subgoal 1.8.3:
+
+ H0. eval_poly
+     (p_add (Destruct(Geq, 0, List.hd s)).1
+      (sum_polys (scale_system (List.tl s) c)))
+     x <= 0
+ H1. s <> []
+ H2. (List.tl s) <> []
+ H3. well_formed (List.tl s) x
+ H4. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H5. eval_system (List.tl s) x
+ H6. has_strict_ineq (List.tl s)
+ H7. Is_a(Geq, List.hd s)
+ H8. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ C0. Is_a([], scale_system (List.tl s) c)
+ C1. eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0
+ C2. c <> []
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.8.2:
+
+ H0. eval_poly
+     (p_add (Destruct(Geq, 0, List.hd s)).1
+      (sum_polys (scale_system (List.tl s) c)))
+     x <= 0
+ H1. s <> []
+ H2. well_formed (List.tl s) x
+ H3. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H4. List.tl s = []
+ H5. eval_system (List.tl s) x
+ H6. has_strict_ineq (List.tl s)
+ H7. Is_a(Geq, List.hd s)
+ H8. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ C0. Is_a([], scale_system (List.tl s) c)
+ C1. c <> []
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq.
+
+Subgoal 1.8.1:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Geq, 0, List.hd s)).1 x <= 0
+ H2. well_formed (List.tl s) x
+ H3. Is_a([], scale_system (List.tl s) c)
+ H4. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H5. eval_system (List.tl s) x
+ H6. has_strict_ineq (List.tl s)
+ H7. Is_a(Geq, List.hd s)
+ H8. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ c <> []
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq.
+
+Subgoal 1.7:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H4. has_strict_ineq s
+ H5. s <> []
+ H6. c <> []
+ H7. not Is_a(Eq, List.hd s)
+ H8. Is_a(Geq, List.hd s)
+ H9. not (List.hd c >= 0)
+ H10. (List.tl s = []) || not (well_formed (List.tl s) x)
+      || not
+         (eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0)
+      || not (eval_system (List.tl s) x) || not (has_strict_ineq (List.tl s))
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_poly, eval_system,
+has_strict_ineq, scale_system, sum_polys and well_formed to the following 3
+subgoals:
+
+Subgoal 1.7.3:
+
+ H0. s <> []
+ H1. (List.tl s) <> []
+ H2. well_formed (List.tl s) x
+ H3. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. Is_a(Geq, List.hd s)
+ H7. c <> []
+ H8. eval_poly
+     (p_add (Destruct(Geq, 0, List.hd s)).1
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H9. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ C0. List.hd c >= 0
+ C1. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ C2. Is_a([], scale_system (List.tl s) (List.tl c))
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.7.2:
+
+ H0. s <> []
+ H1. well_formed (List.tl s) x
+ H2. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H3. List.tl s = []
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. Is_a(Geq, List.hd s)
+ H7. c <> []
+ H8. eval_poly
+     (p_add (Destruct(Geq, 0, List.hd s)).1
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H9. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ C0. List.hd c >= 0
+ C1. Is_a([], scale_system (List.tl s) (List.tl c))
+
+But simplification reduces this to true, using the definition of
+scale_system.
+
+Subgoal 1.7.1:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Geq, 0, List.hd s)).1 x <= 0
+ H2. well_formed (List.tl s) x
+ H3. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. Is_a(Geq, List.hd s)
+ H7. c <> []
+ H8. Is_a([], scale_system (List.tl s) (List.tl c))
+ H9. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ List.hd c >= 0
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq.
+
+Subgoal 1.6:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H4. s <> []
+ H5. c <> []
+ H6. not Is_a(Eq, List.hd s)
+ H7. not Is_a(Geq, List.hd s)
+ H8. List.hd c <= 0
+ H9. (List.tl s = []) || not (well_formed (List.tl s) x)
+     || not
+        (eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0)
+     || not (eval_system (List.tl s) x) || not (has_strict_ineq (List.tl s))
+ H10. has_strict_ineq s
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+scale_system, sum_polys and well_formed to the following 3 subgoals:
+
+Subgoal 1.6.3:
+
+ H0. s <> []
+ H1. List.hd c <= 0
+ H2. (List.tl s) <> []
+ H3. well_formed (List.tl s) x
+ H4. eval_poly
+     (p_add (Destruct(Gt, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H5. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H6. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ H7. eval_system (List.tl s) x
+ H8. c <> []
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq (List.tl s)
+ C1. Is_a(Geq, List.hd s)
+ C2. Is_a(Eq, List.hd s)
+ C3. Is_a([], scale_system (List.tl s) (List.tl c))
+ C4. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+This simplifies, using the rewrite rules eval_p_add_pull and
+sum_poly_good_length to:
+
+Subgoal 1.6.3':
+
+ H0. s <> []
+ H1. List.hd c <= 0
+ H2. well_formed (List.tl s) x
+ H3. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H4. eval_poly (Destruct(Gt, 0, List.hd s)) x
+     +. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ H5. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ H6. eval_system (List.tl s) x
+ H7. (List.tl s) <> []
+ H8. c <> []
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq (List.tl s)
+ C1. Is_a(Geq, List.hd s)
+ C2. Is_a(Eq, List.hd s)
+ C3. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+This simplifies, using the forward-chaining rules add_negative, add_negative,
+add_negative, scale_system_not_empty and scale_system_not_empty to:
+
+Subgoal 1.6.3'':
+
+ H0. s <> []
+ H1. List.hd c <= 0
+ H2. well_formed (List.tl s) x
+ H3. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H4. eval_poly (Destruct(Gt, 0, List.hd s)) x
+     +. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ H5. eval_system (List.tl s) x
+ H6. (List.tl s) <> []
+ H7. c <> []
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq (List.tl s)
+ C1. Is_a(Geq, List.hd s)
+ C2. Is_a(Eq, List.hd s)
+ C3. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+
+We can eliminate destructors by the following
+substitution:
+ c -> c1 :: c2
+ s -> s1 :: s2
+
+This produces the modified subgoal:
+
+Subgoal 1.6.3''':
+
+ H0. c1 <= 0
+ H1. good_poly_length (Destruct(Gt, 0, s1)) x
+ H2. well_formed s2 x
+ H3. eval_system s2 x
+ H4. s2 <> []
+ H5. eval_poly (Destruct(Gt, 0, s1)) x
+     +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+|---------------------------------------------------------------------------
+ C0. eval_poly (Destruct(Gt, 0, s1)) x <= 0
+ C1. has_strict_ineq s2
+ C2. Is_a(Eq, s1)
+ C3. Is_a(Geq, s1)
+
+
+We can eliminate destructors by the following substitution:
+ s1 -> Gt s11
+
+This produces the modified subgoal:
+
+Subgoal 1.6.3'''':
+
+ H0. c1 <= 0
+ H1. eval_poly s11 x +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H2. well_formed s2 x
+ H3. eval_system s2 x
+ H4. good_poly_length s11 x
+ H5. s2 <> []
+|---------------------------------------------------------------------------
+ C0. eval_poly s11 x <= 0
+ C1. has_strict_ineq s2
+
+
+Candidates for generalization:
+
+ eval_poly s11 x
+
+This produces the modified subgoal:
+
+Subgoal 1.6.3''''':
+
+ H0. c1 <= 0
+ H1. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H2. well_formed s2 x
+ H3. eval_system s2 x
+ H4. good_poly_length s11 x
+ H5. s2 <> []
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+
+Must try induction.
+
+The recursive terms in the conjecture suggest 5 inductions.
+Subsumption and merging reduces this to 2.
+
+However, scheme scoring gives us a clear winner.
+We shall induct according to a scheme derived from scale_system.
+
+Induction scheme:
+
+ (not
+  (not Is_a(Geq, List.hd s2)
+   && (not Is_a(Eq, List.hd s2) && (not (c2 <> []) && s2 <> [])))
+  && (not (Is_a(Eq, List.hd s2) && (not (c2 <> []) && s2 <> []))
+      && (not
+          ((List.hd c2 >. 0)
+           && (not Is_a(Geq, List.hd s2)
+               && (not Is_a(Eq, List.hd s2) && (c2 <> [] && s2 <> []))))
+          && (not
+              ((List.hd c2 >=. 0)
+               && (Is_a(Geq, List.hd s2)
+                   && (not Is_a(Eq, List.hd s2) && (c2 <> [] && s2 <> []))))
+              && (not (Is_a(Eq, List.hd s2) && (c2 <> [] && s2 <> []))
+                  && (not
+                      (not (List.hd c2 >. 0)
+                       && (not Is_a(Geq, List.hd s2)
+                           && (not Is_a(Eq, List.hd s2)
+                               && (c2 <> [] && s2 <> []))))
+                      && (not
+                          (not (List.hd c2 >=. 0)
+                           && (Is_a(Geq, List.hd s2)
+                               && (not Is_a(Eq, List.hd s2)
+                                   && (c2 <> [] && s2 <> []))))
+                          && not
+                             (Is_a(Geq, List.hd s2)
+                              && (not Is_a(Eq, List.hd s2)
+                                  && (not (c2 <> []) && s2 <> [])))))))))
+  ==> φ c1 c2 gen_1 s11 s2 x)
+ && ((s2 <> []
+      && (not (c2 <> [])
+          && (not Is_a(Eq, List.hd s2)
+              && (Is_a(Geq, List.hd s2) && φ c1 c2 gen_1 s11 (List.tl s2) x)))
+      ==> φ c1 c2 gen_1 s11 s2 x)
+     && ((s2 <> []
+          && (c2 <> []
+              && (not Is_a(Eq, List.hd s2)
+                  && (Is_a(Geq, List.hd s2)
+                      && (not (List.hd c2 >=. 0)
+                          && φ c1 (List.tl c2) gen_1 s11 (List.tl s2) x))))
+          ==> φ c1 c2 gen_1 s11 s2 x)
+         && ((s2 <> []
+              && (c2 <> []
+                  && (not Is_a(Eq, List.hd s2)
+                      && (not Is_a(Geq, List.hd s2)
+                          && (not (List.hd c2 >. 0)
+                              && φ c1 (List.tl c2) gen_1 s11 (List.tl s2) x))))
+              ==> φ c1 c2 gen_1 s11 s2 x)
+             && ((s2 <> []
+                  && (c2 <> []
+                      && (Is_a(Eq, List.hd s2)
+                          && φ c1 (List.tl c2) gen_1 s11 (List.tl s2) x))
+                  ==> φ c1 c2 gen_1 s11 s2 x)
+                 && ((s2 <> []
+                      && (c2 <> []
+                          && (not Is_a(Eq, List.hd s2)
+                              && (Is_a(Geq, List.hd s2)
+                                  && ((List.hd c2 >=. 0)
+                                      && φ c1 (List.tl c2) gen_1 s11
+                                         (List.tl s2) x))))
+                      ==> φ c1 c2 gen_1 s11 s2 x)
+                     && ((s2 <> []
+                          && (c2 <> []
+                              && (not Is_a(Eq, List.hd s2)
+                                  && (not Is_a(Geq, List.hd s2)
+                                      && ((List.hd c2 >. 0)
+                                          && φ c1 (List.tl c2) gen_1 s11
+                                             (List.tl s2) x))))
+                          ==> φ c1 c2 gen_1 s11 s2 x)
+                         && ((s2 <> []
+                              && (not (c2 <> [])
+                                  && (Is_a(Eq, List.hd s2)
+                                      && φ c1 c2 gen_1 s11 (List.tl s2) x))
+                              ==> φ c1 c2 gen_1 s11 s2 x)
+                             && (s2 <> []
+                                 && (not (c2 <> [])
+                                     && (not Is_a(Eq, List.hd s2)
+                                         && (not Is_a(Geq, List.hd s2)
+                                             && φ c1 c2 gen_1 s11
+                                                (List.tl s2) x)))
+                                 ==> φ c1 c2 gen_1 s11 s2 x)))))))).
+
+9 nontautological subgoals.
+
+Subgoal 1.6.3'''''.9:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. well_formed s2 x
+ H2. s2 <> []
+ H3. eval_system s2 x
+ H4. c1 <= 0
+ H5. good_poly_length s11 x
+ H6. not
+     (not Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2) && not (c2 <> [])
+      && s2 <> [])
+ H7. not (Is_a(Eq, List.hd s2) && not (c2 <> []) && s2 <> [])
+ H8. not
+     (not (List.hd c2 <= 0) && not Is_a(Geq, List.hd s2)
+      && not Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H9. not
+     ((List.hd c2 >= 0) && Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2)
+      && c2 <> [] && s2 <> [])
+ H10. not (Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H11. not
+      ((List.hd c2 <= 0) && not Is_a(Geq, List.hd s2)
+       && not Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H12. not
+      (not (List.hd c2 >= 0) && Is_a(Geq, List.hd s2)
+       && not Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H13. not
+      (Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2) && not (c2 <> [])
+       && s2 <> [])
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, scale_system_not_empty and
+scale_system_not_empty.
+
+Subgoal 1.6.3'''''.8:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. well_formed s2 x
+ H2. s2 <> []
+ H3. eval_system s2 x
+ H4. c1 <= 0
+ H5. good_poly_length s11 x
+ H6. s2 <> []
+ H7. not (c2 <> [])
+ H8. not Is_a(Eq, List.hd s2)
+ H9. Is_a(Geq, List.hd s2)
+ H10. (gen_1 <= 0) || not ((List.tl s2) <> [])
+      || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+      || not
+         (gen_1 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x
+          <= 0)
+      || not (c1 <= 0) || not (good_poly_length s11 x)
+      || not (eval_system (List.tl s2) x)
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 3 subgoals:
+
+Subgoal 1.6.3'''''.8.3:
+
+ H0. (List.tl s2) <> []
+ H1. s2 <> []
+ H2. gen_1
+     +. eval_poly
+        (p_add (Destruct(Geq, 0, List.hd s2)).1
+         (sum_polys (scale_system (List.tl s2) c2)))
+        x
+     <= 0
+ H3. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H4. Is_a(Geq, List.hd s2)
+ H5. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H6. well_formed (List.tl s2) x
+ H7. c1 <= 0
+ H8. good_poly_length s11 x
+ H9. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. gen_1 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x <= 0
+ C2. c2 <> []
+ C3. has_strict_ineq (List.tl s2)
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.6.3'''''.8.2:
+
+ H0. s2 <> []
+ H1. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H2. Is_a(Geq, List.hd s2)
+ H3. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H4. well_formed (List.tl s2) x
+ H5. gen_1 +. eval_poly [] x <= 0
+ H6. c1 <= 0
+ H7. good_poly_length s11 x
+ H8. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. Is_a([], scale_system (List.tl s2) c2)
+ C2. c2 <> []
+ C3. has_strict_ineq (List.tl s2)
+ C4. (List.tl s2) <> []
+
+But simplification reduces this to true, using the definitions of eval_poly
+and eval_system.
+
+Subgoal 1.6.3'''''.8.1:
+
+ H0. s2 <> []
+ H1. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H2. Is_a(Geq, List.hd s2)
+ H3. Is_a([], scale_system (List.tl s2) c2)
+ H4. gen_1 +. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x <= 0
+ H5. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H6. well_formed (List.tl s2) x
+ H7. c1 <= 0
+ H8. good_poly_length s11 x
+ H9. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. c2 <> []
+ C2. has_strict_ineq (List.tl s2)
+ C3. (List.tl s2) <> []
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, scale_system_not_empty and
+scale_system_not_empty.
+
+Subgoal 1.6.3'''''.7:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. well_formed s2 x
+ H2. s2 <> []
+ H3. eval_system s2 x
+ H4. c1 <= 0
+ H5. good_poly_length s11 x
+ H6. s2 <> []
+ H7. c2 <> []
+ H8. not Is_a(Eq, List.hd s2)
+ H9. Is_a(Geq, List.hd s2)
+ H10. not (List.hd c2 >= 0)
+ H11. (gen_1 <= 0) || not ((List.tl s2) <> [])
+      || not
+         (gen_1
+          +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+          <= 0)
+      || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+      || not (c1 <= 0) || not (good_poly_length s11 x)
+      || not (eval_system (List.tl s2) x)
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 3 subgoals:
+
+Subgoal 1.6.3'''''.7.3:
+
+ H0. (List.tl s2) <> []
+ H1. s2 <> []
+ H2. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H3. Is_a(Geq, List.hd s2)
+ H4. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H5. well_formed (List.tl s2) x
+ H6. c2 <> []
+ H7. c1 <= 0
+ H8. good_poly_length s11 x
+ H9. eval_system (List.tl s2) x
+ H10. gen_1
+      +. eval_poly
+         (p_add (Destruct(Geq, 0, List.hd s2)).1
+          (sum_polys (scale_system (List.tl s2) (List.tl c2))))
+         x
+      <= 0
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. gen_1
+     +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x <= 0
+ C2. has_strict_ineq (List.tl s2)
+ C3. List.hd c2 >= 0
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.6.3'''''.7.2:
+
+ H0. s2 <> []
+ H1. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H2. Is_a(Geq, List.hd s2)
+ H3. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H4. well_formed (List.tl s2) x
+ H5. gen_1 +. eval_poly [] x <= 0
+ H6. c2 <> []
+ H7. c1 <= 0
+ H8. good_poly_length s11 x
+ H9. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. Is_a([], scale_system (List.tl s2) (List.tl c2))
+ C2. has_strict_ineq (List.tl s2)
+ C3. List.hd c2 >= 0
+ C4. (List.tl s2) <> []
+
+But simplification reduces this to true, using the definitions of eval_poly
+and eval_system.
+
+Subgoal 1.6.3'''''.7.1:
+
+ H0. s2 <> []
+ H1. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H2. Is_a(Geq, List.hd s2)
+ H3. Is_a([], scale_system (List.tl s2) (List.tl c2))
+ H4. gen_1 +. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x <= 0
+ H5. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H6. well_formed (List.tl s2) x
+ H7. c2 <> []
+ H8. c1 <= 0
+ H9. good_poly_length s11 x
+ H10. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq (List.tl s2)
+ C2. List.hd c2 >= 0
+ C3. (List.tl s2) <> []
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, scale_system_not_empty and
+scale_system_not_empty.
+
+Subgoal 1.6.3'''''.6:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. well_formed s2 x
+ H2. s2 <> []
+ H3. s2 <> []
+ H4. c2 <> []
+ H5. not Is_a(Eq, List.hd s2)
+ H6. not Is_a(Geq, List.hd s2)
+ H7. List.hd c2 <= 0
+ H8. (gen_1 <= 0) || not ((List.tl s2) <> [])
+     || not
+        (gen_1
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not (c1 <= 0) || not (good_poly_length s11 x)
+     || not (eval_system (List.tl s2) x)
+ H9. eval_system s2 x
+ H10. c1 <= 0
+ H11. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq.
+
+Subgoal 1.6.3'''''.5:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. s2 <> []
+ H2. c2 <> []
+ H3. Is_a(Eq, List.hd s2)
+ H4. (gen_1 <= 0) || not ((List.tl s2) <> [])
+     || not
+        (gen_1
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not (c1 <= 0) || not (good_poly_length s11 x)
+     || not (eval_system (List.tl s2) x)
+ H5. well_formed s2 x
+ H6. s2 <> []
+ H7. eval_system s2 x
+ H8. c1 <= 0
+ H9. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 3 subgoals:
+
+Subgoal 1.6.3'''''.5.3:
+
+ H0. (List.tl s2) <> []
+ H1. s2 <> []
+ H2. Is_a(Eq, List.hd s2)
+ H3. well_formed (List.tl s2) x
+ H4. c2 <> []
+ H5. c1 <= 0
+ H6. good_poly_length s11 x
+ H7. eval_system (List.tl s2) x
+ H8. gen_1
+     +. eval_poly
+        (p_add (p_scale (Destruct(Eq, 0, List.hd s2)) (List.hd c2))
+         (sum_polys (scale_system (List.tl s2) (List.tl c2))))
+        x
+     <= 0
+ H9. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H10. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. gen_1
+     +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x <= 0
+ C2. has_strict_ineq (List.tl s2)
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull, eval_poly_scale, good_length_p_scale and
+sum_poly_good_length.
+
+Subgoal 1.6.3'''''.5.2:
+
+ H0. s2 <> []
+ H1. Is_a(Eq, List.hd s2)
+ H2. well_formed (List.tl s2) x
+ H3. gen_1 +. eval_poly [] x <= 0
+ H4. c2 <> []
+ H5. c1 <= 0
+ H6. good_poly_length s11 x
+ H7. eval_system (List.tl s2) x
+ H8. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H9. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. Is_a([], scale_system (List.tl s2) (List.tl c2))
+ C2. has_strict_ineq (List.tl s2)
+ C3. (List.tl s2) <> []
+
+But simplification reduces this to true, using the definitions of eval_poly
+and eval_system.
+
+Subgoal 1.6.3'''''.5.1:
+
+ H0. s2 <> []
+ H1. Is_a(Eq, List.hd s2)
+ H2. gen_1
+     +. eval_poly (p_scale (Destruct(Eq, 0, List.hd s2)) (List.hd c2)) x <= 0
+ H3. Is_a([], scale_system (List.tl s2) (List.tl c2))
+ H4. well_formed (List.tl s2) x
+ H5. c2 <> []
+ H6. c1 <= 0
+ H7. good_poly_length s11 x
+ H8. eval_system (List.tl s2) x
+ H9. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H10. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq (List.tl s2)
+ C2. (List.tl s2) <> []
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, eval_poly_scale,
+scale_system_not_empty and scale_system_not_empty.
+
+Subgoal 1.6.3'''''.4:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. s2 <> []
+ H2. c2 <> []
+ H3. not Is_a(Eq, List.hd s2)
+ H4. Is_a(Geq, List.hd s2)
+ H5. List.hd c2 >= 0
+ H6. (gen_1 <= 0) || not ((List.tl s2) <> [])
+     || not
+        (gen_1
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not (c1 <= 0) || not (good_poly_length s11 x)
+     || not (eval_system (List.tl s2) x)
+ H7. well_formed s2 x
+ H8. s2 <> []
+ H9. eval_system s2 x
+ H10. c1 <= 0
+ H11. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 3 subgoals:
+
+Subgoal 1.6.3'''''.4.3:
+
+ H0. (List.tl s2) <> []
+ H1. s2 <> []
+ H2. gen_1
+     +. eval_poly
+        (p_add (p_scale (Destruct(Geq, 0, List.hd s2)).1 (List.hd c2))
+         (sum_polys (scale_system (List.tl s2) (List.tl c2))))
+        x
+     <= 0
+ H3. List.hd c2 >= 0
+ H4. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H5. Is_a(Geq, List.hd s2)
+ H6. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H7. well_formed (List.tl s2) x
+ H8. c2 <> []
+ H9. c1 <= 0
+ H10. good_poly_length s11 x
+ H11. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. gen_1
+     +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x <= 0
+ C2. has_strict_ineq (List.tl s2)
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull, eval_poly_scale, good_length_p_scale and
+sum_poly_good_length.
+
+Subgoal 1.6.3'''''.4.2:
+
+ H0. s2 <> []
+ H1. List.hd c2 >= 0
+ H2. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H3. Is_a(Geq, List.hd s2)
+ H4. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H5. well_formed (List.tl s2) x
+ H6. gen_1 +. eval_poly [] x <= 0
+ H7. c2 <> []
+ H8. c1 <= 0
+ H9. good_poly_length s11 x
+ H10. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. Is_a([], scale_system (List.tl s2) (List.tl c2))
+ C2. has_strict_ineq (List.tl s2)
+ C3. (List.tl s2) <> []
+
+But simplification reduces this to true, using the definitions of eval_poly
+and eval_system.
+
+Subgoal 1.6.3'''''.4.1:
+
+ H0. s2 <> []
+ H1. gen_1
+     +. eval_poly (p_scale (Destruct(Geq, 0, List.hd s2)).1 (List.hd c2)) x
+     <= 0
+ H2. List.hd c2 >= 0
+ H3. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H4. Is_a(Geq, List.hd s2)
+ H5. Is_a([], scale_system (List.tl s2) (List.tl c2))
+ H6. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H7. well_formed (List.tl s2) x
+ H8. c2 <> []
+ H9. c1 <= 0
+ H10. good_poly_length s11 x
+ H11. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq (List.tl s2)
+ C2. (List.tl s2) <> []
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, eval_poly_scale,
+scale_system_not_empty and scale_system_not_empty.
+
+Subgoal 1.6.3'''''.3:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. well_formed s2 x
+ H2. s2 <> []
+ H3. s2 <> []
+ H4. c2 <> []
+ H5. not Is_a(Eq, List.hd s2)
+ H6. not Is_a(Geq, List.hd s2)
+ H7. not (List.hd c2 <= 0)
+ H8. (gen_1 <= 0) || not ((List.tl s2) <> [])
+     || not
+        (gen_1
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not (c1 <= 0) || not (good_poly_length s11 x)
+     || not (eval_system (List.tl s2) x)
+ H9. eval_system s2 x
+ H10. c1 <= 0
+ H11. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq.
+
+Subgoal 1.6.3'''''.2:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. well_formed s2 x
+ H2. s2 <> []
+ H3. eval_system s2 x
+ H4. c1 <= 0
+ H5. good_poly_length s11 x
+ H6. s2 <> []
+ H7. not (c2 <> [])
+ H8. Is_a(Eq, List.hd s2)
+ H9. (gen_1 <= 0) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_1 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x <= 0)
+     || not (c1 <= 0) || not (good_poly_length s11 x)
+     || not (eval_system (List.tl s2) x)
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 3 subgoals:
+
+Subgoal 1.6.3'''''.2.3:
+
+ H0. (List.tl s2) <> []
+ H1. s2 <> []
+ H2. gen_1
+     +. eval_poly
+        (p_add (Destruct(Eq, 0, List.hd s2))
+         (sum_polys (scale_system (List.tl s2) c2)))
+        x
+     <= 0
+ H3. Is_a(Eq, List.hd s2)
+ H4. well_formed (List.tl s2) x
+ H5. c1 <= 0
+ H6. good_poly_length s11 x
+ H7. eval_system (List.tl s2) x
+ H8. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H9. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. gen_1 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x <= 0
+ C2. c2 <> []
+ C3. has_strict_ineq (List.tl s2)
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.6.3'''''.2.2:
+
+ H0. s2 <> []
+ H1. Is_a(Eq, List.hd s2)
+ H2. well_formed (List.tl s2) x
+ H3. gen_1 +. eval_poly [] x <= 0
+ H4. c1 <= 0
+ H5. good_poly_length s11 x
+ H6. eval_system (List.tl s2) x
+ H7. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H8. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. Is_a([], scale_system (List.tl s2) c2)
+ C2. c2 <> []
+ C3. has_strict_ineq (List.tl s2)
+ C4. (List.tl s2) <> []
+
+But simplification reduces this to true, using the definitions of eval_poly
+and eval_system.
+
+Subgoal 1.6.3'''''.2.1:
+
+ H0. s2 <> []
+ H1. Is_a(Eq, List.hd s2)
+ H2. Is_a([], scale_system (List.tl s2) c2)
+ H3. well_formed (List.tl s2) x
+ H4. gen_1 +. eval_poly (Destruct(Eq, 0, List.hd s2)) x <= 0
+ H5. c1 <= 0
+ H6. good_poly_length s11 x
+ H7. eval_system (List.tl s2) x
+ H8. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H9. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. c2 <> []
+ C2. has_strict_ineq (List.tl s2)
+ C3. (List.tl s2) <> []
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, scale_system_not_empty and
+scale_system_not_empty.
+
+Subgoal 1.6.3'''''.1:
+
+ H0. gen_1 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H1. s2 <> []
+ H2. not (c2 <> [])
+ H3. not Is_a(Eq, List.hd s2)
+ H4. not Is_a(Geq, List.hd s2)
+ H5. (gen_1 <= 0) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_1 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x <= 0)
+     || not (c1 <= 0) || not (good_poly_length s11 x)
+     || not (eval_system (List.tl s2) x)
+ H6. well_formed s2 x
+ H7. s2 <> []
+ H8. eval_system s2 x
+ H9. c1 <= 0
+ H10. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. gen_1 <= 0
+ C1. has_strict_ineq s2
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq.
+
+Subgoal 1.6.2:
+
+ H0. s <> []
+ H1. List.hd c <= 0
+ H2. (List.tl s) <> []
+ H3. well_formed (List.tl s) x
+ H4. eval_poly
+     (p_add (Destruct(Gt, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H5. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H6. eval_system (List.tl s) x
+ H7. c <> []
+|---------------------------------------------------------------------------
+ C0. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ C1. Is_a(Geq, List.hd s)
+ C2. Is_a(Eq, List.hd s)
+ C3. Is_a([], scale_system (List.tl s) (List.tl c))
+ C4. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.6.1:
+
+ H0. s <> []
+ H1. List.hd c <= 0
+ H2. well_formed (List.tl s) x
+ H3. eval_poly
+     (p_add (Destruct(Gt, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H4. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H5. List.tl s = []
+ H6. eval_system (List.tl s) x
+ H7. c <> []
+|---------------------------------------------------------------------------
+ C0. Is_a(Geq, List.hd s)
+ C1. Is_a(Eq, List.hd s)
+ C2. Is_a([], scale_system (List.tl s) (List.tl c))
+ C3. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+But simplification reduces this to true, using the definition of
+scale_system.
+
+Subgoal 1.5:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H4. has_strict_ineq s
+ H5. s <> []
+ H6. c <> []
+ H7. Is_a(Eq, List.hd s)
+ H8. (List.tl s = []) || not (well_formed (List.tl s) x)
+     || not
+        (eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0)
+     || not (eval_system (List.tl s) x) || not (has_strict_ineq (List.tl s))
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_poly, eval_system,
+has_strict_ineq, scale_system, sum_polys and well_formed to the following 3
+subgoals:
+
+Subgoal 1.5.3:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Eq, 0, List.hd s)) x = 0
+ H2. (List.tl s) <> []
+ H3. well_formed (List.tl s) x
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. eval_poly
+     (p_add (p_scale (Destruct(Eq, 0, List.hd s)) (List.hd c))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H7. Is_a(Eq, List.hd s)
+ H8. c <> []
+ H9. good_poly_length (Destruct(Eq, 0, List.hd s)) x
+|---------------------------------------------------------------------------
+ C0. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ C1. Is_a([], scale_system (List.tl s) (List.tl c))
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull, eval_poly_scale, good_length_p_scale and
+sum_poly_good_length.
+
+Subgoal 1.5.2:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Eq, 0, List.hd s)) x = 0
+ H2. well_formed (List.tl s) x
+ H3. List.tl s = []
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. eval_poly
+     (p_add (p_scale (Destruct(Eq, 0, List.hd s)) (List.hd c))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H7. Is_a(Eq, List.hd s)
+ H8. c <> []
+ H9. good_poly_length (Destruct(Eq, 0, List.hd s)) x
+|---------------------------------------------------------------------------
+ Is_a([], scale_system (List.tl s) (List.tl c))
+
+But simplification reduces this to true, using the definition of
+scale_system.
+
+Subgoal 1.5.1:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Eq, 0, List.hd s)) x = 0
+ H2. well_formed (List.tl s) x
+ H3. eval_system (List.tl s) x
+ H4. has_strict_ineq (List.tl s)
+ H5. Is_a(Eq, List.hd s)
+ H6. c <> []
+ H7. Is_a([], scale_system (List.tl s) (List.tl c))
+ H8. good_poly_length (Destruct(Eq, 0, List.hd s)) x
+ H9. eval_poly (p_scale (Destruct(Eq, 0, List.hd s)) (List.hd c)) x <= 0
+|---------------------------------------------------------------------------
+ false
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq, and the rewrite rule eval_poly_scale.
+
+Subgoal 1.4:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. s <> []
+ H4. c <> []
+ H5. not Is_a(Eq, List.hd s)
+ H6. Is_a(Geq, List.hd s)
+ H7. List.hd c >= 0
+ H8. (List.tl s = []) || not (well_formed (List.tl s) x)
+     || not
+        (eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0)
+     || not (eval_system (List.tl s) x) || not (has_strict_ineq (List.tl s))
+ H9. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H10. has_strict_ineq s
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_poly, eval_system,
+has_strict_ineq, scale_system, sum_polys and well_formed to the following 3
+subgoals:
+
+Subgoal 1.4.3:
+
+ H0. s <> []
+ H1. eval_poly
+     (p_add (p_scale (Destruct(Geq, 0, List.hd s)).1 (List.hd c))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H2. (List.tl s) <> []
+ H3. well_formed (List.tl s) x
+ H4. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H5. eval_system (List.tl s) x
+ H6. has_strict_ineq (List.tl s)
+ H7. List.hd c >= 0
+ H8. Is_a(Geq, List.hd s)
+ H9. c <> []
+ H10. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ C0. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ C1. Is_a([], scale_system (List.tl s) (List.tl c))
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull, eval_poly_scale, good_length_p_scale and
+sum_poly_good_length.
+
+Subgoal 1.4.2:
+
+ H0. s <> []
+ H1. eval_poly
+     (p_add (p_scale (Destruct(Geq, 0, List.hd s)).1 (List.hd c))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+ H2. well_formed (List.tl s) x
+ H3. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H4. List.tl s = []
+ H5. eval_system (List.tl s) x
+ H6. has_strict_ineq (List.tl s)
+ H7. List.hd c >= 0
+ H8. Is_a(Geq, List.hd s)
+ H9. c <> []
+ H10. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+|---------------------------------------------------------------------------
+ Is_a([], scale_system (List.tl s) (List.tl c))
+
+But simplification reduces this to true, using the definition of
+scale_system.
+
+Subgoal 1.4.1:
+
+ H0. s <> []
+ H1. well_formed (List.tl s) x
+ H2. eval_poly (Destruct(Geq, 0, List.hd s)).1 x >= 0
+ H3. eval_system (List.tl s) x
+ H4. has_strict_ineq (List.tl s)
+ H5. List.hd c >= 0
+ H6. Is_a(Geq, List.hd s)
+ H7. c <> []
+ H8. Is_a([], scale_system (List.tl s) (List.tl c))
+ H9. good_poly_length (Destruct(Geq, 0, List.hd s)).1 x
+ H10. eval_poly (p_scale (Destruct(Geq, 0, List.hd s)).1 (List.hd c)) x <= 0
+|---------------------------------------------------------------------------
+ false
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq, and the rewrite rule eval_poly_scale.
+
+Subgoal 1.3:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H4. s <> []
+ H5. c <> []
+ H6. not Is_a(Eq, List.hd s)
+ H7. not Is_a(Geq, List.hd s)
+ H8. not (List.hd c <= 0)
+ H9. (List.tl s = []) || not (well_formed (List.tl s) x)
+     || not
+        (eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0)
+     || not (eval_system (List.tl s) x) || not (has_strict_ineq (List.tl s))
+ H10. has_strict_ineq s
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+scale_system, sum_polys and well_formed to the following 3 subgoals:
+
+Subgoal 1.3.3:
+
+ H0. s <> []
+ H1. (List.tl s) <> []
+ H2. well_formed (List.tl s) x
+ H3. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H4. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ H5. eval_system (List.tl s) x
+ H6. c <> []
+ H7. eval_poly
+     (p_add (p_scale (Destruct(Gt, 0, List.hd s)) (List.hd c))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. List.hd c <= 0
+ C1. has_strict_ineq (List.tl s)
+ C2. Is_a(Geq, List.hd s)
+ C3. Is_a(Eq, List.hd s)
+ C4. Is_a([], scale_system (List.tl s) (List.tl c))
+ C5. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+This simplifies, using the rewrite rules eval_p_add_pull, eval_poly_scale,
+good_length_p_scale and sum_poly_good_length to:
+
+Subgoal 1.3.3':
+
+ H0. s <> []
+ H1. well_formed (List.tl s) x
+ H2. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H3. eval_system (List.tl s) x
+ H4. (List.tl s) <> []
+ H5. c <> []
+ H6. List.hd c * eval_poly (Destruct(Gt, 0, List.hd s)) x
+     +. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+|---------------------------------------------------------------------------
+ C0. List.hd c <= 0
+ C1. has_strict_ineq (List.tl s)
+ C2. Is_a(Geq, List.hd s)
+ C3. Is_a(Eq, List.hd s)
+ C4. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+
+We can eliminate destructors by the following
+substitution:
+ c -> c1 :: c2
+ s -> s1 :: s2
+
+This produces the modified subgoal:
+
+Subgoal 1.3.3'':
+
+ H0. well_formed s2 x
+ H1. good_poly_length (Destruct(Gt, 0, s1)) x
+ H2. s2 <> []
+ H3. eval_system s2 x
+ H4. c1 * eval_poly (Destruct(Gt, 0, s1)) x
+     +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+|---------------------------------------------------------------------------
+ C0. eval_poly (Destruct(Gt, 0, s1)) x <= 0
+ C1. has_strict_ineq s2
+ C2. Is_a(Geq, s1)
+ C3. c1 <= 0
+ C4. Is_a(Eq, s1)
+
+
+We can eliminate destructors by the following substitution:
+ s1 -> Gt s11
+
+This produces the modified subgoal:
+
+Subgoal 1.3.3''':
+
+ H0. well_formed s2 x
+ H1. c1 * eval_poly s11 x +. eval_poly (sum_polys (scale_system s2 c2)) x
+     <= 0
+ H2. s2 <> []
+ H3. good_poly_length s11 x
+ H4. eval_system s2 x
+|---------------------------------------------------------------------------
+ C0. eval_poly s11 x <= 0
+ C1. has_strict_ineq s2
+ C2. c1 <= 0
+
+
+Candidates for generalization:
+
+ eval_poly s11 x
+
+This produces the modified subgoal:
+
+Subgoal 1.3.3'''':
+
+ H0. well_formed s2 x
+ H1. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H2. s2 <> []
+ H3. good_poly_length s11 x
+ H4. eval_system s2 x
+|---------------------------------------------------------------------------
+ C0. gen_2 <= 0
+ C1. has_strict_ineq s2
+ C2. c1 <= 0
+
+
+Must try induction.
+
+The recursive terms in the conjecture suggest 5 inductions.
+Subsumption and merging reduces this to 2.
+
+However, scheme scoring gives us a clear winner.
+We shall induct according to a scheme derived from scale_system.
+
+Induction scheme:
+
+ (not
+  (not Is_a(Geq, List.hd s2)
+   && (not Is_a(Eq, List.hd s2) && (not (c2 <> []) && s2 <> [])))
+  && (not (Is_a(Eq, List.hd s2) && (not (c2 <> []) && s2 <> []))
+      && (not
+          ((List.hd c2 >. 0)
+           && (not Is_a(Geq, List.hd s2)
+               && (not Is_a(Eq, List.hd s2) && (c2 <> [] && s2 <> []))))
+          && (not
+              ((List.hd c2 >=. 0)
+               && (Is_a(Geq, List.hd s2)
+                   && (not Is_a(Eq, List.hd s2) && (c2 <> [] && s2 <> []))))
+              && (not (Is_a(Eq, List.hd s2) && (c2 <> [] && s2 <> []))
+                  && (not
+                      (not (List.hd c2 >. 0)
+                       && (not Is_a(Geq, List.hd s2)
+                           && (not Is_a(Eq, List.hd s2)
+                               && (c2 <> [] && s2 <> []))))
+                      && (not
+                          (not (List.hd c2 >=. 0)
+                           && (Is_a(Geq, List.hd s2)
+                               && (not Is_a(Eq, List.hd s2)
+                                   && (c2 <> [] && s2 <> []))))
+                          && not
+                             (Is_a(Geq, List.hd s2)
+                              && (not Is_a(Eq, List.hd s2)
+                                  && (not (c2 <> []) && s2 <> [])))))))))
+  ==> φ c1 c2 gen_2 s11 s2 x)
+ && ((s2 <> []
+      && (not (c2 <> [])
+          && (not Is_a(Eq, List.hd s2)
+              && (Is_a(Geq, List.hd s2) && φ c1 c2 gen_2 s11 (List.tl s2) x)))
+      ==> φ c1 c2 gen_2 s11 s2 x)
+     && ((s2 <> []
+          && (c2 <> []
+              && (not Is_a(Eq, List.hd s2)
+                  && (Is_a(Geq, List.hd s2)
+                      && (not (List.hd c2 >=. 0)
+                          && φ c1 (List.tl c2) gen_2 s11 (List.tl s2) x))))
+          ==> φ c1 c2 gen_2 s11 s2 x)
+         && ((s2 <> []
+              && (c2 <> []
+                  && (not Is_a(Eq, List.hd s2)
+                      && (not Is_a(Geq, List.hd s2)
+                          && (not (List.hd c2 >. 0)
+                              && φ c1 (List.tl c2) gen_2 s11 (List.tl s2) x))))
+              ==> φ c1 c2 gen_2 s11 s2 x)
+             && ((s2 <> []
+                  && (c2 <> []
+                      && (Is_a(Eq, List.hd s2)
+                          && φ c1 (List.tl c2) gen_2 s11 (List.tl s2) x))
+                  ==> φ c1 c2 gen_2 s11 s2 x)
+                 && ((s2 <> []
+                      && (c2 <> []
+                          && (not Is_a(Eq, List.hd s2)
+                              && (Is_a(Geq, List.hd s2)
+                                  && ((List.hd c2 >=. 0)
+                                      && φ c1 (List.tl c2) gen_2 s11
+                                         (List.tl s2) x))))
+                      ==> φ c1 c2 gen_2 s11 s2 x)
+                     && ((s2 <> []
+                          && (c2 <> []
+                              && (not Is_a(Eq, List.hd s2)
+                                  && (not Is_a(Geq, List.hd s2)
+                                      && ((List.hd c2 >. 0)
+                                          && φ c1 (List.tl c2) gen_2 s11
+                                             (List.tl s2) x))))
+                          ==> φ c1 c2 gen_2 s11 s2 x)
+                         && ((s2 <> []
+                              && (not (c2 <> [])
+                                  && (Is_a(Eq, List.hd s2)
+                                      && φ c1 c2 gen_2 s11 (List.tl s2) x))
+                              ==> φ c1 c2 gen_2 s11 s2 x)
+                             && (s2 <> []
+                                 && (not (c2 <> [])
+                                     && (not Is_a(Eq, List.hd s2)
+                                         && (not Is_a(Geq, List.hd s2)
+                                             && φ c1 c2 gen_2 s11
+                                                (List.tl s2) x)))
+                                 ==> φ c1 c2 gen_2 s11 s2 x)))))))).
+
+9 nontautological subgoals.
+
+Subgoal 1.3.3''''.9:
+
+ H0. well_formed s2 x
+ H1. eval_system s2 x
+ H2. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H3. s2 <> []
+ H4. good_poly_length s11 x
+ H5. not
+     (not Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2) && not (c2 <> [])
+      && s2 <> [])
+ H6. not (Is_a(Eq, List.hd s2) && not (c2 <> []) && s2 <> [])
+ H7. not
+     (not (List.hd c2 <= 0) && not Is_a(Geq, List.hd s2)
+      && not Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H8. not
+     ((List.hd c2 >= 0) && Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2)
+      && c2 <> [] && s2 <> [])
+ H9. not (Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H10. not
+      ((List.hd c2 <= 0) && not Is_a(Geq, List.hd s2)
+       && not Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H11. not
+      (not (List.hd c2 >= 0) && Is_a(Geq, List.hd s2)
+       && not Is_a(Eq, List.hd s2) && c2 <> [] && s2 <> [])
+ H12. not
+      (Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2) && not (c2 <> [])
+       && s2 <> [])
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, scale_system_not_empty and
+scale_system_not_empty.
+
+Subgoal 1.3.3''''.8:
+
+ H0. well_formed s2 x
+ H1. eval_system s2 x
+ H2. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H3. s2 <> []
+ H4. not (c2 <> [])
+ H5. not Is_a(Eq, List.hd s2)
+ H6. Is_a(Geq, List.hd s2)
+ H7. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x
+         <= 0)
+ H8. s2 <> []
+ H9. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+scale_system, sum_polys and well_formed to the following 2 subgoals:
+
+Subgoal 1.3.3''''.8.2:
+
+ H0. eval_system (List.tl s2) x
+ H1. Is_a(Geq, List.hd s2)
+ H2. c1 * gen_2
+     +. eval_poly
+        (p_add (Destruct(Geq, 0, List.hd s2)).1
+         (sum_polys (scale_system (List.tl s2) c2)))
+        x
+     <= 0
+ H3. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H4. (List.tl s2) <> []
+ H5. s2 <> []
+ H6. well_formed (List.tl s2) x
+ H7. good_poly_length s11 x
+ H8. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+|---------------------------------------------------------------------------
+ C0. c1 * gen_2 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x
+     <= 0
+ C1. c1 <= 0
+ C2. gen_2 <= 0
+ C3. has_strict_ineq (List.tl s2)
+ C4. Is_a([], scale_system (List.tl s2) c2)
+ C5. c2 <> []
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.3.3''''.8.1:
+
+ H0. eval_system (List.tl s2) x
+ H1. Is_a(Geq, List.hd s2)
+ H2. c1 * gen_2
+     +. eval_poly
+        (p_add (Destruct(Geq, 0, List.hd s2)).1
+         (sum_polys (scale_system (List.tl s2) c2)))
+        x
+     <= 0
+ H3. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H4. s2 <> []
+ H5. well_formed (List.tl s2) x
+ H6. good_poly_length s11 x
+ H7. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+|---------------------------------------------------------------------------
+ C0. (List.tl s2) <> []
+ C1. c1 <= 0
+ C2. gen_2 <= 0
+ C3. has_strict_ineq (List.tl s2)
+ C4. Is_a([], scale_system (List.tl s2) c2)
+ C5. c2 <> []
+
+But simplification reduces this to true, using the definitions of
+scale_system and well_formed.
+
+Subgoal 1.3.3''''.7:
+
+ H0. s2 <> []
+ H1. c2 <> []
+ H2. not Is_a(Eq, List.hd s2)
+ H3. Is_a(Geq, List.hd s2)
+ H4. not (List.hd c2 >= 0)
+ H5. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+ H6. well_formed s2 x
+ H7. eval_system s2 x
+ H8. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H9. s2 <> []
+ H10. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 2 subgoals:
+
+Subgoal 1.3.3''''.7.2:
+
+ H0. eval_system (List.tl s2) x
+ H1. c2 <> []
+ H2. Is_a(Geq, List.hd s2)
+ H3. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H4. (List.tl s2) <> []
+ H5. c1 * gen_2
+     +. eval_poly
+        (p_add (Destruct(Geq, 0, List.hd s2)).1
+         (sum_polys (scale_system (List.tl s2) (List.tl c2))))
+        x
+     <= 0
+ H6. s2 <> []
+ H7. well_formed (List.tl s2) x
+ H8. good_poly_length s11 x
+ H9. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq (List.tl s2)
+ C3. c1 * gen_2
+     +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x <= 0
+ C4. List.hd c2 >= 0
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.3.3''''.7.1:
+
+ H0. eval_system (List.tl s2) x
+ H1. c2 <> []
+ H2. Is_a(Geq, List.hd s2)
+ H3. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H4. s2 <> []
+ H5. well_formed (List.tl s2) x
+ H6. good_poly_length s11 x
+ H7. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H8. c1 * gen_2 +. eval_poly [] x <= 0
+|---------------------------------------------------------------------------
+ C0. (List.tl s2) <> []
+ C1. c1 <= 0
+ C2. gen_2 <= 0
+ C3. has_strict_ineq (List.tl s2)
+ C4. List.hd c2 >= 0
+ C5. Is_a([], scale_system (List.tl s2) (List.tl c2))
+
+But simplification reduces this to true, using the definition of eval_poly.
+
+Subgoal 1.3.3''''.6:
+
+ H0. well_formed s2 x
+ H1. eval_system s2 x
+ H2. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H3. s2 <> []
+ H4. c2 <> []
+ H5. not Is_a(Eq, List.hd s2)
+ H6. not Is_a(Geq, List.hd s2)
+ H7. List.hd c2 <= 0
+ H8. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+ H9. s2 <> []
+ H10. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+But simplification reduces this to true, using the definitions of
+eval_system, has_strict_ineq, p_add, scale_system and sum_polys.
+
+Subgoal 1.3.3''''.5:
+
+ H0. well_formed s2 x
+ H1. eval_system s2 x
+ H2. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H3. s2 <> []
+ H4. good_poly_length s11 x
+ H5. s2 <> []
+ H6. c2 <> []
+ H7. Is_a(Eq, List.hd s2)
+ H8. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 2 subgoals:
+
+Subgoal 1.3.3''''.5.2:
+
+ H0. eval_system (List.tl s2) x
+ H1. c2 <> []
+ H2. c1 * gen_2
+     +. eval_poly
+        (p_add (p_scale (Destruct(Eq, 0, List.hd s2)) (List.hd c2))
+         (sum_polys (scale_system (List.tl s2) (List.tl c2))))
+        x
+     <= 0
+ H3. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+ H4. (List.tl s2) <> []
+ H5. Is_a(Eq, List.hd s2)
+ H6. s2 <> []
+ H7. well_formed (List.tl s2) x
+ H8. good_poly_length s11 x
+ H9. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq (List.tl s2)
+ C3. c1 * gen_2
+     +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x <= 0
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull, eval_poly_scale, good_length_p_scale and
+sum_poly_good_length.
+
+Subgoal 1.3.3''''.5.1:
+
+ H0. eval_system (List.tl s2) x
+ H1. c2 <> []
+ H2. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+ H3. Is_a(Eq, List.hd s2)
+ H4. s2 <> []
+ H5. well_formed (List.tl s2) x
+ H6. good_poly_length s11 x
+ H7. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H8. c1 * gen_2 +. eval_poly [] x <= 0
+|---------------------------------------------------------------------------
+ C0. (List.tl s2) <> []
+ C1. c1 <= 0
+ C2. gen_2 <= 0
+ C3. has_strict_ineq (List.tl s2)
+ C4. Is_a([], scale_system (List.tl s2) (List.tl c2))
+
+But simplification reduces this to true, using the definition of eval_poly.
+
+Subgoal 1.3.3''''.4:
+
+ H0. well_formed s2 x
+ H1. eval_system s2 x
+ H2. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H3. s2 <> []
+ H4. s2 <> []
+ H5. c2 <> []
+ H6. not Is_a(Eq, List.hd s2)
+ H7. Is_a(Geq, List.hd s2)
+ H8. List.hd c2 >= 0
+ H9. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+ H10. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 2 subgoals:
+
+Subgoal 1.3.3''''.4.2:
+
+ H0. eval_system (List.tl s2) x
+ H1. c2 <> []
+ H2. Is_a(Geq, List.hd s2)
+ H3. List.hd c2 >= 0
+ H4. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H5. c1 * gen_2
+     +. eval_poly
+        (p_add (p_scale (Destruct(Geq, 0, List.hd s2)).1 (List.hd c2))
+         (sum_polys (scale_system (List.tl s2) (List.tl c2))))
+        x
+     <= 0
+ H6. (List.tl s2) <> []
+ H7. s2 <> []
+ H8. well_formed (List.tl s2) x
+ H9. good_poly_length s11 x
+ H10. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq (List.tl s2)
+ C3. c1 * gen_2
+     +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x <= 0
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull, eval_poly_scale, good_length_p_scale and
+sum_poly_good_length.
+
+Subgoal 1.3.3''''.4.1:
+
+ H0. eval_system (List.tl s2) x
+ H1. c2 <> []
+ H2. Is_a(Geq, List.hd s2)
+ H3. List.hd c2 >= 0
+ H4. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H5. s2 <> []
+ H6. well_formed (List.tl s2) x
+ H7. good_poly_length s11 x
+ H8. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+ H9. c1 * gen_2 +. eval_poly [] x <= 0
+|---------------------------------------------------------------------------
+ C0. (List.tl s2) <> []
+ C1. c1 <= 0
+ C2. gen_2 <= 0
+ C3. has_strict_ineq (List.tl s2)
+ C4. Is_a([], scale_system (List.tl s2) (List.tl c2))
+
+But simplification reduces this to true, using the definition of eval_poly.
+
+Subgoal 1.3.3''''.3:
+
+ H0. s2 <> []
+ H1. c2 <> []
+ H2. not Is_a(Eq, List.hd s2)
+ H3. not Is_a(Geq, List.hd s2)
+ H4. not (List.hd c2 <= 0)
+ H5. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c2))) x
+         <= 0)
+ H6. well_formed s2 x
+ H7. eval_system s2 x
+ H8. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H9. s2 <> []
+ H10. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+But simplification reduces this to true, using the definitions of
+eval_system, has_strict_ineq, p_add, scale_system and sum_polys.
+
+Subgoal 1.3.3''''.2:
+
+ H0. well_formed s2 x
+ H1. eval_system s2 x
+ H2. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H3. s2 <> []
+ H4. s2 <> []
+ H5. not (c2 <> [])
+ H6. Is_a(Eq, List.hd s2)
+ H7. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x
+         <= 0)
+ H8. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+scale_system, sum_polys and well_formed to the following 2 subgoals:
+
+Subgoal 1.3.3''''.2.2:
+
+ H0. eval_system (List.tl s2) x
+ H1. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+ H2. (List.tl s2) <> []
+ H3. Is_a(Eq, List.hd s2)
+ H4. s2 <> []
+ H5. well_formed (List.tl s2) x
+ H6. good_poly_length s11 x
+ H7. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H8. c1 * gen_2
+     +. eval_poly
+        (p_add (Destruct(Eq, 0, List.hd s2))
+         (sum_polys (scale_system (List.tl s2) c2)))
+        x
+     <= 0
+|---------------------------------------------------------------------------
+ C0. c1 * gen_2 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x
+     <= 0
+ C1. c1 <= 0
+ C2. gen_2 <= 0
+ C3. has_strict_ineq (List.tl s2)
+ C4. Is_a([], scale_system (List.tl s2) c2)
+ C5. c2 <> []
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.3.3''''.2.1:
+
+ H0. eval_system (List.tl s2) x
+ H1. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+ H2. Is_a(Eq, List.hd s2)
+ H3. s2 <> []
+ H4. well_formed (List.tl s2) x
+ H5. good_poly_length s11 x
+ H6. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H7. c1 * gen_2
+     +. eval_poly
+        (p_add (Destruct(Eq, 0, List.hd s2))
+         (sum_polys (scale_system (List.tl s2) c2)))
+        x
+     <= 0
+|---------------------------------------------------------------------------
+ C0. (List.tl s2) <> []
+ C1. c1 <= 0
+ C2. gen_2 <= 0
+ C3. has_strict_ineq (List.tl s2)
+ C4. Is_a([], scale_system (List.tl s2) c2)
+ C5. c2 <> []
+
+But simplification reduces this to true, using the definitions of eval_poly,
+p_add, scale_system and sum_polys.
+
+Subgoal 1.3.3''''.1:
+
+ H0. well_formed s2 x
+ H1. eval_system s2 x
+ H2. c1 * gen_2 +. eval_poly (sum_polys (scale_system s2 c2)) x <= 0
+ H3. s2 <> []
+ H4. not (c2 <> [])
+ H5. not Is_a(Eq, List.hd s2)
+ H6. not Is_a(Geq, List.hd s2)
+ H7. not (eval_system (List.tl s2) x) || (c1 <= 0) || (gen_2 <= 0)
+     || has_strict_ineq (List.tl s2) || not ((List.tl s2) <> [])
+     || not (well_formed (List.tl s2) x) || not (good_poly_length s11 x)
+     || not
+        (c1 * gen_2 +. eval_poly (sum_polys (scale_system (List.tl s2) c2)) x
+         <= 0)
+ H8. s2 <> []
+ H9. good_poly_length s11 x
+|---------------------------------------------------------------------------
+ C0. c1 <= 0
+ C1. gen_2 <= 0
+ C2. has_strict_ineq s2
+
+But simplification reduces this to true, using the definitions of
+eval_system, has_strict_ineq, scale_system and sum_polys.
+
+Subgoal 1.3.2:
+
+ H0. s <> []
+ H1. (List.tl s) <> []
+ H2. well_formed (List.tl s) x
+ H3. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H4. eval_system (List.tl s) x
+ H5. c <> []
+ H6. eval_poly
+     (p_add (p_scale (Destruct(Gt, 0, List.hd s)) (List.hd c))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. List.hd c <= 0
+ C1. eval_poly (sum_polys (scale_system (List.tl s) (List.tl c))) x <= 0
+ C2. Is_a(Geq, List.hd s)
+ C3. Is_a(Eq, List.hd s)
+ C4. Is_a([], scale_system (List.tl s) (List.tl c))
+ C5. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull, eval_poly_scale, good_length_p_scale and
+sum_poly_good_length.
+
+Subgoal 1.3.1:
+
+ H0. s <> []
+ H1. well_formed (List.tl s) x
+ H2. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H3. List.tl s = []
+ H4. eval_system (List.tl s) x
+ H5. c <> []
+ H6. eval_poly
+     (p_add (p_scale (Destruct(Gt, 0, List.hd s)) (List.hd c))
+      (sum_polys (scale_system (List.tl s) (List.tl c))))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. List.hd c <= 0
+ C1. Is_a(Geq, List.hd s)
+ C2. Is_a(Eq, List.hd s)
+ C3. Is_a([], scale_system (List.tl s) (List.tl c))
+ C4. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+But simplification reduces this to true, using the definitions of eval_poly,
+p_add, scale_system and sum_polys.
+
+Subgoal 1.2:
+
+ H0. well_formed s x
+ H1. eval_system s x
+ H2. s <> []
+ H3. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H4. s <> []
+ H5. not (c <> [])
+ H6. Is_a(Eq, List.hd s)
+ H7. (List.tl s = []) || not (well_formed (List.tl s) x)
+     || not (eval_system (List.tl s) x)
+     || not (eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0)
+     || not (has_strict_ineq (List.tl s))
+ H8. has_strict_ineq s
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_poly, eval_system,
+has_strict_ineq, scale_system, sum_polys and well_formed to the following 3
+subgoals:
+
+Subgoal 1.2.3:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Eq, 0, List.hd s)) x = 0
+ H2. (List.tl s) <> []
+ H3. well_formed (List.tl s) x
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. Is_a(Eq, List.hd s)
+ H7. good_poly_length (Destruct(Eq, 0, List.hd s)) x
+ H8. eval_poly
+     (p_add (Destruct(Eq, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) c)))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. Is_a([], scale_system (List.tl s) c)
+ C1. eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0
+ C2. c <> []
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.2.2:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Eq, 0, List.hd s)) x = 0
+ H2. well_formed (List.tl s) x
+ H3. List.tl s = []
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. Is_a(Eq, List.hd s)
+ H7. good_poly_length (Destruct(Eq, 0, List.hd s)) x
+ H8. eval_poly
+     (p_add (Destruct(Eq, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) c)))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. Is_a([], scale_system (List.tl s) c)
+ C1. c <> []
+
+But simplification reduces this to true, using the definitions of eval_poly,
+has_strict_ineq, p_add, scale_system and sum_polys.
+
+Subgoal 1.2.1:
+
+ H0. s <> []
+ H1. eval_poly (Destruct(Eq, 0, List.hd s)) x = 0
+ H2. well_formed (List.tl s) x
+ H3. Is_a([], scale_system (List.tl s) c)
+ H4. eval_system (List.tl s) x
+ H5. has_strict_ineq (List.tl s)
+ H6. eval_poly (Destruct(Eq, 0, List.hd s)) x <= 0
+ H7. Is_a(Eq, List.hd s)
+ H8. good_poly_length (Destruct(Eq, 0, List.hd s)) x
+|---------------------------------------------------------------------------
+ c <> []
+
+But simplification reduces this to true, using the definition of
+has_strict_ineq.
+
+Subgoal 1.1:
+
+ H0. well_formed s x
+ H1. s <> []
+ H2. not (c <> [])
+ H3. not Is_a(Eq, List.hd s)
+ H4. not Is_a(Geq, List.hd s)
+ H5. (List.tl s = []) || not (well_formed (List.tl s) x)
+     || not (eval_system (List.tl s) x)
+     || not (eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0)
+     || not (has_strict_ineq (List.tl s))
+ H6. eval_system s x
+ H7. s <> []
+ H8. eval_poly (sum_polys (scale_system s c)) x <= 0
+ H9. has_strict_ineq s
+|---------------------------------------------------------------------------
+ false
+
+This simplifies, using the definitions of eval_poly, eval_system,
+has_strict_ineq, scale_system, sum_polys and well_formed to the following 3
+subgoals:
+
+Subgoal 1.1.3:
+
+ H0. s <> []
+ H1. (List.tl s) <> []
+ H2. well_formed (List.tl s) x
+ H3. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H4. eval_system (List.tl s) x
+ H5. eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0
+ H6. eval_poly
+     (p_add (Destruct(Gt, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) c)))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. Is_a([], scale_system (List.tl s) c)
+ C1. has_strict_ineq (List.tl s)
+ C2. Is_a(Geq, List.hd s)
+ C3. Is_a(Eq, List.hd s)
+ C4. c <> []
+ C5. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+This simplifies, using the rewrite rules eval_p_add_pull and
+sum_poly_good_length to:
+
+Subgoal 1.1.3':
+
+ H0. s <> []
+ H1. well_formed (List.tl s) x
+ H2. eval_poly (Destruct(Gt, 0, List.hd s)) x
+     +. eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0
+ H3. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H4. eval_system (List.tl s) x
+ H5. (List.tl s) <> []
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq (List.tl s)
+ C1. Is_a(Geq, List.hd s)
+ C2. Is_a(Eq, List.hd s)
+ C3. c <> []
+ C4. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+
+We can eliminate destructors by the following substitution:
+ s -> s1 :: s2
+
+This produces the modified subgoal:
+
+Subgoal 1.1.3'':
+
+ H0. good_poly_length (Destruct(Gt, 0, s1)) x
+ H1. s2 <> []
+ H2. eval_poly (Destruct(Gt, 0, s1)) x
+     +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H3. well_formed s2 x
+ H4. eval_system s2 x
+|---------------------------------------------------------------------------
+ C0. Is_a(Eq, s1)
+ C1. has_strict_ineq s2
+ C2. c <> []
+ C3. eval_poly (Destruct(Gt, 0, s1)) x <= 0
+ C4. Is_a(Geq, s1)
+
+
+We can eliminate destructors by the following substitution:
+ s1 -> Gt s11
+
+This produces the modified subgoal:
+
+Subgoal 1.1.3''':
+
+ H0. s2 <> []
+ H1. eval_poly s11 x +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H2. good_poly_length s11 x
+ H3. well_formed s2 x
+ H4. eval_system s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. c <> []
+ C2. eval_poly s11 x <= 0
+
+
+Candidates for generalization:
+
+ eval_poly s11 x
+
+This produces the modified subgoal:
+
+Subgoal 1.1.3'''':
+
+ H0. s2 <> []
+ H1. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H2. good_poly_length s11 x
+ H3. well_formed s2 x
+ H4. eval_system s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. c <> []
+ C2. gen_3 <= 0
+
+
+Must try induction.
+
+The recursive terms in the conjecture suggest 5 inductions.
+Subsumption and merging reduces this to 2.
+
+However, scheme scoring gives us a clear winner.
+We shall induct according to a scheme derived from scale_system.
+
+Induction scheme:
+
+ (not
+  (not Is_a(Geq, List.hd s2)
+   && (not Is_a(Eq, List.hd s2) && (not (c <> []) && s2 <> [])))
+  && (not (Is_a(Eq, List.hd s2) && (not (c <> []) && s2 <> []))
+      && (not
+          ((List.hd c >. 0)
+           && (not Is_a(Geq, List.hd s2)
+               && (not Is_a(Eq, List.hd s2) && (c <> [] && s2 <> []))))
+          && (not
+              ((List.hd c >=. 0)
+               && (Is_a(Geq, List.hd s2)
+                   && (not Is_a(Eq, List.hd s2) && (c <> [] && s2 <> []))))
+              && (not (Is_a(Eq, List.hd s2) && (c <> [] && s2 <> []))
+                  && (not
+                      (not (List.hd c >. 0)
+                       && (not Is_a(Geq, List.hd s2)
+                           && (not Is_a(Eq, List.hd s2)
+                               && (c <> [] && s2 <> []))))
+                      && (not
+                          (not (List.hd c >=. 0)
+                           && (Is_a(Geq, List.hd s2)
+                               && (not Is_a(Eq, List.hd s2)
+                                   && (c <> [] && s2 <> []))))
+                          && not
+                             (Is_a(Geq, List.hd s2)
+                              && (not Is_a(Eq, List.hd s2)
+                                  && (not (c <> []) && s2 <> [])))))))))
+  ==> φ c gen_3 s11 s2 x)
+ && ((s2 <> []
+      && (not (c <> [])
+          && (not Is_a(Eq, List.hd s2)
+              && (Is_a(Geq, List.hd s2) && φ c gen_3 s11 (List.tl s2) x)))
+      ==> φ c gen_3 s11 s2 x)
+     && ((s2 <> []
+          && (c <> []
+              && (not Is_a(Eq, List.hd s2)
+                  && (Is_a(Geq, List.hd s2)
+                      && (not (List.hd c >=. 0)
+                          && φ (List.tl c) gen_3 s11 (List.tl s2) x))))
+          ==> φ c gen_3 s11 s2 x)
+         && ((s2 <> []
+              && (c <> []
+                  && (not Is_a(Eq, List.hd s2)
+                      && (not Is_a(Geq, List.hd s2)
+                          && (not (List.hd c >. 0)
+                              && φ (List.tl c) gen_3 s11 (List.tl s2) x))))
+              ==> φ c gen_3 s11 s2 x)
+             && ((s2 <> []
+                  && (c <> []
+                      && (Is_a(Eq, List.hd s2)
+                          && φ (List.tl c) gen_3 s11 (List.tl s2) x))
+                  ==> φ c gen_3 s11 s2 x)
+                 && ((s2 <> []
+                      && (c <> []
+                          && (not Is_a(Eq, List.hd s2)
+                              && (Is_a(Geq, List.hd s2)
+                                  && ((List.hd c >=. 0)
+                                      && φ (List.tl c) gen_3 s11
+                                         (List.tl s2) x))))
+                      ==> φ c gen_3 s11 s2 x)
+                     && ((s2 <> []
+                          && (c <> []
+                              && (not Is_a(Eq, List.hd s2)
+                                  && (not Is_a(Geq, List.hd s2)
+                                      && ((List.hd c >. 0)
+                                          && φ (List.tl c) gen_3 s11
+                                             (List.tl s2) x))))
+                          ==> φ c gen_3 s11 s2 x)
+                         && ((s2 <> []
+                              && (not (c <> [])
+                                  && (Is_a(Eq, List.hd s2)
+                                      && φ c gen_3 s11 (List.tl s2) x))
+                              ==> φ c gen_3 s11 s2 x)
+                             && (s2 <> []
+                                 && (not (c <> [])
+                                     && (not Is_a(Eq, List.hd s2)
+                                         && (not Is_a(Geq, List.hd s2)
+                                             && φ c gen_3 s11 (List.tl s2) x)))
+                                 ==> φ c gen_3 s11 s2 x)))))))).
+
+9 nontautological subgoals.
+
+Subgoal 1.1.3''''.9:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. eval_system s2 x
+ H3. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H4. not
+     (not Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2) && not (c <> [])
+      && s2 <> [])
+ H5. not (Is_a(Eq, List.hd s2) && not (c <> []) && s2 <> [])
+ H6. not
+     (not (List.hd c <= 0) && not Is_a(Geq, List.hd s2)
+      && not Is_a(Eq, List.hd s2) && c <> [] && s2 <> [])
+ H7. not
+     ((List.hd c >= 0) && Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2)
+      && c <> [] && s2 <> [])
+ H8. not (Is_a(Eq, List.hd s2) && c <> [] && s2 <> [])
+ H9. not
+     ((List.hd c <= 0) && not Is_a(Geq, List.hd s2)
+      && not Is_a(Eq, List.hd s2) && c <> [] && s2 <> [])
+ H10. not
+      (not (List.hd c >= 0) && Is_a(Geq, List.hd s2)
+       && not Is_a(Eq, List.hd s2) && c <> [] && s2 <> [])
+ H11. not
+      (Is_a(Geq, List.hd s2) && not Is_a(Eq, List.hd s2) && not (c <> [])
+       && s2 <> [])
+ H12. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+But simplification reduces this to true, using the forward-chaining rules
+add_negative, add_negative, add_negative, scale_system_not_empty and
+scale_system_not_empty.
+
+Subgoal 1.1.3''''.8:
+
+ H0. s2 <> []
+ H1. s2 <> []
+ H2. not (c <> [])
+ H3. not Is_a(Eq, List.hd s2)
+ H4. Is_a(Geq, List.hd s2)
+ H5. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3 +. eval_poly (sum_polys (scale_system (List.tl s2) c)) x <= 0)
+     || not (eval_system (List.tl s2) x) || c <> []
+ H6. good_poly_length s11 x
+ H7. eval_system s2 x
+ H8. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H9. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 2 subgoals:
+
+Subgoal 1.1.3''''.8.2:
+
+ H0. (List.tl s2) <> []
+ H1. s2 <> []
+ H2. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H3. good_poly_length s11 x
+ H4. Is_a(Geq, List.hd s2)
+ H5. well_formed (List.tl s2) x
+ H6. gen_3
+     +. eval_poly
+        (p_add (Destruct(Geq, 0, List.hd s2)).1
+         (sum_polys (scale_system (List.tl s2) c)))
+        x
+     <= 0
+ H7. eval_system (List.tl s2) x
+ H8. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+|---------------------------------------------------------------------------
+ C0. gen_3 <= 0
+ C1. has_strict_ineq (List.tl s2)
+ C2. gen_3 +. eval_poly (sum_polys (scale_system (List.tl s2) c)) x <= 0
+ C3. c <> []
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.1.3''''.8.1:
+
+ H0. s2 <> []
+ H1. good_poly_length (Destruct(Geq, 0, List.hd s2)).1 x
+ H2. good_poly_length s11 x
+ H3. Is_a(Geq, List.hd s2)
+ H4. well_formed (List.tl s2) x
+ H5. eval_system (List.tl s2) x
+ H6. gen_3 +. eval_poly [] x <= 0
+ H7. eval_poly (Destruct(Geq, 0, List.hd s2)).1 x >= 0
+|---------------------------------------------------------------------------
+ C0. gen_3 <= 0
+ C1. Is_a([], scale_system (List.tl s2) c)
+ C2. has_strict_ineq (List.tl s2)
+ C3. (List.tl s2) <> []
+ C4. c <> []
+
+But simplification reduces this to true, using the definition of eval_poly.
+
+Subgoal 1.1.3''''.7:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. eval_system s2 x
+ H3. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H4. s2 <> []
+ H5. c <> []
+ H6. not Is_a(Eq, List.hd s2)
+ H7. Is_a(Geq, List.hd s2)
+ H8. not (List.hd c >= 0)
+ H9. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c))) x
+         <= 0)
+     || not (eval_system (List.tl s2) x) || (List.tl c) <> []
+ H10. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+But this is immediate by our hypotheses.
+
+Subgoal 1.1.3''''.6:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. eval_system s2 x
+ H3. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H4. s2 <> []
+ H5. c <> []
+ H6. not Is_a(Eq, List.hd s2)
+ H7. not Is_a(Geq, List.hd s2)
+ H8. List.hd c <= 0
+ H9. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c))) x
+         <= 0)
+     || not (eval_system (List.tl s2) x) || (List.tl c) <> []
+ H10. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+But this is immediate by our hypotheses.
+
+Subgoal 1.1.3''''.5:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. s2 <> []
+ H3. c <> []
+ H4. Is_a(Eq, List.hd s2)
+ H5. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c))) x
+         <= 0)
+     || not (eval_system (List.tl s2) x) || (List.tl c) <> []
+ H6. eval_system s2 x
+ H7. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H8. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+But this is immediate by our hypotheses.
+
+Subgoal 1.1.3''''.4:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. eval_system s2 x
+ H3. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H4. s2 <> []
+ H5. c <> []
+ H6. not Is_a(Eq, List.hd s2)
+ H7. Is_a(Geq, List.hd s2)
+ H8. List.hd c >= 0
+ H9. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c))) x
+         <= 0)
+     || not (eval_system (List.tl s2) x) || (List.tl c) <> []
+ H10. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+But this is immediate by our hypotheses.
+
+Subgoal 1.1.3''''.3:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. s2 <> []
+ H3. c <> []
+ H4. not Is_a(Eq, List.hd s2)
+ H5. not Is_a(Geq, List.hd s2)
+ H6. not (List.hd c <= 0)
+ H7. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3
+         +. eval_poly (sum_polys (scale_system (List.tl s2) (List.tl c))) x
+         <= 0)
+     || not (eval_system (List.tl s2) x) || (List.tl c) <> []
+ H8. eval_system s2 x
+ H9. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H10. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+But this is immediate by our hypotheses.
+
+Subgoal 1.1.3''''.2:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. s2 <> []
+ H3. not (c <> [])
+ H4. Is_a(Eq, List.hd s2)
+ H5. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3 +. eval_poly (sum_polys (scale_system (List.tl s2) c)) x <= 0)
+     || not (eval_system (List.tl s2) x) || c <> []
+ H6. eval_system s2 x
+ H7. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H8. well_formed s2 x
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+This simplifies, using the definitions of eval_system, has_strict_ineq,
+p_add, scale_system, sum_polys and well_formed to the following 2 subgoals:
+
+Subgoal 1.1.3''''.2.2:
+
+ H0. (List.tl s2) <> []
+ H1. s2 <> []
+ H2. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H3. good_poly_length s11 x
+ H4. gen_3
+     +. eval_poly
+        (p_add (Destruct(Eq, 0, List.hd s2))
+         (sum_polys (scale_system (List.tl s2) c)))
+        x
+     <= 0
+ H5. well_formed (List.tl s2) x
+ H6. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+ H7. Is_a(Eq, List.hd s2)
+ H8. eval_system (List.tl s2) x
+|---------------------------------------------------------------------------
+ C0. gen_3 <= 0
+ C1. has_strict_ineq (List.tl s2)
+ C2. gen_3 +. eval_poly (sum_polys (scale_system (List.tl s2) c)) x <= 0
+ C3. c <> []
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.1.3''''.2.1:
+
+ H0. s2 <> []
+ H1. good_poly_length (Destruct(Eq, 0, List.hd s2)) x
+ H2. good_poly_length s11 x
+ H3. well_formed (List.tl s2) x
+ H4. eval_poly (Destruct(Eq, 0, List.hd s2)) x = 0
+ H5. Is_a(Eq, List.hd s2)
+ H6. eval_system (List.tl s2) x
+ H7. gen_3 +. eval_poly [] x <= 0
+|---------------------------------------------------------------------------
+ C0. gen_3 <= 0
+ C1. Is_a([], scale_system (List.tl s2) c)
+ C2. has_strict_ineq (List.tl s2)
+ C3. (List.tl s2) <> []
+ C4. c <> []
+
+But simplification reduces this to true, using the definition of eval_poly.
+
+Subgoal 1.1.3''''.1:
+
+ H0. s2 <> []
+ H1. good_poly_length s11 x
+ H2. eval_system s2 x
+ H3. gen_3 +. eval_poly (sum_polys (scale_system s2 c)) x <= 0
+ H4. well_formed s2 x
+ H5. s2 <> []
+ H6. not (c <> [])
+ H7. not Is_a(Eq, List.hd s2)
+ H8. not Is_a(Geq, List.hd s2)
+ H9. not ((List.tl s2) <> []) || not (good_poly_length s11 x) || (gen_3 <= 0)
+     || not (well_formed (List.tl s2) x) || has_strict_ineq (List.tl s2)
+     || not
+        (gen_3 +. eval_poly (sum_polys (scale_system (List.tl s2) c)) x <= 0)
+     || not (eval_system (List.tl s2) x) || c <> []
+|---------------------------------------------------------------------------
+ C0. has_strict_ineq s2
+ C1. gen_3 <= 0
+ C2. c <> []
+
+But simplification reduces this to true, using the definitions of
+eval_system, has_strict_ineq, p_add, scale_system, sum_polys and well_formed.
+
+Subgoal 1.1.2:
+
+ H0. s <> []
+ H1. (List.tl s) <> []
+ H2. well_formed (List.tl s) x
+ H3. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H4. eval_system (List.tl s) x
+ H5. eval_poly
+     (p_add (Destruct(Gt, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) c)))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. Is_a([], scale_system (List.tl s) c)
+ C1. eval_poly (sum_polys (scale_system (List.tl s) c)) x <= 0
+ C2. Is_a(Geq, List.hd s)
+ C3. Is_a(Eq, List.hd s)
+ C4. c <> []
+ C5. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+But simplification reduces this to true, using the rewrite rules
+eval_p_add_pull and sum_poly_good_length.
+
+Subgoal 1.1.1:
+
+ H0. s <> []
+ H1. well_formed (List.tl s) x
+ H2. good_poly_length (Destruct(Gt, 0, List.hd s)) x
+ H3. List.tl s = []
+ H4. eval_system (List.tl s) x
+ H5. eval_poly
+     (p_add (Destruct(Gt, 0, List.hd s))
+      (sum_polys (scale_system (List.tl s) c)))
+     x <= 0
+|---------------------------------------------------------------------------
+ C0. Is_a([], scale_system (List.tl s) c)
+ C1. Is_a(Geq, List.hd s)
+ C2. Is_a(Eq, List.hd s)
+ C3. c <> []
+ C4. eval_poly (Destruct(Gt, 0, List.hd s)) x <= 0
+
+But simplification reduces this to true, using the definitions of eval_poly,
+eval_system, p_add, scale_system, sum_polys and well_formed.
+
+ ⓘ  Rules:
+    (:def eval_poly)
+    (:def eval_system)
+    (:def has_strict_ineq)
+    (:def p_add)
+    (:def scale_system)
+    (:def sum_polys)
+    (:def well_formed)
+    (:rw eval_p_add_pull)
+    (:rw eval_poly_scale)
+    (:rw good_length_p_scale)
+    (:rw sum_poly_good_length)
+    (:fc add_negative)
+    (:fc eval_p_add_pull)
+    (:fc eval_poly_scale)
+    (:fc scale_system_not_empty)
+    (:induct scale_system)
+
+[✓] Theorem proved.

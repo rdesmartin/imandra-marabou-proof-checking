@@ -5,6 +5,7 @@ type var_vect = Real.t list;;
 type exp = 
   | Eq of poly
   | Geq of (int * poly)
+  | Gt of poly
 ;;
 
 type certificate = Real.t list;;
@@ -31,7 +32,14 @@ let rec is_neg_constant (p: poly): bool =
     match p with
     | [c] -> c <. 0.
     | p :: ps -> p = 0. && is_neg_constant ps
-    | [] -> false (* maybe we need true here *)
+    | [] -> false
+
+    let rec is_nonpos_constant (p: poly): bool = 
+    match p with
+    | [c] -> c <=. 0.
+    | p :: ps -> p = 0. && is_nonpos_constant ps
+    | [] -> false
+
 
 let rec p_add (p: poly) (q: poly): poly =
     match p, q with 
@@ -66,8 +74,13 @@ let rec scale_system (es: system) (cs: Real.t list) : poly list =
 let mk_certificate (s: system) (cs: Real.t list): certificate =
     sum_polys (scale_system s cs)
 
-let check_cert (s: system) (cs: certificate): bool = 
-    is_neg_constant (mk_certificate s cs) 
+let check_cert (s: system) (cs: certificate): bool =
+    if (has_strict_ineq s)
+    then (
+        is_nonpos_constant (mk_certificate s cs)
+    ) else (
+        is_neg_constant (mk_certificate s cs) 
+    )
 
 (* Housekeeping about size, etc. *)
 
@@ -193,8 +206,3 @@ theorem farkas_lemma (s: system) (x: var_vect) (c: certificate) =
     negative_eval_certificate s c x,
     non_negative_solution_certificate' s c x
     ]
-
-    
-
-
-

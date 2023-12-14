@@ -1,16 +1,15 @@
-type poly = Real.t list;;
+type poly = Real.t list
 
-type var_vect = Real.t list;;
+type var_vect = Real.t list
 
 type exp = 
   | Eq of poly
-  | Geq of (int * poly)
+  | Geq of poly
   | Gt of poly
-;;
 
-type certificate = Real.t list;;
+type certificate = Real.t list
 
-type system = exp list;;
+type system = exp list
 
 let rec eval_poly (p: poly) (x: var_vect): Real.t =
     match p, x with
@@ -21,7 +20,7 @@ let rec eval_poly (p: poly) (x: var_vect): Real.t =
 let eval_exp (e: exp) (x: var_vect): bool =
     match e with
     | Eq p  -> eval_poly p x = 0.
-    | Geq (_, p) -> eval_poly p x >=. 0.
+    | Geq p -> eval_poly p x >=. 0.
     | Gt p -> eval_poly p x >. 0. 
 
 let rec eval_system (s: system) (x: var_vect): bool = 
@@ -34,13 +33,6 @@ let rec is_neg_constant (p: poly): bool =
     | [c] -> c <. 0.
     | p :: ps -> p = 0. && is_neg_constant ps
     | [] -> false
-
-    let rec is_nonpos_constant (p: poly): bool = 
-    match p with
-    | [c] -> c <=. 0.
-    | p :: ps -> p = 0. && is_nonpos_constant ps
-    | [] -> false
-
 
 let rec p_add (p: poly) (q: poly): poly =
     match p, q with 
@@ -62,7 +54,7 @@ let rec sum_polys (ps: poly list): poly =
 let rec scale_system (es: system) (cs: Real.t list) : poly list =
     match es, cs with
     | Eq e :: es , c :: cs -> p_scale e c :: scale_system es cs
-    | Geq (_, e) :: es , c :: cs ->
+    | Geq e :: es , c :: cs ->
         if (c >=. 0.) then (
             p_scale e c :: scale_system es cs
         ) else (
@@ -75,7 +67,7 @@ let rec scale_system (es: system) (cs: Real.t list) : poly list =
             e :: scale_system es cs
         )
     | Eq e :: es, [] -> e :: scale_system es cs
-    | Geq (_, e) :: es, [] -> e :: scale_system es cs 
+    | Geq e :: es, [] -> e :: scale_system es cs 
     | Gt e :: es, [] -> e :: scale_system es cs  
     | _ -> []
 
@@ -89,7 +81,7 @@ let rec has_strict_ineq s = match s with
     | Eq _ :: s | Geq _ :: s -> has_strict_ineq s
 
 let check_cert (s: system) (cs: certificate): bool =
-    is_nonpos_constant (mk_certificate s cs)
+    is_neg_constant (mk_certificate s cs)
 
 (* Housekeeping about size, etc. *)
 
@@ -101,9 +93,10 @@ let rec good_poly_length (p: poly) (x: var_vect): bool =
 
 let rec well_formed (s: system) (x: var_vect): bool =
     match s with
-    | [] -> true
+    | [] -> false
+    | [Eq e] | [Geq e] | [Gt e] -> good_poly_length e x
     | Eq e :: es -> good_poly_length e x && well_formed es x 
-    | Geq (_, e) :: es -> good_poly_length e x && well_formed es x
+    | Geq e :: es -> good_poly_length e x && well_formed es x
     | Gt e :: es -> good_poly_length e x && well_formed es x
 
 lemma good_length_p_scale (p: poly) (x: var_vect) (c: Real.t) =
@@ -131,7 +124,6 @@ lemma sum_poly_good_length (s: system) (c: Real.t list) (x: var_vect) =
     good_poly_length (sum_polys (scale_system s c)) x
 [@@auto][@@rw][@@fc]
 
-
 (* actual proof:
 
     A := check_cert s c = true
@@ -144,28 +136,28 @@ lemma sum_poly_good_length (s: system) (c: Real.t list) (x: var_vect) =
     therefore A -> not B
 *)
 
-(* check_cert s c -> eval_poly (mk_certificate s c) x <. 0.
+(* check_cert s c -> eval_poly (mk_certificate s c) x <=. 0.
 *)
 lemma negative_certificate s c =
     check_cert s c 
     ==>
-    is_nonpos_constant (mk_certificate s c)
+    is_neg_constant (mk_certificate s c)
 [@@rw]
 
-lemma neg_constant (p: poly) (x: var_vect) =
+lemma eval_neg_constant (p: poly) (x: var_vect) =
     good_poly_length p x &&
-    is_nonpos_constant p 
+    is_neg_constant p 
     ==> 
     eval_poly p x <=. 0.
     [@@auto]
 
 lemma neg_constant_certificate (s: system) (c: Real.t list) (x: var_vect) =
     well_formed s x &&
-    is_nonpos_constant (mk_certificate s c) 
+    is_neg_constant (mk_certificate s c) 
     ==> 
     eval_poly (mk_certificate s c) x <=. 0.
     [@@auto]
-    [@@apply neg_constant (mk_certificate s c) x]
+    [@@apply eval_neg_constant (mk_certificate s c) x]
     [@@disable mk_certificate]
 
 lemma negative_eval_certificate s c x =
@@ -197,3 +189,38 @@ lemma add_negative x y =
     ==> 
     y <. 0.
     [@@auto][@@fc]
+
+lemma scale_system_not_empty s c x =
+    well_formed s x &&
+    s <> [] 
+    ==>
+    scale_system s c <> []
+    [@@auto][@@fc]
+
+(* lemma positive_solution_certificate s c x =
+    well_formed s x 
+    && eval_system s x 
+    && s <> [] 
+    && has_strict_ineq s 
+    ==>
+    eval_poly (mk_certificate s c) x >. 0.
+[@@auto]
+
+lemma non_negative_solution_certificate' s c x = 
+    well_formed s x &&
+    eval_system s x 
+    ==>
+    not (eval_poly (mk_certificate s c) x <=. 0.)
+[@@auto][@@apply non_negative_solution_certificate s c x]
+
+(* main theorem *)
+theorem farkas_lemma (s: system) (x: var_vect) (c: certificate) =
+    well_formed s x &&
+    check_cert s c
+    ==>
+    eval_system s x = false
+    [@@auto]
+    [@@apply 
+    negative_eval_certificate s c x,
+    non_negative_solution_certificate' s c x
+    ] *)
