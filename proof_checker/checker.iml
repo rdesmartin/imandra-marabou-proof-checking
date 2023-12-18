@@ -16,6 +16,9 @@ let check_contradiction' contradiction (tableau: real list list) (upper_bounds: 
 (* check contradiction with new representation *)
 let check_contradiction (contradiction: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool = 
     let sys = mk_system contradiction tableau upper_bounds lower_bounds in
+    (* The original contradiction vector has 1 value per tableau row.
+       When we convert the tableau & bounds to the system, we add Geq constraints that we already scale. 
+       We append 1s at the end of the contradiction vector to account for these new constraints. *)
     let c = contradiction @ (repeat 1. (List.length upper_bounds)) in
     check_cert sys c
 
@@ -33,7 +36,6 @@ let check_children_splits children constraints =
     let valid_relu_split = check_relu_split children_splits constraints in
     let valid_single_var_split = check_single_var_split children_splits in
     non_empty_children_splits && (valid_relu_split || valid_single_var_split)
-
 
 (* recursively check nodes in the proof tree *)
 (* We first update the bounds according to the split.

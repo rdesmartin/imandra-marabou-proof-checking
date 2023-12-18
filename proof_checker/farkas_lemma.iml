@@ -4,7 +4,7 @@ type var_vect = Real.t list;;
 
 type exp = 
   | Eq of poly
-  | Geq of (int * poly)
+  | Geq of poly
   | Gt of poly
 ;;
 

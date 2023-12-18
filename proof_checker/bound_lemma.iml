@@ -28,18 +28,26 @@ module BoundLemma = struct
                 (Q.to_float value) 
     [@@program]
 
-    (* Check that the bound lemmas correspond to a known ReLU bound tightening lemma *)
-    let match_relu_lemmas b f aux bound_lemma tableau upper_bounds lower_bounds =
+    let check_lemma bound_lemma tableau upper_bounds lower_bounds =
     match bound_lemma with
     | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
         let linear_combination = LinArith.compute_combination expl tableau in
-        let updated_linear_combination = increment_elem linear_combination caus_var in
+        let updated_linear_combination = increment_elem linear_combination caus_var in 
         let row_bound = 
             if caus_bound_t = UPPER 
-            then 
+            then
                 LinArith.compute_row_upper_bound updated_linear_combination upper_bounds lower_bounds 
             else
                 LinArith.compute_row_lower_bound updated_linear_combination upper_bounds lower_bounds in
+        let system = mk_system_lemma expl tableau upper_bounds lower_bounds (caus_var, row_bound, caus_bound_t) in
+        let cert_coeffs = (1. :: expl) @ (repeat 1. (List.length upper_bounds)) in
+        (check_cert system cert_coeffs, row_bound)  
+    | _ -> (false, 0.)
+
+    (* Check that the bound lemmas correspond to a known ReLU bound tightening lemma *)
+    let match_relu_lemmas b f aux bound_lemma row_bound =
+    match bound_lemma with
+    | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
         if
             (caus_var = b && caus_bound_t = LOWER && row_bound >. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
             (caus_var = f && caus_bound_t = LOWER && row_bound >=. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
@@ -68,16 +76,21 @@ module BoundLemma = struct
     match bound_lemmas with
         | [] -> (true, upper_bounds, lower_bounds)
         | ((Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, _)) as bound_lemma)::tl ->
-            let matched_constraint = match_constraint aff_var caus_var constraints in
-            ( match matched_constraint with
-                | (RELU, [b; f; aux; _]) -> let (matched_lemma, to_update) = match_relu_lemmas b f aux bound_lemma tableau upper_bounds lower_bounds in
-                    if matched_lemma
-                    then
-                        let (upper_bounds', lower_bounds') = Tightening.update_bounds [(aff_var, to_update, aff_bound_t)] upper_bounds lower_bounds in
-                        check_full_lemmas tl tableau upper_bounds' lower_bounds' constraints
-                    else
-                        (false, upper_bounds, lower_bounds)
-                | _ -> (false, upper_bounds, lower_bounds)
+            let (checked, row_bound) = check_lemma bound_lemma tableau upper_bounds lower_bounds in
+            if checked then (
+                let matched_constraint = match_constraint aff_var caus_var constraints in
+                ( match matched_constraint with
+                    | (RELU, [b; f; aux; _]) -> let (matched_lemma, to_update) = match_relu_lemmas b f aux bound_lemma row_bound in
+                        if matched_lemma
+                        then
+                            let (upper_bounds', lower_bounds') = Tightening.update_bounds [(aff_var, to_update, aff_bound_t)] upper_bounds lower_bounds in
+                            check_full_lemmas tl tableau upper_bounds' lower_bounds' constraints
+                        else
+                            (false, upper_bounds, lower_bounds)
+                    | _ -> (false, upper_bounds, lower_bounds)
+                )    
+            ) else (
+                (false, upper_bounds, lower_bounds)
             )
         | (Short _)::_ -> (false, upper_bounds, lower_bounds)
 

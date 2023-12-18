@@ -1,5 +1,6 @@
 open Farkas_lemma
 open Arithmetic
+open Tightening
 
 (*
   Create a polynomial of (size + 1) that represents the bound of variable i:
@@ -56,13 +57,30 @@ let mk_geq_constraints (cs: real list) (upper_bounds: real list) (lower_bounds: 
   let size = List.length cs in
   mk_geq_constraints' cs upper_bounds lower_bounds 0 size
 
+
+let mk_gt_constraint (size: int) (var, value, bound_type): exp = 
+  match bound_type with
+  | Utils.UPPER -> let p = mk_bound_poly size var 1. (-1 *. value) in
+                   Gt p
+  | Utils.LOWER -> let p = mk_bound_poly size var -1. value in
+                   Gt p
+
+
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
-let mk_system (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
+let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
     let eq_constraints = mk_eq_constraints tableau in
     let tableau_linear_combination = LinArith.compute_combination expl tableau in
     let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
     eq_constraints @ geq_constraints
-    
+
+(* Create the polynomial representation of the linear constraints from the matrix representation for bound tightening lemma checking, i.e. with strict inequality constraints *)
+let mk_system_lemma (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) (tightening: Tightening.t): exp list =
+  let eq_constraints = mk_eq_constraints tableau in
+  let tableau_linear_combination = LinArith.compute_combination expl tableau in
+  let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
+  let gt_constraint = mk_gt_constraint (List.length tableau_linear_combination) tightening in
+  gt_constraint @ eq_constraints @ geq_constraints
+
 (* Utils to_string functions for debugging *)
 let rec poly_to_string p = 
   match p with 

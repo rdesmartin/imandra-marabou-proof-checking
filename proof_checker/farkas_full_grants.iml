@@ -58,7 +58,7 @@ let rec p_scale (p:poly) (r:Real.t) : poly =
 let rec is_neg_const (p:poly) : bool =
   match p with
   | [] -> false
-  | [c] -> Real.(c < 0.0)
+  | [c] -> Real.(c <= 0.0)
   | c::p -> c = 0.0 && is_neg_const p
 
 let rec sum_polys (ps:poly list) : poly =
