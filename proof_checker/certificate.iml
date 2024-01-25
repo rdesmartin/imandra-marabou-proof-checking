@@ -1,13 +1,14 @@
 open Farkas_lemma
 open Arithmetic
 open Tightening
+open Utils
 
 (*
-  Create a polynomial of (size + 1) that represents the bound of variable i:
-  all coefficients are 0, except at index i where it is 1 for lower bound
-  and -1 for upper bounds. The constant is the value of the bound.
+  Create a polynomial of size (size + 1) that represents the bound of variable i:
+  all coefficients are 0, except at index i where it is  `coeff` (should be 1 for a lower bound
+  and -1 for an upper bound). The constant is the value of the bound.
 *)
-let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real) =
+let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real): real list =
   if size < 0 then []
   else if size = 0 then [bound]
   else (
@@ -16,10 +17,11 @@ let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real) =
   )
 
 (* return the polynomial from the expression (just the coefficients) *)
-let extract_poly (e: exp) =
+let extract_poly (e: exp): real list =
   match e with
-  | Geq (i, e) -> e
+  | Geq e -> e
   | Eq e -> e
+  | Gt e -> e
 
 (* 
   transform the tableau into a list of Eq expressions, with 
@@ -47,7 +49,7 @@ let rec mk_geq_constraints' (cs: real list) (upper_bounds: real list) (lower_bou
                 mk_bound_poly size i Real.(1. * -c) Real.(-l * -c)
               )
       in
-      Geq (i, p) :: mk_geq_constraints' cs us ls (i + 1) size
+      Geq p :: mk_geq_constraints' cs us ls (i + 1) size
   | _ -> []
 
 (*
@@ -58,13 +60,12 @@ let mk_geq_constraints (cs: real list) (upper_bounds: real list) (lower_bounds: 
   mk_geq_constraints' cs upper_bounds lower_bounds 0 size
 
 
-let mk_gt_constraint (size: int) (var, value, bound_type): exp = 
-  match bound_type with
-  | Utils.UPPER -> let p = mk_bound_poly size var 1. (-1 *. value) in
-                   Gt p
-  | Utils.LOWER -> let p = mk_bound_poly size var -1. value in
-                   Gt p
-
+let mk_gt_constraint (size: int) ((var, value, bound_t): (int * real * bound_type)): exp = 
+  match bound_t with
+  | UPPER -> let p: real list = mk_bound_poly size var 1. (-1. *. value) in
+             Gt p
+  | LOWER -> let p: real list = mk_bound_poly size var (-1.) value in
+             Gt p
 
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
 let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
@@ -72,14 +73,29 @@ let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_b
     let tableau_linear_combination = LinArith.compute_combination expl tableau in
     let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
     eq_constraints @ geq_constraints
+    (*
+    (eval expl tableau upper_bounds lower_bounds tightening x) =
+    is_bounded lower_bounds x upper_bounds && null_product tableau x 
+    *)
 
-(* Create the polynomial representation of the linear constraints from the matrix representation for bound tightening lemma checking, i.e. with strict inequality constraints *)
+(* Create the polynomial representation of the linear constraints from the matrix representation 
+   for bound tightening lemma checking, i.e. with strict inequality constraints *)
 let mk_system_lemma (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) (tightening: Tightening.t): exp list =
   let eq_constraints = mk_eq_constraints tableau in
   let tableau_linear_combination = LinArith.compute_combination expl tableau in
   let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
   let gt_constraint = mk_gt_constraint (List.length tableau_linear_combination) tightening in
-  gt_constraint @ eq_constraints @ geq_constraints
+  gt_constraint :: (eq_constraints @ geq_constraints)
+  (* mk_system_lemma expl tableau upper_bounds lower_bounds tightening: expr list
+
+  equivalence lemma:
+  forall x
+  (eval expl tableau upper_bounds lower_bounds tightening x) 
+  =
+  s (mk_system_lemma expl tableau upper_bounds lower_bounds tightening) 
+  *)
+
+
 
 (* Utils to_string functions for debugging *)
 let rec poly_to_string p = 
@@ -91,6 +107,7 @@ let rec poly_to_string p =
 let rec system_to_string system = 
   match system with 
   | [] -> "\n"
-  | Geq (var, e) :: es -> "Geq " ^ poly_to_string e ^ system_to_string es
+  | Geq e :: es -> "Geq " ^ poly_to_string e ^ system_to_string es
   | Eq e :: es -> "Eq " ^ poly_to_string e ^ system_to_string es
+  | Gt e :: es -> "Gt " ^ poly_to_string e ^ system_to_string es
 [@@program]

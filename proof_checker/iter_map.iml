@@ -31,7 +31,7 @@ module Iter_map = struct
 
   let empty = of_list []
 
-   let rec to_list len m =
+  let rec to_list len m =
    if len < 0 then []
    else
    (to_list (len - 1) m) @ [(get len m)]

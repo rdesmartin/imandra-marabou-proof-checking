@@ -74,7 +74,11 @@ module JSON_decoder = struct
     let* bound_type = field "bound" bound_decoder in
     succeed (var, value, bound_type)
 
-  let lemma_decoder: BoundLemma.t D.decoder =
+  let explanation_decoder (proof_size: int): real list D.decoder =
+    let open D in
+    map (M.to_list (proof_size - (Z.of_int 1))) sparse_row_decoder
+  
+  let lemma_decoder (proof_size: int): BoundLemma.t D.decoder =
     let open D in
     one_of [
       ( "full_lemma",
@@ -84,7 +88,7 @@ module JSON_decoder = struct
         let* caus_var = field "causVar" int_decoder in
         let* caus_bound = field "causBound" bound_decoder in
         let* constrnt = field "constraint" constraint_type_decoder in
-        let* expl = field "expl" (list float_decoder) in
+        let* expl = field "expl" (explanation_decoder proof_size) in
         succeed @@ BoundLemma.Full (aff_var, aff_bound, bound, caus_var, caus_bound, constrnt, expl)
       );
       ( "short_lemma",
@@ -95,36 +99,36 @@ module JSON_decoder = struct
       )
     ]
 
-  let proof_node_decoder: ProofTree.t D.decoder =
+  let rec proof_node_decoder (proof_size: int): ProofTree.t D.decoder =
     let open D in
-    fix (fun proof_node_decoder ->
+    (* fix (fun proof_node_decoder -> *)
         one_of [
           ( "node",
             let* splits = field "split" (list split_decoder) in
-            let* lemmas = field_opt_or ~default:[] "lemmas" (list lemma_decoder) in
-            let* children = field "children" (list proof_node_decoder) in
+            let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
+            let* children = field "children" (list (proof_node_decoder proof_size)) in
             succeed (ProofTree.Node (splits, lemmas, children))
           );
           ( "leaf",
             let* splits = field "split" (list split_decoder) in
-            let* lemmas = field_opt_or ~default:[] "lemmas" (list lemma_decoder) in
-            let* contradiction = field "contradiction" (list float_decoder) in
+            let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
+            let* contradiction = field "contradiction" (explanation_decoder proof_size) in
             succeed (ProofTree.Leaf (splits, lemmas, contradiction))
           )
         ]
-      )
+      (* ) *)
 
-  let proof_root_decoder: ProofTree.t D.decoder =
+  let proof_root_decoder (proof_size: int): ProofTree.t D.decoder =
     let open D in
     one_of [
       ( "node",
-        let* lemmas = field_opt_or ~default:[] "lemmas" (list lemma_decoder) in
-        let* children = field "children" (list proof_node_decoder) in
+        let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
+        let* children = field "children" (list (proof_node_decoder proof_size)) in
         succeed (ProofTree.Node ([], lemmas, children))
       );
       ( "leaf",
-        let* lemmas = field_opt_or ~default:[] "lemmas" (list lemma_decoder) in
-        let* contradiction = field "contradiction" (list float_decoder) in
+        let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
+        let* contradiction = field "contradiction" (explanation_decoder proof_size) in
         succeed (ProofTree.Leaf ([], lemmas, contradiction))
       )
     ]
@@ -137,8 +141,9 @@ module JSON_decoder = struct
     let* lower_bounds = field "lowerBounds" @@ list (map Q.of_float float) in
     let* tableau_width = succeed @@ List.length upper_bounds in
     let* tableau = field "tableau" (sparse_matrix_decoder tableau_width) in
+    let* proof_size = succeed @@ List.length tableau in
     let* constraints = field "constraints" (list constraint_decoder) in
-    let* proof_tree = field "proof" proof_root_decoder in
+    let* proof_tree = field "proof" (proof_root_decoder proof_size) in
     succeed (tableau, upper_bounds, lower_bounds, constraints, proof_tree)
 
   let decode_proof_file file_name= D.decode_file proof_decoder file_name 
@@ -147,7 +152,7 @@ module JSON_decoder = struct
   let decode_proof_file_refl file_name = 
     match D.decode_file proof_decoder file_name with
     | Ok res -> Result.return res
-    | Error e -> Result.fail @@ "error"
+    | Error e -> Result.fail e
   [@@program]
 
 end 

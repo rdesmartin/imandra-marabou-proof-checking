@@ -1,14 +1,21 @@
 open Json_decoder
 open Proof_tree
 open Checker
+open Certificate
+
+open Tightening
+(* let test_tightening: Tightening.t = (3, 3., Utils.LOWER);; *)
+
+(* Printf.printf "%s" (system_to_string [mk_gt_constraint 4 test_tightening]) *)
 
 let load_proof = JSON_decoder.decode_proof_file [@@program]
 
 let check_proof_file file_name =
     let proof_res = load_proof file_name in
     match proof_res with
-    | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
-      check_proof_tree tableau upper_bounds lower_bounds constraints proof_tree
+    | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> (* what are the constraints ? *)
+      check_proof_tree tableau upper_bounds lower_bounds constraints proof_tree 
+      (*check_proof_tree = true means that the (tableau, bounds) is unsatisfiable *)
     | Error e -> let () = Printf.printf "Error opening proof file %s\n" file_name in
                  false
     [@@program]
@@ -16,20 +23,5 @@ let check_proof_file file_name =
 let current_proof = Sys.argv.(1)
 [@@program]
 
-let mk_cert_test () =
-  let open Certificate in
-  let tableau = [[1.; 1.];
-                 [2.; -3.]]
-  in
-  let upper_bounds = [- 1.; 2.] in
-  let lower_bounds = [- 2.; - 1.] in
-  let contradiction = [1.; 1.] in
-  let sys = mk_system contradiction tableau upper_bounds lower_bounds in
-  let () = Printf.printf "%s" (system_to_string sys) in 
-  let c = contradiction @ (Utils.repeat 1. (List.length upper_bounds)) in
-  Printf.printf "%b\n" (Farkas_lemma.check_cert sys c)
-
-(* let () = mk_cert_test () *)
-
 let () = Printf.printf "Result for %s: %b\n" current_proof (check_proof_file current_proof) 
-[@@program]
+[@@program] 

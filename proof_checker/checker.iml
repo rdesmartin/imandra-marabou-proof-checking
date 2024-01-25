@@ -8,19 +8,21 @@ open Constraint
 open Farkas_lemma
 open Certificate
 
-(* check that the contradiction is a valid Farkas lemma vector *)
+(* check that the contradiction is a valid Farkas lemma vector in matrix/vector representation *)
 let check_contradiction' contradiction (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool =
     let linear_combination = LinArith.compute_combination contradiction tableau in
-    LinArith.compute_row_upper_bound linear_combination upper_bounds lower_bounds <. 0.
+    let row_upper_bound = LinArith.compute_row_upper_bound linear_combination upper_bounds lower_bounds in
+    row_upper_bound <. 0.
 
-(* check contradiction with new representation *)
+(* check contradiction with polynomials representation *)
 let check_contradiction (contradiction: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool = 
-    let sys = mk_system contradiction tableau upper_bounds lower_bounds in
+    let sys = mk_system_contradiction contradiction tableau upper_bounds lower_bounds in
     (* The original contradiction vector has 1 value per tableau row.
        When we convert the tableau & bounds to the system, we add Geq constraints that we already scale. 
        We append 1s at the end of the contradiction vector to account for these new constraints. *)
-    let c = contradiction @ (repeat 1. (List.length upper_bounds)) in
-    check_cert sys c
+    let contradiction' = contradiction @ (repeat 1. (List.length upper_bounds)) in
+    let res = (check_cert sys contradiction') in
+    res
 
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
 let check_children_splits children constraints =

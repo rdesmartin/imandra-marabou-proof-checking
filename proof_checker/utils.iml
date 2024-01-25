@@ -9,6 +9,12 @@ let bound_type_to_int = function
     | LOWER -> 0i 
     [@@program]
 
+let bound_type_to_str = function
+    | UPPER -> "UPPER"
+    | LOWER -> "LOWER"
+    [@@program]
+
+
 type constraint_type =
     | RELU
     | MAX
