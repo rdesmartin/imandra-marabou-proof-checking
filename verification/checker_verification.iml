@@ -1,52 +1,22 @@
-module M = Iter_map
 
-let is_bounded (x: (int, real) M.t) upper_bounds lower_bounds = 
-    let rec f keys =
-        match keys with
-        | [] -> true
-        | k::ks -> let value = M.get k x in
-            let upper_bound = M.get k upper_bounds in   
-            let lower_bound = M.get k lower_bounds in
-            if value >=. lower_bound && value <=. upper_bound
-            then f ks
-            else false
-    in
-    f x.keys
-
-let rec null_prod (tableau: (int, real) M.t list) (x: (int, real) M.t) =
-    match tableau with 
-    | [] -> true
-    | row::tl -> dot_product row.keys row x = 0. && (null_prod tl x)
-
-let rec satisfy_constraints x constraints =
-    match constraints with 
-    | (RELU, b, f, _, _)::tl -> 
-        let b_value = M.get b x in
-        let f_value = M.get f x in
-        ((b = f && b >=. 0.) || (f = 0. && b <=. 0.)) && 
-        satisfy_constraints x tl
-    | _ -> false
-
-lemma verify_node_checking x tableau upper_bounds lower_bounds constraints proof_node =
-    match proof_node with
-    | ProofTree.Node (split, bound_lemmas, children) ->
-       (check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints &&
-       check_children_splits children constraints &&
-       all (List.map (check_node tableau upper_bounds'' lower_bounds'' constraints) children) ) ==>
-
-       not (is_bounded x upper_bounds lower_bounds && 
-       null_prod tableau x &&
-       satisfies_constraints x constraints)
-    | ProofTree.Leaf (split, bound_lemmas, contradiction) ->
-    (check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints &&
-    check_contradiction tableau upper_bounds lower_bounds constraints contradiction) ==>
-    not (is_bounded x upper_bounds lower_bounds && 
-    null_prod tableau x &&
-    satisfies_constraints x constraints)
+(** Return true if the variable vector x is a solution to the tableau *)
+let is_solution (tableau: real list list) (x: real list) : bool =
+    all (List.map (fun row -> dot_product row x = 0.))
 
 
-theorem verify_checker x tableau upper_bounds lower_bounds constraints proof_node =
-    check_root tableau upper_bounds lower_bounds constraints proof_node ==> 
-    not (is_bounded x upper_bounds lower_bounds && 
-         null_prod tableau x &&
-         satisfies_constraints x constraints)
+lemma split_correctness = 
+
+
+lemma node_checker_verification tableau upper_bounds lower_bounds constraints proof_tree x =
+    valid_bounds && valid_children_splits && valid_children 
+    ==>
+    (is_bounded lower_bounds x upper_bounds &&
+    is_solution tableau x
+    ) = false
+
+theorem checker_verification tableau upper_bounds lower_bounds constraints proof_tree x =
+    check_proof_tree tableau upper_bounds lower_bounds proof_tree
+    ==> 
+    (is_bounded lower_bounds x upper_bounds &&
+     is_solution tableau x
+    ) = false

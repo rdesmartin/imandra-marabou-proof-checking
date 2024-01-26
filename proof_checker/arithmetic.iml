@@ -1,12 +1,8 @@
 open Utils
 
 module LinArith = struct
-    (* is_bounded returns true is the vector xs is bounded by us and ls, i.e. for each corresponding
-       elements x_i, l_i, u_i, l_i <= x <= u_i *)
-    (* let is_bounded xs us ls = 
-       all @@ List.map (fun (x, (u, l)) -> l <=. x && x <=. u) (zip xs (zip us ls))
- *)
-
+    (** is_bounded returns true is the vector xs is bounded by us and ls, i.e. for each corresponding
+        elements x_i, l_i, u_i, l_i <= x <= u_i *)
     let is_upper_bounded x u = all @@ List.map (fun (a, b) -> a <=. b) (zip x u)
 
     lemma is_upper_bounded_elem x u n = 
@@ -27,27 +23,22 @@ module LinArith = struct
         | _ -> true
     [@@auto][@@apply is_upper_bounded_elem l x n, is_upper_bounded_elem x u n]
 
-
-    (* let rec is_bounded_list (vars: real list) (upper_bounds: real list) (lower_bounds: real list) =
-    match vars, upper_bounds, lower_bounds with
-            | [], [], [] -> true
-            | x::xs, u::us, l::ls ->
-                x >=. l && x <=. u && is_bounded_list xs us ls
-            | _ -> false *)
-
+    (** dot-product (or scalar product) of vector x and y, defined with List.map and zip *)
     let dot_product x y = List.fold_left (+.) 0. (List.map (fun (a, b) -> a *. b) (zip x y))
     
+    (** dot-product (or scalar product) of vector x and y, defined recursively (legacy) *)
     let rec dot_product' x y =
         match x, y with
         | [], [] -> 0.
         | x1::xs, y1::ys -> x1 *. y1 +. (dot_product' xs ys)
         | _ -> 0.
     
+    (** Helper function for {!compute_combination} *)
     let update_combination (lc: real list) ((coeff, row): real * real list): real list = 
         list_add lc (list_scale row coeff)
 
-    (* compute a linear combination of tableau rows with coefficients from an explanation vector 
-    (i.e. a lemma vector or a contradiction in a Leaf node) *)
+    (** Compute a linear combination of tableau rows with coefficients from the explanation vector `expl` 
+        (i.e. a bound-tightening lemma vector or a contradiction in a Leaf node) *)
     let compute_combination (expl: real list) (tableau: real list list): real list =
         if tableau = []
         then
@@ -56,6 +47,7 @@ module LinArith = struct
             let linear_combination = (repeat 0. (List.length (List.hd tableau))) in
             List.fold_left update_combination linear_combination (zip expl tableau)
 
+    (** Helper function for {!compute_row_upper_bound} *)
     let upper_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
         if coeff <. 0. 
         then 
@@ -63,10 +55,7 @@ module LinArith = struct
         else
             bound +. (upper_bound *. coeff)
 
-    (* compute the upper bound for a tableau row represented as list of reals *)
-    (* let compute_row_upper_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
-        List.fold_left upper_bound_acc_fun 0. (zip row (zip upper_bounds lower_bounds)) *)
-
+    (** Compute the upper bound for a tableau row represented as list of reals *)
     let rec compute_row_upper_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list): real =
         match row, upper_bounds, lower_bounds with
         | row_h :: row_t, upp_h :: upp_t, low_h :: low_t -> 
@@ -87,6 +76,7 @@ module LinArith = struct
         dot_product x row <=. u
     [@@induct functional upper_bound_induct_scheme] *)
 
+    (** Helper function for {!compute_row_lower_bound}  *)
     let lower_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
         if coeff <. 0. 
         then 
@@ -94,7 +84,7 @@ module LinArith = struct
         else
             bound +. (lower_bound *. coeff)
 
-    (* compute the upper bound for a tableau row represented as list of reals *)
+    (** Compute the upper bound for a tableau row represented as list of reals *)
     let compute_row_lower_bound (row: real list) (upper_bounds: real list) (lower_bounds: real list) =
         List.fold_left lower_bound_acc_fun 0. (zip row (zip upper_bounds lower_bounds))
 

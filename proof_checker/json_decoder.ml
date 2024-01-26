@@ -42,8 +42,8 @@ module JSON_decoder = struct
   let sparse_matrix_decoder (matrix_width: int): ((real list list) D.decoder) =
     let open D in
     list @@ map (M.to_list (matrix_width - (Z.of_int 1))) sparse_row_decoder
-  (* Constraints decoder *)
-
+  
+  (** Constraints decoder *)
   let constraint_type_decoder: constraint_type D.decoder =
     let open D in
     int_decoder >>= (fun x -> succeed @@ Constraint.constraint_type_of_int x)

@@ -6,15 +6,17 @@ open Farkas_lemma
 open Certificate
 
 module BoundLemma = struct
-    (* affected variable, affected bound type (UPPER or LOWER), bound value, causing variable, causing bound type, constraint type, explanation *)     
+    (** Affected variable, affected bound type (UPPER or LOWER), bound value, causing variable, causing bound type, constraint type, explanation *)     
     type t = 
     | Full of int * bound_type * real * int * bound_type * constraint_type * real list
     | Short of int * bound_type * real
 
+    (** Extract bound-tightening information (affected variable, new value, bound-type) from a BoundLemma.t variable *)
     let to_tightening l = match l with
         | Full (var, bound_t, value, _, _, _, _) -> (var, value, bound_t)
         | Short (var, bound_t, value) -> (var, value, bound_t)
 
+    (** Serialise to string *)
     let to_string l = match l with
         | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) -> 
             Printf.sprintf "aff_var: %d, aff_bound_t: %d, value: %f, caus_var: %d, caus_bound_t: %d \n" 
@@ -30,6 +32,8 @@ module BoundLemma = struct
                 (Q.to_float value) 
     [@@program]
 
+    (** Check with the verified [check_cert] function that a bound-tightening lemma is valid, i.e. that the  
+        certificate given by the explanation vector implies unsatisfiability *)
     let check_lemma bound_lemma tableau upper_bounds lower_bounds =
     match bound_lemma with
     | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
@@ -43,19 +47,25 @@ module BoundLemma = struct
             else
                 LinArith.compute_row_lower_bound updated_linear_combination upper_bounds lower_bounds in
         let system = mk_system_lemma expl tableau upper_bounds lower_bounds (caus_var, row_bound, caus_bound_t) in
-        (* let () = Printf.printf "%s\n" (system_to_string system) in *)
+        (*  When computing the proof of UNSAT, the coeffs for the Gt and the Geq constraint polynomials are 1, 
+            and the coefficients for the Eq constraint are the coefficients of [expl], so create the certificate coeffs by
+            adding 1s to the [expl] vector. *)
         let cert_coeffs = (1. :: expl) @ (repeat 1. (List.length upper_bounds)) in
+        (*  The verified [check_cert] function proves the system's unsatisfiability *)
         let checked_lemma = check_cert system cert_coeffs in
         if checked_lemma = false then (
-            let () = Printf.printf "\nvalue: %f\nrow_bound: %f\naff_var: %d\naff_var_bound_t: %s\ncaus_var: %d\nbound_type: %s\n" (Q.to_float value) (Q.to_float row_bound) (Z.to_int aff_var) (bound_type_to_str aff_bound_t) (Z.to_int caus_var) (bound_type_to_str caus_bound_t) in
             (checked_lemma, row_bound)
         ) else (
-            let () = Printf.printf "check_lemma is ok\n"
             (checked_lemma, row_bound)
         )
     | _ -> (false, 0.)
 
-    (* Check that the bound lemmas correspond to a known ReLU bound tightening lemma *)
+    (** Check that the bound lemmas correspond to a known ReLU bound-tightening lemma (defined by Marabou implementation) 
+        and return new value of the bound depending on the matched lemma.
+        @return (b * v): 
+            (b: bool) represents whether the lemma is valid 
+            (v: real) the new value of the bound 
+    *)
     let match_relu_lemmas b f aux bound_lemma row_bound =
     match bound_lemma with
     | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
@@ -71,10 +81,10 @@ module BoundLemma = struct
             (caus_var = f && caus_bound_t = UPPER && aff_var = b && aff_bound_t = UPPER) ||
             (caus_var = b && caus_bound_t = UPPER && row_bound >. 0. && aff_var = f && aff_bound_t = UPPER)
         then
-        (true, row_bound)
+            (true, row_bound)
         else if
-        (caus_var = aux && caus_bound_t = UPPER && aff_var = b && aff_bound_t = LOWER) ||
-        (caus_var = b && caus_bound_t = LOWER && aff_var = aux && aff_bound_t = UPPER && value >=. 0.)
+            (caus_var = aux && caus_bound_t = UPPER && aff_var = b && aff_bound_t = LOWER) ||
+            (caus_var = b && caus_bound_t = LOWER && aff_var = aux && aff_bound_t = UPPER && value >=. 0.)
         then
             (true, -. row_bound)
         else
@@ -82,7 +92,8 @@ module BoundLemma = struct
     | _ -> (false, 0.)
 
 
-    (* complete check of bound lemmas, and updates the bounds between two lemma checkings *)
+    (** Check that bound-tightening lemmas (1) correspond to a ReLU lemma that is part of Marabou's theory, and (2) can be explained by the stored explanation vector.
+        The bounds are updated between two lemma checkings *)
     let rec check_full_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints =
     match bound_lemmas with
         | [] -> (true, upper_bounds, lower_bounds)
@@ -102,18 +113,18 @@ module BoundLemma = struct
                 )
             ) else (
                 (* if check_lemma fails, we continue to check the proof without updating the bounds *)
-                (true, upper_bounds, lower_bounds)
+                check_full_lemmas tl tableau upper_bounds lower_bounds constraints
+                (* (true, upper_bounds, lower_bounds) *)
             )
         | (Short _)::_ -> (false, upper_bounds, lower_bounds)
 
-    (* updates the bounds according to the dynamic tightenings lemmas *)
+    (** Update the bounds according to the dynamic tightenings lemmas (without checking validity of lemmas) *)
     let update_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints =
         let tightenings = List.map to_tightening bound_lemmas in
         let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
         (true, upper_bounds', lower_bounds')
 
-
-    (* applies complete lemma checking for full lemmas and simply updates the bounds in case of simple lemmas *)
+    (** Apply complete lemma checking for full lemmas and simply updates the bounds in case of simple lemmas *)
     let check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints =
         match bound_lemmas with
         | (Short _)::tl -> update_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints

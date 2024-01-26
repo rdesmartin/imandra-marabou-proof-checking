@@ -5,24 +5,29 @@ import os
 import subprocess
 from datetime import datetime as dt
 
-CMD = "dune exec -- ./proof_checker/main_program.exe".split(' ')
+CMD = "dune exec -- ./proof_checker/main_extract.exe".split(' ')
 LOG_FILE = "./experiments.log"
 RESULT_FILE = "./timing.csv"
 
 TIMEOUT=5*3600  # in seconds
 
 TEST_FILES = [
-    "json/acasxu_2_9_3_LEMMAS.json",
-    "json/acasxu_3_7_3_LEMMAS.json", 
-    "json/acasxu_5_7_3_LEMMAS.json",  
-    "json/acasxu_5_9_3_LEMMAS.json",
-    "json/acasxu_2_9_4_LEMMAS.json",  
-    # "json/acasxu_2_9_p3_NL.json",
-    # "json/acasxu_2_9_p4_NL.json",
-    # "json/acasxu_3_7_p3_NL.json",  
-    # "json/acasxu_5_7_p3_NL.json",  
-    # "json/acasxu_5_9_p3_NL.json",
+    "./examples/proof_reluBenchmark0.05650806427s.json", 
+    "./examples/proof_reluBenchmark0.05650806427s_lemmas.json", 
+    "./examples/proof_reluBenchmark0.15145778656s.json", 
+    "./examples/proof_reluBenchmark0.15145778656s_lemmas.json", 
+    "./examples/proof_reluBenchmark0.19238615036s.json", 
+    "./examples/proof_reluBenchmark0.19238615036s_lemmas.json", 
+    "./examples/proof_reluBenchmark0.24204993248s.json", 
+    "./examples/proof_reluBenchmark0.24204993248s_lemmas.json", 
+    "./examples/proof_reluBenchmark0.24551987648s.json", 
+    "./examples/proof_reluBenchmark0.24551987648s_lemmas.json", 
+    "./examples/proof_reluBenchmark0.359375s.json", 
+    "./examples/proof_reluBenchmark0.359375s_lemmas.json", 
+    "./examples/proof_reluBenchmark0.479170084s.json", 
+    "./examples/proof_reluBenchmark0.479170084s_lemmas.json"
 ]
+
 
 def log(msg):
     with open(LOG_FILE, "a+") as f:

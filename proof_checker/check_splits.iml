@@ -6,7 +6,7 @@ let check_single_var_split children_splits =
     | [[(var1, value1, bound_type1)]; [(var2, value2, bound_type2)]] -> var1 = var2 && value1 = value2 && bound_type1 <> bound_type2
     | _ -> false
 
-(* find a ReLU constraint given some splits *)
+(** Match a given split with a constraint from a list of known ReLU constraints*)
 let rec match_relu_constraint children_splits constraints =
     match constraints with
     | [] -> []
@@ -46,8 +46,8 @@ let is_inactive split f b = match split with
     | [(var1, 0., UPPER); (var2, 0., UPPER)] -> (var1 = f && var2 = b) || (var1 = b && var2 = f)
     | _ -> false
 
-(* check that children's splits correspond to a ReLU constraint *)
-let check_relu_split children_splits constraints =
+(* Check whether a proof tree node's split correspond to a known ReLU constraint *)
+let check_relu_split (children_splits: (int * float * bound_t) list) constraints =
     let matched_constraint = match_relu_constraint children_splits constraints in
     match matched_constraint, children_splits with
         | [b; f; aux; _], [split1; split2] -> (is_active split1 b aux && is_inactive split2 f b) || (is_active split2 b aux && is_inactive split1 f b)

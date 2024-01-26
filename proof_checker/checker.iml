@@ -39,14 +39,14 @@ let check_children_splits children constraints =
     let valid_single_var_split = check_single_var_split children_splits in
     non_empty_children_splits && (valid_relu_split || valid_single_var_split)
 
-(* recursively check nodes in the proof tree *)
-(* We first update the bounds according to the split.
-   We then check that the dynamic bound tightenings performed at this step are valid, and we apply them. 
+(** Recursively check nodes in the proof tree
+    First, update the bounds according to the split.
+    We then check that the dynamic bound tightenings performed at this step are valid, and we apply them. 
    
-   If the node is not a leaf, we then check that its children split the search space correctly (either 2 phases of relu or single var split TODO: what is single var split again?)
-   Then we recursively apply `check_node` on all the node's children.
+    If the node is not a leaf, we then check that its children split the search space correctly (either 2 phases of relu or single var split TODO: what is single var split again?)
+    Then we recursively apply `check_node` on all the node's children.
 
-   If the node is a Leaf, we check that the saved proof vector leads to a contradiction
+    If the node is a Leaf, we check that the saved proof vector leads to a contradiction
     *)
 let rec check_node tableau upper_bounds lower_bounds constraints proof_node =
     match proof_node with
