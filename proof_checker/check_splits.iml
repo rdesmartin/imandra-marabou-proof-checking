@@ -52,3 +52,12 @@ let check_relu_split (children_splits: (int * float * bound_t) list) constraints
     match matched_constraint, children_splits with
         | [b; f; aux; _], [split1; split2] -> (is_active split1 b aux && is_inactive split2 f b) || (is_active split2 b aux && is_inactive split1 f b)
         | _ -> false
+
+let check_non_empty_split c = match c with
+    | ProofTree.Node ([], _, _) | ProofTree.Leaf ([], _, _) -> false
+    | _ -> true
+
+let get_child_split c = match c with
+    | ProofTree.Node (s, _, _) 
+    | ProofTree.Leaf (s, _, _) -> s
+

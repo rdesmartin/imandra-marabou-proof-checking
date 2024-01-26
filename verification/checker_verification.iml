@@ -4,15 +4,11 @@ let is_solution (tableau: real list list) (x: real list) : bool =
     all (List.map (fun row -> dot_product row x = 0.))
 
 
-lemma split_correctness = 
-
-
-lemma node_checker_verification tableau upper_bounds lower_bounds constraints proof_tree x =
-    valid_bounds && valid_children_splits && valid_children 
+lemma split_correctness (_, _, children as proof_tree) x constraints =
+    let children_splits = List.map get_child_split children in
+    check_children_splits children_splits constraints 
     ==>
-    (is_bounded lower_bounds x upper_bounds &&
-    is_solution tableau x
-    ) = false
+    (* express that for each variable with updated bounds in the children, the union of the updated bounds is equal to the variable's bounds in the parent node. *)
 
 theorem checker_verification tableau upper_bounds lower_bounds constraints proof_tree x =
     check_proof_tree tableau upper_bounds lower_bounds proof_tree
