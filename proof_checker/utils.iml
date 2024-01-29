@@ -102,6 +102,12 @@ let increment_elem (l: real list) (n: int): real list =
     | None -> l
     | Some value -> set_nth l n (value +. 1.)
 
+(* decrement list element at given index by 1 *)
+let decrement_elem (l: real list) (n: int): real list =
+    match List.nth n l with
+    | None -> l
+    | Some value -> set_nth l n (value -. 1.)
+
 let rec zip (x: 'a list) (y: 'b list): ('a * 'b) list =
     match x, y with
     | [], _ | _, [] -> []

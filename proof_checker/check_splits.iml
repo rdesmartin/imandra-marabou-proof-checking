@@ -47,17 +47,8 @@ let is_inactive split f b = match split with
     | _ -> false
 
 (* Check whether a proof tree node's split correspond to a known ReLU constraint *)
-let check_relu_split (children_splits: (int * float * bound_t) list) constraints =
+let check_relu_split children_splits constraints =
     let matched_constraint = match_relu_constraint children_splits constraints in
     match matched_constraint, children_splits with
         | [b; f; aux; _], [split1; split2] -> (is_active split1 b aux && is_inactive split2 f b) || (is_active split2 b aux && is_inactive split1 f b)
         | _ -> false
-
-let check_non_empty_split c = match c with
-    | ProofTree.Node ([], _, _) | ProofTree.Leaf ([], _, _) -> false
-    | _ -> true
-
-let get_child_split c = match c with
-    | ProofTree.Node (s, _, _) 
-    | ProofTree.Leaf (s, _, _) -> s
-

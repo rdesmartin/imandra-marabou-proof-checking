@@ -24,6 +24,14 @@ let check_contradiction (contradiction: real list) (tableau: real list list) (up
     let res = (check_cert sys contradiction') in
     res
 
+let check_non_empty_split c = match c with
+    | ProofTree.Node ([], _, _) | ProofTree.Leaf ([], _, _) -> false
+    | _ -> true
+
+let get_child_split c = match c with
+    | ProofTree.Node (s, _, _) 
+    | ProofTree.Leaf (s, _, _) -> s
+
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
 let check_children_splits children constraints =
     let children_splits = List.map get_child_split children in
