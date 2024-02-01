@@ -40,12 +40,6 @@ let rec is_nonpos_constant (p: poly): bool =
     | p :: ps -> if (p = 0.) then is_nonpos_constant ps else (let () = Printf.printf "\np = %f\n" (Q.to_float p) in false)
     | [] -> false
 
-let rec is_nonneg_constant (p: poly): bool =
-    match p with
-    | [c] -> if (c >=. 0.) then (true) else (let () = Printf.printf "\nc is not noneg: %f\n" (Q.to_float c) in false)
-    | p :: ps -> if (p = 0.) then is_nonneg_constant ps else (let () = Printf.printf "\np = %f\n" (Q.to_float p) in false)
-    | [] -> false
-
 let rec p_add (p: poly) (q: poly): poly =
     match p, q with 
     | [], [] -> []
@@ -94,10 +88,8 @@ let rec has_strict_ineq s = match s with
 
 let check_cert (s: system) (cs: certificate): bool =
     if has_strict_ineq s then (
-        (* let () = Printf.printf "\ncall is_nonpos_constant\n" in *)
         is_nonpos_constant (mk_certificate s cs)
     ) else (
-        (* let () = Printf.printf "\ncall is_neg_constant\n" in *)
         is_neg_constant (mk_certificate s cs)
     )
 

@@ -50,12 +50,12 @@ module BoundLemma = struct
         (*  When computing the proof of UNSAT, the coeffs for the Gt and the Geq constraint polynomials are 1, 
             and the coefficients for the Eq constraint are the coefficients of [expl], so create the certificate coeffs by
             adding 1s to the [expl] vector. *)
-        let cert_coeffs = (1. :: expl) @ (repeat 1. (List.length upper_bounds)) in
-        (*  The verified [check_cert] function proves the system's unsatisfiability *)
-        let checked_lemma = if caus_bound_t = UPPER
-            then is_nonpos_constant (mk_certificate system cert_coeffs)
-            else is_nonneg_constant (mk_certificate system cert_coeffs)
+        let cert_coeffs = if caus_bound_t = UPPER
+            then (1. :: expl) @ (repeat 1. (List.length upper_bounds)) 
+            else (1. :: (list_scale expl (-1.))) @ (repeat 1. (List.length upper_bounds)) 
         in
+        (*  The verified [check_cert] function proves the system's unsatisfiability *)
+        let checked_lemma = check_cert system cert_coeffs in
         if checked_lemma = false then (
             let () = Printf.printf "\nvalue: %f\nrow_bound: %f\naff_var: %d\naff_var_bound_t: %s\ncaus_var: %d\nbound_type: %s\n" (Q.to_float value) (Q.to_float row_bound) (Z.to_int aff_var) (bound_type_to_str aff_bound_t) (Z.to_int caus_var) (bound_type_to_str caus_bound_t) in
             (checked_lemma, row_bound)
