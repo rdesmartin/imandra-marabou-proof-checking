@@ -1,0 +1,235 @@
+(* Proof of correctness of the Farkas Lemma as used in the proof checker *)
+
+open Farkas_lemma
+
+(* Housekeeping about size, etc. *)
+
+let rec good_poly_length (p: poly) (x: var_vect): bool =
+    match p, x with
+    | [_], [] -> true
+    | _ :: ps, _ :: xs -> good_poly_length ps xs
+    | _ -> false
+
+let rec well_formed (s: system) (x: var_vect): bool =
+    match s with
+    | [] -> false
+    | [Eq e] | [Geq e] | [Gt e] -> good_poly_length e x
+    | Eq e :: es -> good_poly_length e x && well_formed es x 
+    | Geq e :: es -> good_poly_length e x && well_formed es x
+    | Gt e :: es -> good_poly_length e x && well_formed es x
+
+lemma good_length_p_scale (p: poly) (x: var_vect) (c: Real.t) =
+    good_poly_length p x ==> good_poly_length (p_scale p c) x
+[@@auto][@@rw][@@fc]
+
+lemma good_length_p_add (p: poly) (q: poly) (x: var_vect) =
+    good_poly_length p x &&
+    good_poly_length q x 
+    ==>
+    good_poly_length (p_add p q) x
+[@@auto][@@rw][@@fc]
+
+lemma mk_certificate_good_length (s: system) (c: Real.t list) (x: var_vect) =
+    s <> [] &&
+    well_formed s x
+    ==>
+    good_poly_length (mk_certificate s c) x
+[@@auto][@@rw][@@fc]
+
+lemma sum_poly_good_length (s: system) (c: Real.t list) (x: var_vect) =
+    s <> [] &&
+    well_formed s x
+    ==>
+    good_poly_length (sum_polys (scale_system s c)) x
+[@@auto][@@rw][@@fc]
+
+(* lemmas needed for the proof *)
+
+lemma eval_p_add_pull p q x =
+    good_poly_length p x && 
+    good_poly_length q x 
+    ==>
+    eval_poly (p_add p q) x = (eval_poly p x) +. (eval_poly q x)
+    [@@auto][@@rw][@@fc]
+
+lemma eval_poly_scale p x c = 
+    good_poly_length p x
+    ==>
+    eval_poly (p_scale p c) x = c *. (eval_poly p x)
+    [@@auto][@@rw][@@fc]
+
+lemma add_negative x y =
+    x +. y <=. 0. && 
+    x >. 0.
+    ==> 
+    y <. 0.
+    [@@auto][@@fc]
+
+lemma scale_system_not_empty s c x =
+    well_formed s x &&
+    s <> [] 
+    ==>
+    scale_system s c <> []
+    [@@auto][@@fc]
+
+(* proof for case with strict inequalities:
+
+    A := check_cert s c = true
+    B := eval_system s x = true
+    C := is_nonpos_constant (mk_certificate s c)
+
+    We want to prove 
+    A -> C
+    B -> not C
+    therefore A -> not B
+*)
+
+(* check_cert s c -> eval_poly (mk_certificate s c) x <=. 0.
+*)
+lemma nonpos_certificate s c =
+    has_strict_ineq s &&
+    check_cert s c 
+    ==>
+    is_nonpos_constant (mk_certificate s c)
+[@@auto][@@rw]
+
+lemma eval_nonpos_constant (p: poly) (x: var_vect) =
+    good_poly_length p x &&
+    is_nonpos_constant p 
+    ==> 
+    eval_poly p x <=. 0.
+    [@@auto]
+
+lemma nonpos_constant_certificate (s: system) (c: Real.t list) (x: var_vect) =
+    well_formed s x &&
+    is_nonpos_constant (mk_certificate s c) 
+    ==> 
+    eval_poly (mk_certificate s c) x <=. 0.
+    [@@auto]
+    [@@apply eval_nonpos_constant (mk_certificate s c) x]
+    [@@disable mk_certificate]
+
+lemma nonpos_eval_certificate s c x =
+    well_formed s x &&
+    has_strict_ineq s &&
+    check_cert s c
+    ==>
+    eval_poly (mk_certificate s c) x <=. 0.
+[@@auto][@@apply nonpos_constant_certificate s c x][@@fc]
+
+(* eval_system s x = true -> eval_poly (mk_certificate s c) x > 0. *)
+
+lemma positive_solution_certificate s c x =
+    well_formed s x 
+    && eval_system s x 
+    && s <> [] 
+    && has_strict_ineq s
+    ==>
+    eval_poly (mk_certificate s c) x >. 0.
+[@@auto]
+
+lemma positive_solution_certificate' s c x = 
+    well_formed s x &&
+    has_strict_ineq s &&
+    eval_system s x 
+    ==>
+    not (eval_poly (mk_certificate s c) x <=. 0.)
+[@@auto][@@apply positive_solution_certificate s c x]
+
+(* main theorem *)
+theorem farkas_lemma_strict_ineq (s: system) (x: var_vect) (c: certificate) =
+    well_formed s x &&
+    has_strict_ineq s &&
+    check_cert s c
+    ==>
+    eval_system s x = false
+    [@@auto]
+    [@@apply 
+    nonpos_eval_certificate s c x,
+    positive_solution_certificate' s c x
+    ]
+    [@@fc]
+
+
+(* Proof for case without strict inequalities (same as above) *)
+
+(* check_cert s c -> eval_poly (mk_certificate s c) x <. 0.
+*)
+lemma negative_certificate s c =
+    has_strict_ineq s = false &&
+    check_cert s c 
+    ==>
+    is_neg_constant (mk_certificate s c)
+[@@rw]
+
+lemma neg_constant (p: poly) (x: var_vect) =
+    good_poly_length p x &&
+    is_neg_constant p 
+    ==> 
+    eval_poly p x <. 0.
+    [@@auto]
+
+lemma neg_constant_certificate (s: system) (c: Real.t list) (x: var_vect) =
+    well_formed s x &&
+    is_neg_constant (mk_certificate s c) 
+    ==> 
+    eval_poly (mk_certificate s c) x <. 0.
+    [@@auto]
+    [@@apply neg_constant (mk_certificate s c) x]
+    [@@disable mk_certificate]
+
+lemma negative_eval_certificate s c x =
+    has_strict_ineq s = false &&
+    well_formed s x &&
+    check_cert s c
+    ==>
+    eval_poly (mk_certificate s c) x <. 0.
+[@@auto][@@apply neg_constant_certificate s c x][@@fc]
+
+
+(* eval_system s x = true -> eval_poly (mk_certificate s c) x >= 0. *)
+
+lemma non_negative_solution_certificate s c x =
+    well_formed s x &&
+    eval_system s x &&
+    s <> [] &&
+    has_strict_ineq s = false
+    ==>
+    eval_poly (mk_certificate s c) x >=. 0.
+[@@auto]
+
+lemma non_negative_solution_certificate' s c x = 
+    well_formed s x &&
+    has_strict_ineq s = false &&
+    eval_system s x 
+    ==>
+    not (eval_poly (mk_certificate s c) x <. 0.)
+[@@auto][@@apply non_negative_solution_certificate s c x]
+
+(* main theorem *)
+theorem farkas_lemma_no_strict_ineq (s: system) (x: var_vect) (c: certificate) =
+    well_formed s x &&
+    has_strict_ineq s = false &&
+    check_cert s c
+    ==>
+    eval_system s x = false
+    [@@auto]
+    [@@apply 
+    negative_eval_certificate s c x,
+    non_negative_solution_certificate' s c x
+    ]
+    [@@fc]
+    
+
+(* main theorem *)
+theorem farkas_lemma (s: system) (x: var_vect) (c: certificate) =
+    well_formed s x &&
+    check_cert s c
+    ==>
+    eval_system s x = false
+    [@@auto]
+    [@@apply 
+    farkas_lemma_strict_ineq s c x,
+    farkas_lemma_no_strict_ineq s c x
+    ]
+    [@@disable check_cert, well_formed, eval_system, has_strict_ineq]

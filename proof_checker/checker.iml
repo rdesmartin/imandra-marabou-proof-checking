@@ -8,6 +8,14 @@ open Constraint
 open Farkas_lemma
 open Certificate
 
+type query = {
+    tableau: real list list;
+    upper_bounds: real list;
+    lower_bounds: real list;
+    constraints: Constraint.t list;
+    proof_tree: ProofTree.t;
+}
+
 (* check that the contradiction is a valid Farkas lemma vector in matrix/vector representation *)
 let check_contradiction' contradiction (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool =
     let linear_combination = LinArith.compute_combination contradiction tableau in
@@ -24,20 +32,12 @@ let check_contradiction (contradiction: real list) (tableau: real list list) (up
     let res = (check_cert sys contradiction') in
     res
 
-let check_non_empty_split c = match c with
-    | ProofTree.Node ([], _, _) | ProofTree.Leaf ([], _, _) -> false
-    | _ -> true
-
-let get_child_split c = match c with
-    | ProofTree.Node (s, _, _) 
-    | ProofTree.Leaf (s, _, _) -> s
-
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
 let check_children_splits children constraints =
-    let children_splits = List.map get_child_split children in
-    let non_empty_children_splits = all ((List.map check_non_empty_split) children) in
-    let valid_relu_split = check_relu_split children_splits constraints in
-    let valid_single_var_split = check_single_var_split children_splits in
+    let children_tightenings = List.map ProofTree.get_tightening children in
+    let non_empty_children_splits = all ((List.map ProofTree.non_empty_tightening) children) in
+    let valid_relu_split = check_relu_split children_tightenings constraints in
+    let valid_single_var_split = check_single_var_split children_tightenings in
     non_empty_children_splits && (valid_relu_split || valid_single_var_split)
 
 (** Recursively check nodes in the proof tree

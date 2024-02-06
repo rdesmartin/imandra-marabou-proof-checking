@@ -1,6 +1,4 @@
-open Json_decoder
-open Proof_tree
-open Checker
+let () = System.use "utils.iml"
 
 let tiny1 = "json/tinyJsonProof1.json"
 let tiny1_lemma = "json/tinyJsonProof1_Lemmas.json" (* ~70 Mb *)
@@ -75,8 +73,8 @@ let check_proof_file file_name =
     [@@program]
 
 (* change below to the desired proof file *)
-let current_proof = "json/acasxu_5_7_p3_NL.json"
+(* let current_proof = "json/acasxu_5_7_p3_NL.json"
 [@@program]
 
 let () = Printf.printf "Result for %s: %b\n" current_proof (check_proof_file current_proof) 
-[@@program]
+[@@program] *)

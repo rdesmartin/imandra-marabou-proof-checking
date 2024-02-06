@@ -12,3 +12,17 @@
 ./examples/proof_reluBenchmark0.359375s_lemmas.json;OK;0:00:00.724898
 ./examples/proof_reluBenchmark0.479170084s.json;OK;0:00:01.213967
 ./examples/proof_reluBenchmark0.479170084s_lemmas.json;OK;0:00:02.736211
+./examples/proof_reluBenchmark0.05650806427s.json;OK;0:00:00.647312
+./examples/proof_reluBenchmark0.05650806427s_lemmas.json;OK;0:00:03.848992
+./examples/proof_reluBenchmark0.15145778656s.json;OK;0:00:00.271062
+./examples/proof_reluBenchmark0.15145778656s_lemmas.json;OK;0:00:02.555555
+./examples/proof_reluBenchmark0.19238615036s.json;OK;0:00:00.524003
+./examples/proof_reluBenchmark0.19238615036s_lemmas.json;OK;0:00:13.069930
+./examples/proof_reluBenchmark0.24204993248s.json;OK;0:00:00.628593
+./examples/proof_reluBenchmark0.24204993248s_lemmas.json;OK;0:00:16.275634
+./examples/proof_reluBenchmark0.24551987648s.json;OK;0:00:00.218562
+./examples/proof_reluBenchmark0.24551987648s_lemmas.json;OK;0:00:01.607871
+./examples/proof_reluBenchmark0.359375s.json;OK;0:00:00.427508
+./examples/proof_reluBenchmark0.359375s_lemmas.json;OK;0:00:05.520425
+./examples/proof_reluBenchmark0.479170084s.json;OK;0:00:01.196208
+./examples/proof_reluBenchmark0.479170084s_lemmas.json;OK;0:00:21.703225

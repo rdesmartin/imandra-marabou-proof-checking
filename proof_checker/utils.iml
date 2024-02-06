@@ -161,4 +161,9 @@ lemma zip_cat x1 x2 y1 y2 =
     List.length x1 = List.length y1
     ==> 
     zip (x1 @ x2) (y1 @ y2) = (zip x1 y1) @ (zip x2 y2)
-[@@auto]        
+[@@auto]
+
+(** returns true if all elements of l1 are gte to corresponding elements of l2  *)
+let list_geq (l1: real list) (l2: real list): bool =
+    all (List.map (fun (a, b) -> a >=. b) (zip l1 l2))
+

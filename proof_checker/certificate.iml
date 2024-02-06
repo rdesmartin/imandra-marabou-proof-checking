@@ -73,10 +73,6 @@ let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_b
     let tableau_linear_combination = LinArith.compute_combination expl tableau in
     let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
     eq_constraints @ geq_constraints
-    (*
-    (eval expl tableau upper_bounds lower_bounds tightening x) =
-    is_bounded lower_bounds x upper_bounds && null_product tableau x 
-    *)
 
 (* Create the polynomial representation of the linear constraints from the matrix representation 
    for bound tightening lemma checking, i.e. with strict inequality constraints *)

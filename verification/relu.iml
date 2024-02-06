@@ -1,0 +1,63 @@
+let relu x = if x >=. 0. then x else 0. 
+
+theorem relu_b_non_neg f b aux = 
+    f = relu b && aux +. b -. f = 0. 
+    ==> 
+    f >=. 0.
+[@@fc]
+
+theorem relu_aux_pos b f aux = 
+    f = relu b && aux +. b -. f = 0. 
+    ==> 
+    aux >=. 0.
+[@@fc]
+
+theorem relu_split b f aux = 
+    f = relu b && aux +. b -. f = 0. 
+    ==> 
+    (b >=. 0. && aux <=. 0.) ||
+    (b <=. 0. && f <=. 0. )
+[@@fc]
+
+theorem relu_lemmas_1 b f aux = 
+    f = relu b && aux +. b -. f = 0. 
+    ==>
+    b >=. 0. ==> aux <=. 0.
+
+theorem relu_lemmas_2 b f aux = 
+    f = relu b && aux +. b -. f = 0. 
+    ==>
+    f >. 0. ==> aux <=. 0. 
+    
+theorem relu_lemmas_3 b f aux = 
+    f = relu b && aux +. b -. f = 0. 
+    ==> 
+    aux >. 0. ==> f <=. 0.
+
+
+theorem relu_lemmas_4 b f aux = 
+    f = relu b && aux +. b -. f = 0. 
+    ==>
+    b <=. 0. ==> f <=. 0.
+
+    theorem relu_lemmas_5 b f aux x = 
+    f = relu b && aux +. b -. f = 0. 
+    ==>
+    f <=. x ==> b <=. x
+
+    theorem relu_lemmas_6 b f aux x = 
+    f = relu b && aux +. b -. f = 0. 
+    ==>
+    b <=. x && x >=. 0. ==> f <=. x
+
+    theorem relu_lemmas_7 b f aux x = 
+    f = relu b && aux +. b -. f = 0. 
+    ==>
+    aux <=. x ==> b >=. (-. x)
+
+    theorem relu_lemmas_8 b f aux x = 
+    f = relu b && aux +. b -. f = 0. 
+    ==>
+    b >=. x && x <=. 0. ==> aux <=. (-. x)
+
+

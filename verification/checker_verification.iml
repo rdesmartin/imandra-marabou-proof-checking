@@ -1,18 +1,111 @@
+open Utils
+open Arithmetic
+open Constraint
+open Proof_tree
+open Checker
+open Check_splits
+open Certificate
+open Farkas_lemma
+open Tightening
+open Bound_lemma
 
 (** Return true if the variable vector x is a solution to the tableau *)
 let is_solution (tableau: real list list) (x: real list) : bool =
-    all (List.map (fun row -> dot_product row x = 0.))
+    Utils.all (List.map (fun row -> LinArith.dot_product row x = 0.) tableau)
 
+let valid_split (node: ProofTree.t) (q: query) = 
+    match node with
+    | Leaf _ -> true
+    | Node (tightenings, bound_lemma, children) ->
+        check_children_splits children q.constraints
 
-lemma split_correctness (_, _, children as proof_tree) x constraints =
-    let children_splits = List.map get_child_split children in
-    check_children_splits children_splits constraints 
+lemma valid_split_lm node (q: query) =
+    check_node q.tableau q.upper_bounds q.lower_bounds q.constraints node
     ==>
-    (* express that for each variable with updated bounds in the children, the union of the updated bounds is equal to the variable's bounds in the parent node. *)
+    valid_split node q
+    
+(* let rec valid_split_invariant (node: ProofTree.t) (q: query) = 
+    match node with
+    | Leaf _ -> true
+    | Node (tightenings, bound_lemma, children) ->
+        check_children_splits children q.constraints && 
+        all (List.map (fun n -> valid_split_invariant n q) children)
 
-theorem checker_verification tableau upper_bounds lower_bounds constraints proof_tree x =
+
+lemma valid_split_invariant_lm (node: ProofTree.t) (q: query) =
+    check_node q.tableau q.upper_bounds q.lower_bounds q.constraints node
+    ==>
+    valid_split_invariant node q *)
+    
+
+lemma tighten_invariant tightenings upper_bounds lower_bounds = 
+    tightenings = [] 
+    ==> 
+    Tightening.update_bounds tightenings upper_bounds lower_bounds = (upper_bounds, lower_bounds)
+    [@@rw][@@fc]
+
+lemma bound_lemma_invariant bound_lemmas tableau upper_bounds lower_bounds constraints upper_bounds' lower_bounds' check = 
+    bound_lemmas = []
+    ==>
+    (check, upper_bounds', lower_bounds') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints
+    [@@fc]
+
+(* lemma check_node_invariant tableau upper_bounds lower_bounds constraints node =
+    check_node tableau upper_bounds lower_bounds constraints node
+    ==>
+    match node with
+    | Leaf _ -> true
+    | Node (tightenings, bound_lemmas, children) ->
+        let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
+        let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
+        all (List.map (check_node tableau upper_bounds'' lower_bounds'' constraints) children)
+[@@auto][@@induct functional check_node] *)
+
+(* let check_bounds_invariant (node: ProofTree.t) (q: query): bool =
+    let children_tightenings = List.map ProofTree.get_tightening (ProofTree.get_children node) in
+    let updated_bounds = List.map (fun tightenings -> Tightening.update_bounds tightenings q.upper_bounds q.lower_bounds) children_tightenings in
+    all (List.map (fun (u', l') -> Utils.list_geq q.upper_bounds u' && Utils.list_geq l' q.lower_bounds) updated_bounds) *)
+
+axiom valid_conversion system expl tableau upper_bounds lower_bounds x =
+    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
+    check_cert system (expl @ (repeat 1. (List.length upper_bounds)))
+    ==> 
+    (LinArith.is_bounded lower_bounds x upper_bounds &&
+    is_solution tableau x) = false
+    [@@fc]
+
+lemma checker_leaf_verification contradiction tableau upper_bounds lower_bounds x = 
+    check_contradiction contradiction tableau upper_bounds lower_bounds 
+    ==>
+    (LinArith.is_bounded lower_bounds x upper_bounds &&
+    is_solution tableau x) = false
+    [@@auto]
+    [@@disable Certificate.mk_system_contradiction, Arithmetic.LinArith.is_bounded, Farkas_lemma.check_cert]
+    [@@fc]
+
+theorem checker_leaf_verification tableau upper_bounds lower_bounds constraints node x = 
+    let open ProofTree in
+    match node with 
+    | Node _ -> true
+    | Leaf (tightenings, bound_lemmas, contradiction) ->
+        bound_lemmas = [] && tightenings = [] ==> (
+        let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
+        let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
+        check_contradiction contradiction tableau upper_bounds'' lower_bounds'' 
+        ==>
+        (LinArith.is_bounded lower_bounds x upper_bounds &&
+        is_solution tableau x) = false)
+    [@@auto]
+    [@@disable Tightening.Tightening.update_bounds,
+               Bound_lemma.BoundLemma.check_bound_lemmas,
+               Certificate.mk_system_contradiction,
+               Arithmetic.LinArith.is_bounded,
+               Checker.check_contradiction]
+
+
+(* theorem checker_verification tableau upper_bounds lower_bounds constraints proof_tree x =
     check_proof_tree tableau upper_bounds lower_bounds proof_tree
     ==> 
     (is_bounded lower_bounds x upper_bounds &&
      is_solution tableau x
-    ) = false
+    ) = false *)
