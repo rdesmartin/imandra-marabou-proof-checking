@@ -1,0 +1,492 @@
+open Utils
+open Arithmetic.LinArith
+open Constraint
+open Proof_tree
+open Checker
+open Check_splits
+open Certificate
+open Farkas_lemma
+open Tightening
+open Bound_lemma
+
+(** Return true if the variable vector x is a solution to the tableau *)
+let is_solution (tableau: real list list) (x: real list) : bool =
+    Utils.all (List.map (fun row -> dot_product row x = 0.) tableau)
+
+
+
+(** 
+=========== well_formed_mk_eq_constraints ================================
+ *)
+lemma good_poly_length_append row =
+    good_poly_length (List.append row [0.]) row
+    [@@auto]
+    [@@rw][@@fc]
+
+let rec equal_rows_length tableau size = 
+    match tableau with
+    | hd :: tl -> List.length hd = size && equal_rows_length tl size
+    | [] -> true
+
+let well_formed_tableau tableau = 
+    tableau <> [] &&
+    List.hd tableau <> [] && 
+    equal_rows_length tableau (List.length (List.hd tableau))
+
+lemma equal_row_length_empty_row row tableau =
+    tableau <> [] && List.hd tableau = [] &&
+    row <> []
+    ==>
+    equal_rows_length tableau (List.length row) = false
+    [@@auto]
+    [@@rw][@@fc]
+
+lemma wf_tableau_all_rows_eq_size tableau r = 
+    well_formed_tableau tableau &&
+    List.mem r tableau
+    ==> 
+    List.length r = List.length (List.hd tableau)
+[@@auto]
+[@@fc]
+
+lemma good_poly_length_constraints_same_len tableau system =
+    well_formed_tableau tableau &&
+    system = mk_eq_constraints tableau
+    ==> 
+    good_poly_length (extract_poly (List.hd system)) (List.hd tableau)
+    [@@auto]
+    [@@fc]
+
+lemma wf_tableau_non_empty_row tableau r = 
+    well_formed_tableau tableau &&
+    List.mem r tableau
+    ==> 
+    r <> []
+[@@auto]
+[@@fc]
+
+lemma mk_eq_constraints_non_empty_invariant tableau = 
+    tableau <> [] 
+    ==> 
+    mk_eq_constraints tableau <> []
+    [@@rw][@@fc]
+
+lemma equal_rows_length_tl_invariant tableau1 tableau2 =
+    tableau2 <> [] &&
+    equal_rows_length tableau2 (List.length tableau1)
+    ==>
+    List.length (List.hd tableau2) = List.length tableau1
+    [@@auto]
+    [@@fc]
+
+lemma good_poly_length_transitivity p x1 x2 = 
+    List.length x1 = List.length x2 
+    && good_poly_length p x1 
+    ==> 
+    good_poly_length p x2
+    [@@auto]
+    [@@fc]
+
+lemma well_formed_system_eq_lists_invariant tableau l1 l2 =
+    List.length l1 = List.length l2 &&
+    well_formed_tableau tableau &&
+    well_formed (mk_eq_constraints tableau) l1
+    ==>
+    well_formed (mk_eq_constraints tableau) l2
+    [@@auto]
+    [@@fc]
+
+lemma well_formed_tableau_prepend_invariant tableau row =
+    well_formed_tableau tableau && 
+    well_formed_tableau [row] && 
+    List.length (List.hd tableau) = List.length row
+    ==> 
+    well_formed_tableau (row :: tableau)
+    [@@disable List.map, List.length, Utils.all]
+    [@@auto]
+
+let rec well_formed_eq_induction_scheme tableau system =
+    match tableau, system with
+    | ht::tt, hs::ts -> well_formed_eq_induction_scheme tt ts
+    | [], [] -> true
+    | _, _ -> true
+
+lemma well_formed_mk_eq_constraints tableau system =
+    well_formed_tableau tableau &&
+    system = mk_eq_constraints tableau
+    ==>
+    well_formed system (List.hd tableau)
+[@@disable List.map, List.length, Utils.all]
+[@@induct functional well_formed_eq_induction_scheme]
+
+
+
+(** 
+=========== well_formed_mk_geq_constraints ================================
+ *)
+
+lemma mk_bound_poly_size p size i coeff bound =
+    size >= 0 &&
+    p = mk_bound_poly size i coeff bound
+    ==> 
+    List.length p = size + 1
+    [@@auto]
+    [@@fc]
+
+lemma mk_geq_poly_size p c u l i size = 
+    size >= 0 &&
+    p = mk_geq_poly c u l i size
+    ==> 
+    List.length p = size + 1
+    [@@auto]
+    [@@fc]
+
+lemma good_poly_length_helper p x =
+    List.length p = (List.length x) + 1
+    ==>
+    good_poly_length p x
+    [@@auto]
+    [@@rw][@@fc]
+
+let rec well_formed_geq_induction_scheme coeffs upper_bounds lower_bounds i size system = 
+    match coeffs, upper_bounds, lower_bounds, system with
+    | c :: cs, u :: us, l :: ls, s :: ss -> well_formed_geq_induction_scheme cs us ls i size ss
+    | [], [], [], [] -> true
+    | _ -> true
+
+lemma well_formed_mk_geq_constraints_helper1 c u l i size poly x =
+    poly = mk_geq_poly c u l i size &&
+    List.length x = size
+    ==>
+    good_poly_length poly x
+[@@auto]
+[@@apply good_poly_length_helper poly x]
+[@@disable Certificate.mk_geq_poly]
+[@@fc]
+
+
+lemma well_formed_mk_geq_constraints_helper2 c u l i size poly x =
+    poly = mk_geq_poly c u l i size &&
+    List.length x = size
+    ==>
+    well_formed [Geq poly] x
+[@@auto]
+[@@apply well_formed_mk_geq_constraints_helper1 c u l i size poly x]
+[@@disable Certificate.mk_geq_poly]
+
+let is_geq p = match p with
+    | Geq _ -> true
+    | _ -> false
+
+lemma mk_geq_constraint_is_geq c u l i size =
+    c <> [] && u <> [] && l <> [] 
+    ==>
+    is_geq (List.hd (mk_geq_constraints' c u l i size))
+    [@@auto]
+    [@@fc]
+
+lemma well_formed_mk_geq_constraints_head coeffs upper_bounds lower_bounds i size system l =
+    system = mk_geq_constraints' coeffs upper_bounds lower_bounds i size &&
+    coeffs <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    List.length l = size
+    ==> 
+    good_poly_length (extract_poly (List.hd system)) l
+    [@@auto]
+    [@@disable Certificate.mk_geq_poly]
+
+lemma well_formed_mk_geq_constraints' coeffs upper_bounds lower_bounds i size system x =
+    system = mk_geq_constraints' coeffs upper_bounds lower_bounds i size &&
+    coeffs <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    List.length x = size
+    ==> 
+    well_formed system x
+    [@@auto]
+    [@@disable Certificate.mk_geq_poly]
+    [@@fc]
+
+lemma well_formed_mk_geq_constraints coeffs upper_bounds lower_bounds system =
+    system = mk_geq_constraints coeffs upper_bounds lower_bounds &&
+    coeffs <> [] && upper_bounds <> [] && lower_bounds <> []
+    ==>
+    well_formed system coeffs
+[@@auto]
+[@@disable Certificate.mk_geq_poly]
+[@@fc]
+
+
+
+(* 
+============= well_formed_mk_system_contradiction ========================
+ *)
+
+lemma well_formed_concat_invariant s1 s2 x =
+    well_formed s1 x &&
+    well_formed s2 x 
+    ==>
+    well_formed (s1 @ s2) x
+[@@auto]
+[@@fc]
+
+
+
+(** Linear combination size invariant *)
+
+lemma well_formed_combination_hd tableau =
+    well_formed_tableau tableau
+    ==>
+    List.length (repeat 0. (List.length (List.hd tableau))) = List.length (List.hd tableau)
+[@@auto]
+[@@fc]
+
+lemma well_formed_combination_helper3 lc tableau row =
+    well_formed_tableau tableau &&
+    List.mem row tableau &&
+    List.length lc = List.length (List.hd tableau)
+    ==>
+    List.length lc = List.length row
+[@@auto]
+[@@apply wf_tableau_all_rows_eq_size tableau row]
+[@@fc]
+
+
+let rec induction_scheme_update_combination (lc: real list) (expl: real list) (tableau: real list list) = 
+    match expl, tableau with
+    | coeff:: expl', row::tableau' -> induction_scheme_update_combination (list_add lc (list_scale row coeff)) expl' tableau'
+    | [], [] -> true
+    | [], hd :: tl -> true
+    | hd :: tl, [] -> true
+
+lemma list_scale_len_invariant lc coeff row =
+    List.length lc = List.length row 
+    ==>
+    List.length lc  = List.length (Utils.list_scale row coeff)
+    [@@auto]
+    [@@fc]
+
+lemma list_add_scale_len_invariant_helper lc coeff row =
+    List.length lc = List.length (Utils.list_scale row coeff) 
+    ==>
+    List.length (Utils.list_add lc (Utils.list_scale row coeff)) = List.length lc
+    [@@auto]
+    [@@apply Utils.list_add_length_invariant lc (Utils.list_scale row coeff)]
+    [@@rw][@@fc]
+
+lemma list_add_scale_len_invariant lc coeff row =
+    List.length lc = List.length row
+    ==>
+    List.length (Utils.list_add lc (Utils.list_scale row coeff)) = List.length lc
+    [@@auto]
+    [@@rw][@@fc]
+
+lemma update_combination_hd_len_invariant lc expl tableau =
+    List.length lc = List.length (List.hd tableau) &&
+    expl <> []
+    ==>
+    List.length (update_combination lc [List.hd expl] [List.hd tableau]) = List.length lc
+    [@@auto]
+    [@@induct functional induction_scheme_update_combination]
+    [@@rw][@@fc]
+
+lemma update_combination_expl_hd_len_invariant lc expl tableau =
+    List.length lc = List.length (List.hd tableau) &&
+    expl <> []
+    ==>
+    List.length (update_combination lc [List.hd expl] tableau) = List.length lc
+    [@@auto]
+    [@@apply update_combination_hd_len_invariant lc expl tableau]
+    [@@rw][@@fc]
+
+lemma update_combination_len_invariant_helper lc expl tableau =
+    List.length lc = List.length (List.hd tableau) &&
+    expl <> []
+    ==>
+    List.length (update_combination lc expl [List.hd tableau]) = List.length lc
+    [@@auto]
+    [@@disable List.length]
+    [@@rw][@@fc]
+
+lemma equal_rows_length_tl tableau = 
+    let hd = List.hd tableau in
+    let tl = List.tl tableau in
+    tableau <> [] && hd <> [] &&
+    equal_rows_length tableau (List.length hd)
+    ==>
+    equal_rows_length tl (List.length (List.hd tl))
+    [@@auto]
+    [@@fc]
+
+lemma update_combination_length_invariant_helper lc tableau =
+    well_formed_tableau tableau && List.tl tableau <> [] &&
+    equal_rows_length tableau (List.length (List.hd tableau)) &&
+    List.length lc = List.length (List.hd tableau)
+    ==>
+    List.length lc = List.length (List.hd (List.tl tableau))
+    [@@auto]
+    [@@fc]
+
+lemma well_formed_non_empty tableau row =
+    well_formed_tableau tableau &&
+    List.mem row tableau
+    ==>
+    row <> []
+    [@@auto]
+    [@@fc]
+
+lemma update_combination_len_invariant (lc: real list) (expl: real list) (tableau: real list list) =
+    well_formed_tableau tableau &&
+    expl <> [] &&
+    List.length lc = List.length (List.hd tableau)
+    ==>
+    List.length (update_combination lc expl tableau) = List.length (List.hd tableau)
+[@@auto]
+[@@induct functional induction_scheme_update_combination]
+[@@disable List.length, equal_rows_length, Utils.list_add, Utils.list_scale]
+
+lemma compute_combination_length_invariant expl tableau =
+    well_formed_tableau tableau &&
+    expl <> []
+    ==>
+    List.length (compute_combination expl tableau) = List.length (List.hd tableau)
+[@@auto]
+[@@apply update_combination_len_invariant (repeat 0. (List.length (List.hd tableau))) expl tableau]
+[@@rw][@@fc]
+
+lemma update_combination_base_case (lc: real list) (expl: real list) (tableau: real list list) =
+    (expl = [] || tableau = [] || List.hd tableau = []) &&
+    lc <> [] 
+    ==>
+    update_combination lc expl tableau <> []
+    [@@auto]
+    [@@fc]
+
+(* needed for compute_combination_empty *)
+lemma update_combination_empty lc expl tableau = 
+    update_combination lc expl tableau = []
+    ==> 
+    lc = []
+    [@@auto]
+    [@@fc]
+
+(* needed for compute_combination_empty *)
+lemma update_combination_non_empty (lc: real list) (expl: real list) (tableau: real list list) =
+    well_formed_tableau tableau &&
+    expl <> [] && 
+    lc <> []
+    ==> 
+    update_combination lc expl tableau <> []
+    [@@auto]
+    [@@induct functional induction_scheme_update_combination]
+    [@@disable Utils.list_add, Utils.list_scale]
+
+(* needed for well_formed_mk_system_geq *)
+lemma compute_combination_non_empty expl tableau = 
+    tableau <> [] && 
+    List.hd tableau <> [] &&
+    expl <> [] 
+    ==> 
+    compute_combination expl tableau <> [] 
+    [@@auto][@@fc]
+
+lemma well_formed_mk_system_geq expl tableau upper_bounds lower_bounds geq_constraints =
+    geq_constraints = mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds &&
+    expl <> [] && tableau <> [] && List.hd tableau <> [] && upper_bounds <> [] && lower_bounds <> []
+    ==>
+    well_formed geq_constraints (compute_combination expl tableau)
+[@@auto]
+[@@apply well_formed_mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds geq_constraints]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
+[@@fc]
+
+lemma well_formed_same_lengths system l1 l2 =
+    List.length l1 = List.length l2 &&
+    well_formed system l1
+    ==>
+    well_formed system l2
+    [@@auto]
+    [@@fc]
+
+lemma well_formed_mk_system_geq' expl tableau upper_bounds lower_bounds geq_constraints =
+    well_formed geq_constraints (compute_combination expl tableau) &&
+    well_formed_tableau tableau &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> []
+    ==>
+    well_formed geq_constraints (List.hd tableau)
+[@@auto]
+[@@apply compute_combination_length_invariant expl tableau,
+    well_formed_same_lengths geq_constraints (compute_combination expl tableau) (List.hd tableau)    
+]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
+
+lemma well_formed_conversion expl tableau upper_bounds lower_bounds eq_constraints geq_constraints =
+    well_formed_tableau tableau &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    eq_constraints = mk_eq_constraints tableau &&
+    geq_constraints = mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds
+    ==>
+    well_formed (eq_constraints @ geq_constraints) (List.hd tableau)
+[@@auto]
+[@@apply well_formed_mk_eq_constraints tableau eq_constraints,
+    well_formed_mk_system_geq' expl tableau upper_bounds lower_bounds geq_constraints,
+    well_formed_concat_invariant eq_constraints geq_constraints (List.hd tableau)]
+[@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
+[@@fc]
+
+lemma well_formed_conversion' expl tableau upper_bounds lower_bounds system =
+    well_formed_tableau tableau &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    system = mk_system_contradiction expl tableau upper_bounds lower_bounds
+    ==>
+    well_formed system (List.hd tableau)
+[@@auto]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
+[@@fc]
+
+lemma well_formed_conversion'' expl tableau upper_bounds lower_bounds system x =
+    well_formed_tableau tableau &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau)
+    ==>
+    well_formed system x
+[@@auto]
+[@@apply well_formed_conversion' expl tableau upper_bounds lower_bounds system,
+    well_formed_same_lengths system (List.hd tableau) x]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
+[@@fc]
+
+
+lemma contradiction_system_evaluation_false_helper expl tableau upper_bounds lower_bounds system x c =
+    well_formed_tableau tableau &&
+    List.length x = List.length (List.hd tableau) &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
+    check_cert system c
+    ==>
+    well_formed system x
+    [@@auto]
+    [@@apply well_formed_conversion'' expl tableau upper_bounds lower_bounds system x]
+    [@@disable Certificate.mk_system_contradiction, Farkas_lemma.check_cert]
+    [@@fc]
+
+axiom farkas_lemma s x c =
+    well_formed s x &&
+    check_cert s c
+    ==>
+    eval_system s x = false
+    [@@fc]
+
+
+lemma contradiction_system_evaluation_false expl tableau upper_bounds lower_bounds system x c =
+    well_formed_tableau tableau &&
+    List.length x = List.length (List.hd tableau) &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
+    check_cert system c
+    ==>
+    eval_system system x = false
+    [@@auto]
+    [@@apply contradiction_system_evaluation_false_helper expl tableau upper_bounds lower_bounds system x c,
+        farkas_lemma system x c]
+    [@@disable Certificate.mk_system_contradiction, Farkas_lemma.check_cert]
+    [@@fc]
+

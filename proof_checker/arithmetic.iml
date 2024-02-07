@@ -36,9 +36,9 @@ module LinArith = struct
     (** Helper function for {!compute_combination} *)
     let rec update_combination (lc: real list) (expl: real list) (tableau: real list list): real list = 
         match expl, tableau with
-        | coeff :: expl, row :: tableau -> update_combination (list_add lc (list_scale row coeff)) expl tableau
-        | [coeff], [row] -> list_add lc (list_scale row coeff)
-        | _::_, [] | [], _::_ | [], [] -> lc
+        | _, [] :: _ -> lc
+        | _, [] | [], _ | [], [] -> lc
+        | coeff :: expl', row :: tableau' -> update_combination (list_add lc (list_scale row coeff)) expl' tableau'
 
     (** Compute a linear combination of tableau rows with coefficients from the explanation vector `expl` 
         (i.e. a bound-tightening lemma vector or a contradiction in a Leaf node) *)

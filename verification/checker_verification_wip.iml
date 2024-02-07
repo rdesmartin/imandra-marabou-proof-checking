@@ -1,111 +1,25 @@
+let valid_split (node: ProofTree.t) (q: query) = 
+    match node with
+    | Leaf _ -> true
+    | Node (tightenings, bound_lemma, children) ->
+        check_children_splits children q.constraints
 
-axiom update_combination_size_preservation (lc: real list) (expl: real list) (tableau: real list list) =
-    well_formed_tableau tableau &&
-    expl <> [] &&
-    List.length lc = List.length (List.hd tableau)
+lemma valid_split_lm node (q: query) =
+    check_node q.tableau q.upper_bounds q.lower_bounds q.constraints node
     ==>
-    List.length (update_combination lc expl tableau) = List.length (List.hd tableau)
-(* [@@auto]
-[@@induct functional induction_scheme_update_combination]
-[@@disable List.length, well_formed_tableau'] *)
+    valid_split node q
 
-lemma compute_combination_length_preservation expl tableau =
-    well_formed_tableau tableau &&
-    expl <> []
-    ==>
-    List.length (compute_combination expl tableau) = List.length (List.hd tableau)
-[@@auto]
-[@@apply update_combination_size_preservation (repeat 0. (List.length (List.hd tableau))) expl tableau]
-[@@rw][@@fc]
-
-axiom compute_combination_non_empty expl tableau = 
-    tableau <> [] && 
-    List.hd tableau <> [] &&
-    expl <> [] 
+lemma tighten_invariant tightenings upper_bounds lower_bounds = 
+    tightenings = [] 
     ==> 
-    compute_combination expl tableau <> [] 
-    [@@auto][@@fc]
+    Tightening.update_bounds tightenings upper_bounds lower_bounds = (upper_bounds, lower_bounds)
+    [@@rw][@@fc]
 
-lemma well_formed_mk_system_geq expl tableau upper_bounds lower_bounds geq_constraints =
-    geq_constraints = mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds &&
-    expl <> [] && tableau <> [] && List.hd tableau <> [] && upper_bounds <> [] && lower_bounds <> []
+lemma bound_lemma_invariant bound_lemmas tableau upper_bounds lower_bounds constraints = 
+    bound_lemmas = []
     ==>
-    well_formed geq_constraints (compute_combination expl tableau)
-[@@auto]
-[@@apply well_formed_mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds geq_constraints]
-[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
-[@@fc]
-
-lemma well_formed_same_lengths system l1 l2 =
-    List.length l1 = List.length l2 &&
-    well_formed system l1
-    ==>
-    well_formed system l2
-    [@@auto]
-    [@@fc]
-
-lemma well_formed_mk_system_geq' expl tableau upper_bounds lower_bounds geq_constraints =
-    well_formed geq_constraints (compute_combination expl tableau) &&
-    well_formed_tableau tableau &&
-    expl <> [] && upper_bounds <> [] && lower_bounds <> []
-    ==>
-    well_formed geq_constraints (List.hd tableau)
-[@@auto]
-[@@apply compute_combination_length_preservation expl tableau,
-    well_formed_same_lengths geq_constraints (compute_combination expl tableau) (List.hd tableau)    
-]
-[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
-
-lemma well_formed_conversion expl tableau upper_bounds lower_bounds eq_constraints geq_constraints =
-    well_formed_tableau tableau &&
-    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
-    eq_constraints = mk_eq_constraints tableau &&
-    geq_constraints = mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds
-    ==>
-    well_formed (eq_constraints @ geq_constraints) (List.hd tableau)
-[@@auto]
-[@@apply well_formed_mk_eq_constraints tableau eq_constraints,
-    well_formed_mk_system_geq' expl tableau upper_bounds lower_bounds geq_constraints,
-    well_formed_concat eq_constraints geq_constraints (List.hd tableau)]
-[@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
-[@@fc]
-
-lemma well_formed_conversion' expl tableau upper_bounds lower_bounds system =
-    well_formed_tableau tableau &&
-    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
-    system = mk_system_contradiction expl tableau upper_bounds lower_bounds
-    ==>
-    well_formed system (List.hd tableau)
-[@@auto]
-[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
-[@@fc]
-
-lemma well_formed_conversion'' expl tableau upper_bounds lower_bounds system x =
-    well_formed_tableau tableau &&
-    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
-    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
-    List.length x = List.length (List.hd tableau)
-    ==>
-    well_formed system x
-[@@auto]
-[@@apply well_formed_conversion' expl tableau upper_bounds lower_bounds system,
-    well_formed_same_lengths system (List.hd tableau) x]
-[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
-[@@fc]
-
-
-lemma contradiction_system_evaluation_false expl tableau upper_bounds lower_bounds x system c =
-    well_formed_tableau tableau &&
-    List.length x = List.length (List.hd tableau) &&
-    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
-    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
-    check_cert system c
-    ==>
-    well_formed system x
-    [@@auto]
-    [@@apply well_formed_conversion'' expl tableau upper_bounds lower_bounds system x]
-    [@@disable Certificate.mk_system_contradiction, Farkas_lemma.check_cert]
-    [@@fc]
+    BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints = (true, upper_bounds, lower_bounds)
+    [@@rw][@@fc]
 
 lemma unsatisfiability expl tableau upper_bounds lower_bounds x =
     let system = mk_system_contradiction expl tableau upper_bounds lower_bounds in

@@ -133,7 +133,7 @@ let rec list_add (x: real list) (y: real list): real list =
     | x :: xs, y :: ys -> x +. y :: list_add xs ys
     | x::xs, [] | [], x :: xs -> []
 
-lemma list_add_length_preservation l1 l2 = 
+lemma list_add_length_invariant l1 l2 = 
     List.length l1 = List.length l2 
     ==>
     List.length (list_add l1 l2) = List.length l1
