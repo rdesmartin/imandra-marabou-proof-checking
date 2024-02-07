@@ -93,3 +93,17 @@ let check_cert (s: system) (cs: certificate): bool =
         is_neg_constant (mk_certificate s cs)
     )
 
+    let rec good_poly_length (p: poly) (x: var_vect): bool =
+    match p, x with
+    | [_], [] -> true
+    | _ :: ps, _ :: xs -> good_poly_length ps xs
+    | _ -> false
+
+let rec well_formed (s: system) (x: var_vect): bool =
+    match s with
+    | [] -> false
+    | [Eq e] | [Geq e] | [Gt e] -> good_poly_length e x
+    | Eq e :: es -> good_poly_length e x && well_formed es x 
+    | Geq e :: es -> good_poly_length e x && well_formed es x
+    | Gt e :: es -> good_poly_length e x && well_formed es x
+

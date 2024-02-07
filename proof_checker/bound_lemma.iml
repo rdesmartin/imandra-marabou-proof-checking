@@ -4,6 +4,7 @@ open Check_splits
 open Tightening
 open Farkas_lemma
 open Certificate
+open Constraint
 
 module BoundLemma = struct
     (** Affected variable, affected bound type (UPPER or LOWER), bound value, causing variable, causing bound type, constraint type, explanation *)     
@@ -127,7 +128,7 @@ module BoundLemma = struct
         (true, upper_bounds', lower_bounds')
 
     (** Apply complete lemma checking for full lemmas and simply updates the bounds in case of simple lemmas *)
-    let check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints =
+    let check_bound_lemmas (bound_lemmas: 'b list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) (constraints: Constraint.t list): (bool * 'a list * 'a list) =
         match bound_lemmas with
         | (Short _)::tl -> update_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints
         | (Full _)::tl -> check_full_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints

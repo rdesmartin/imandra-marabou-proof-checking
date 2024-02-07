@@ -34,7 +34,6 @@ theorem relu_lemmas_3 b f aux =
     ==> 
     aux >. 0. ==> f <=. 0.
 
-
 theorem relu_lemmas_4 b f aux = 
     f = relu b && aux +. b -. f = 0. 
     ==>
@@ -59,5 +58,3 @@ theorem relu_lemmas_4 b f aux =
     f = relu b && aux +. b -. f = 0. 
     ==>
     b >=. x && x <=. 0. ==> aux <=. (-. x)
-
-

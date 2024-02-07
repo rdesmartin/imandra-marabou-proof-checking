@@ -34,8 +34,11 @@ module LinArith = struct
         | _ -> 0.
     
     (** Helper function for {!compute_combination} *)
-    let update_combination (lc: real list) ((coeff, row): real * real list): real list = 
-        list_add lc (list_scale row coeff)
+    let rec update_combination (lc: real list) (expl: real list) (tableau: real list list): real list = 
+        match expl, tableau with
+        | coeff :: expl, row :: tableau -> update_combination (list_add lc (list_scale row coeff)) expl tableau
+        | [coeff], [row] -> list_add lc (list_scale row coeff)
+        | _::_, [] | [], _::_ | [], [] -> lc
 
     (** Compute a linear combination of tableau rows with coefficients from the explanation vector `expl` 
         (i.e. a bound-tightening lemma vector or a contradiction in a Leaf node) *)
@@ -45,7 +48,7 @@ module LinArith = struct
             []
         else
             let linear_combination = (repeat 0. (List.length (List.hd tableau))) in
-            List.fold_left update_combination linear_combination (zip expl tableau)
+            update_combination linear_combination expl tableau
 
     (** Helper function for {!compute_row_upper_bound} *)
     let upper_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =

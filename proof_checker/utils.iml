@@ -127,13 +127,28 @@ lemma zip_map x y f n =
 [@@auto]
 
     (* Add 2 lists of reals element-wise *)
-let list_add (x: real list) (y: real list): real list = 
-    let open List in
-    map (fun (a, b) -> a +. b) (zip x y)
+let rec list_add (x: real list) (y: real list): real list = 
+    match x, y with
+    | [], [] -> []
+    | x :: xs, y :: ys -> x +. y :: list_add xs ys
+    | x::xs, [] | [], x :: xs -> []
+
+lemma list_add_length_preservation l1 l2 = 
+    List.length l1 = List.length l2 
+    ==>
+    List.length (list_add l1 l2) = List.length l1
+    [@@auto][@@induct functional list_add]
 
 (* Multiply all elements in a list of reals by a constant *)
-let list_scale (x: real list) (c: real): real list = 
-    List.map (fun a -> a *. c) x
+let rec list_scale (x: real list) (c: real): real list = 
+    match x with
+    | [] -> []
+    | x :: xs -> x *. c :: list_scale xs c
+
+lemma list_scale_length_preservation l c = 
+    List.length (list_scale l c) = List.length l
+    [@@auto]
+    [@@rw][@@fc]
 
 lemma repeat_length x n =
     n >= 0 

@@ -4,20 +4,6 @@ open Farkas_lemma
 
 (* Housekeeping about size, etc. *)
 
-let rec good_poly_length (p: poly) (x: var_vect): bool =
-    match p, x with
-    | [_], [] -> true
-    | _ :: ps, _ :: xs -> good_poly_length ps xs
-    | _ -> false
-
-let rec well_formed (s: system) (x: var_vect): bool =
-    match s with
-    | [] -> false
-    | [Eq e] | [Geq e] | [Gt e] -> good_poly_length e x
-    | Eq e :: es -> good_poly_length e x && well_formed es x 
-    | Geq e :: es -> good_poly_length e x && well_formed es x
-    | Gt e :: es -> good_poly_length e x && well_formed es x
-
 lemma good_length_p_scale (p: poly) (x: var_vect) (c: Real.t) =
     good_poly_length p x ==> good_poly_length (p_scale p c) x
 [@@auto][@@rw][@@fc]

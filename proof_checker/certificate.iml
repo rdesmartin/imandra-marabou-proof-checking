@@ -27,8 +27,10 @@ let extract_poly (e: exp): real list =
   transform the tableau into a list of Eq expressions, with 
   an added 0. for the constant at the end 
 *)
-let mk_eq_constraints (tableau: real list list): exp list = 
-  List.map (fun x -> Eq (x @ [0.])) tableau
+let rec mk_eq_constraints (tableau: real list list): exp list =
+  match tableau with 
+  | hd :: tl -> Eq (hd @ [0.]) :: mk_eq_constraints tl
+  | [] -> []
 
 (* 
   recursively iterate over the coeffs computed with w^T . A. 
@@ -38,17 +40,21 @@ let mk_eq_constraints (tableau: real list list): exp list =
   certificate coefficients vector.
   size = number of variables
 *)
+
+let mk_geq_poly c u l i size =
+  if (c >=. 0.)
+  then (
+    mk_bound_poly size i Real.(-1. * c) Real.(u * c)
+  ) else (
+    mk_bound_poly size i Real.(1. * -c) Real.(-l * -c)
+  )
+
+
 let rec mk_geq_constraints' (cs: real list) (upper_bounds: real list) (lower_bounds: real list) (i: int) (size: int): exp list =
   match cs, upper_bounds, lower_bounds with
   | [], [], [] -> []
   | c :: cs, u :: us, l :: ls -> 
-      let p = if (c >=. 0.)
-              then (
-                mk_bound_poly size i Real.(-1. * c) Real.(u * c)
-              ) else (
-                mk_bound_poly size i Real.(1. * -c) Real.(-l * -c)
-              )
-      in
+      let p = mk_geq_poly c u l i size in 
       Geq p :: mk_geq_constraints' cs us ls (i + 1) size
   | _ -> []
 
@@ -69,10 +75,13 @@ let mk_gt_constraint (size: int) ((var, value, bound_t): (int * real * bound_typ
 
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
 let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
-    let eq_constraints = mk_eq_constraints tableau in
+  (mk_eq_constraints tableau) @ (mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds)
+(* let eq_constraints = mk_eq_constraints tableau in
     let tableau_linear_combination = LinArith.compute_combination expl tableau in
     let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
-    eq_constraints @ geq_constraints
+    eq_constraints @ geq_constraints *)
+
+
 
 (* Create the polynomial representation of the linear constraints from the matrix representation 
    for bound tightening lemma checking, i.e. with strict inequality constraints *)
