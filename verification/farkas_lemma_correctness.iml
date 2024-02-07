@@ -93,7 +93,7 @@ lemma nonpos_constant_certificate (s: system) (c: Real.t list) (x: var_vect) =
     eval_poly (mk_certificate s c) x <=. 0.
     [@@auto]
     [@@apply eval_nonpos_constant (mk_certificate s c) x]
-    [@@disable mk_certificate]
+    [@@disable Farkas_lemma.mk_certificate]
 
 lemma nonpos_eval_certificate s c x =
     well_formed s x &&
@@ -162,7 +162,7 @@ lemma neg_constant_certificate (s: system) (c: Real.t list) (x: var_vect) =
     eval_poly (mk_certificate s c) x <. 0.
     [@@auto]
     [@@apply neg_constant (mk_certificate s c) x]
-    [@@disable mk_certificate]
+    [@@disable Farkas_lemma.mk_certificate]
 
 lemma negative_eval_certificate s c x =
     has_strict_ineq s = false &&
@@ -218,4 +218,5 @@ theorem farkas_lemma (s: system) (x: var_vect) (c: certificate) =
     farkas_lemma_strict_ineq s c x,
     farkas_lemma_no_strict_ineq s c x
     ]
-    [@@disable check_cert, well_formed, eval_system, has_strict_ineq]
+    [@@disable Farkas_lemma.check_cert, Farkas_lemma.well_formed, Farkas_lemma.eval_system, Farkas_lemma.has_strict_ineq]
+    [@@fc]

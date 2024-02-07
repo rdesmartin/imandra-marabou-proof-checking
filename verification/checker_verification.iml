@@ -312,7 +312,7 @@ lemma update_combination_expl_hd_size_preservation lc expl tableau =
     ==>
     List.length (update_combination lc [List.hd expl] tableau) = List.length lc
     [@@auto]
-    [@@apply update_combination_size_preservation_helper3 lc expl tableau]
+    [@@apply update_combination_hd_size_preservation lc expl tableau]
     [@@rw][@@fc]
 
 lemma update_combination_size_preservation_helper lc expl tableau =

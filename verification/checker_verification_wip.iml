@@ -70,15 +70,42 @@ lemma well_formed_conversion expl tableau upper_bounds lower_bounds eq_constrain
 [@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
 [@@fc]
 
-lemma well_formed_conversion' expl tableau upper_bounds lower_bounds x system =
+lemma well_formed_conversion' expl tableau upper_bounds lower_bounds system =
     well_formed_tableau tableau &&
     expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
     system = mk_system_contradiction expl tableau upper_bounds lower_bounds
     ==>
     well_formed system (List.hd tableau)
 [@@auto]
-[@@simp]
 [@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
+[@@fc]
+
+lemma well_formed_conversion'' expl tableau upper_bounds lower_bounds system x =
+    well_formed_tableau tableau &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau)
+    ==>
+    well_formed system x
+[@@auto]
+[@@apply well_formed_conversion' expl tableau upper_bounds lower_bounds system,
+    well_formed_same_lengths system (List.hd tableau) x]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
+[@@fc]
+
+
+lemma contradiction_system_evaluation_false expl tableau upper_bounds lower_bounds x system c =
+    well_formed_tableau tableau &&
+    List.length x = List.length (List.hd tableau) &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    system = mk_system_contradiction expl tableau upper_bounds lower_bounds &&
+    check_cert system c
+    ==>
+    well_formed system x
+    [@@auto]
+    [@@apply well_formed_conversion'' expl tableau upper_bounds lower_bounds system x]
+    [@@disable Certificate.mk_system_contradiction, Farkas_lemma.check_cert]
+    [@@fc]
 
 lemma unsatisfiability expl tableau upper_bounds lower_bounds x =
     let system = mk_system_contradiction expl tableau upper_bounds lower_bounds in

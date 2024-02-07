@@ -1,5 +1,5 @@
 open Farkas_lemma
-open Arithmetic
+open Arithmetic.LinArith
 open Tightening
 open Utils
 
@@ -88,8 +88,8 @@ let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_b
 let mk_system_lemma (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) ((caus_var, row_bound, caus_bound_t) as tightening: Tightening.t): exp list =
   let eq_constraints = mk_eq_constraints tableau in
   let tableau_linear_combination = if caus_bound_t = UPPER
-            then LinArith.compute_combination expl tableau
-            else LinArith.compute_combination (list_scale expl (-1.)) tableau
+            then compute_combination expl tableau
+            else compute_combination (list_scale expl (-1.)) tableau
   in
   let updated_linear_combination =  if caus_bound_t = UPPER
     then (increment_elem tableau_linear_combination caus_var)
