@@ -446,3 +446,257 @@
 
 
 2024-02-08 10:30:10.526456: ==========
+
+2024-02-08 11:34:32.230219: Proof ./examples/proof_reluBenchmark0.05650806427s.json finished; status: KO
+
+
+2024-02-08 11:34:32.230332: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:32.230390: ==========
+
+2024-02-08 11:34:32.343696: Proof ./examples/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: KO
+
+
+2024-02-08 11:34:32.343862: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:32.343955: ==========
+
+2024-02-08 11:34:32.457590: Proof ./examples/proof_reluBenchmark0.15145778656s.json finished; status: KO
+
+
+2024-02-08 11:34:32.457718: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:32.457793: ==========
+
+2024-02-08 11:34:32.573610: Proof ./examples/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: KO
+
+
+2024-02-08 11:34:32.573691: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:32.573816: ==========
+
+2024-02-08 11:34:32.698276: Proof ./examples/proof_reluBenchmark0.19238615036s.json finished; status: KO
+
+
+2024-02-08 11:34:32.698329: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:32.698362: ==========
+
+2024-02-08 11:34:32.814825: Proof ./examples/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: KO
+
+
+2024-02-08 11:34:32.814883: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:32.814923: ==========
+
+2024-02-08 11:34:32.929143: Proof ./examples/proof_reluBenchmark0.24204993248s.json finished; status: KO
+
+
+2024-02-08 11:34:32.929228: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:32.929282: ==========
+
+2024-02-08 11:34:33.044441: Proof ./examples/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: KO
+
+
+2024-02-08 11:34:33.044523: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:33.044578: ==========
+
+2024-02-08 11:34:33.154345: Proof ./examples/proof_reluBenchmark0.24551987648s.json finished; status: KO
+
+
+2024-02-08 11:34:33.154425: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:33.154480: ==========
+
+2024-02-08 11:34:33.254524: Proof ./examples/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: KO
+
+
+2024-02-08 11:34:33.254625: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:33.254751: ==========
+
+2024-02-08 11:34:33.325749: Proof ./examples/proof_reluBenchmark0.359375s.json finished; status: KO
+
+
+2024-02-08 11:34:33.325795: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:33.325827: ==========
+
+2024-02-08 11:34:33.424867: Proof ./examples/proof_reluBenchmark0.359375s_lemmas.json finished; status: KO
+
+
+2024-02-08 11:34:33.424962: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:33.425018: ==========
+
+2024-02-08 11:34:33.505410: Proof ./examples/proof_reluBenchmark0.479170084s.json finished; status: KO
+
+
+2024-02-08 11:34:33.505489: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:33.505544: ==========
+
+2024-02-08 11:34:33.605567: Proof ./examples/proof_reluBenchmark0.479170084s_lemmas.json finished; status: KO
+
+
+2024-02-08 11:34:33.605674: File "proof_checker/bound_lemma.iml", line 111, characters 45-47:
+Error: Unbound value =.
+
+
+2024-02-08 11:34:33.605762: ==========
+
+2024-02-08 11:35:17.840163: Proof ./examples/proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-02-08 11:35:17.840449: Result for ./examples/proof_reluBenchmark0.05650806427s.json: true
+
+
+2024-02-08 11:35:17.840584: ==========
+
+2024-02-08 11:35:23.721208: Proof ./examples/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-02-08 11:35:23.721319: Result for ./examples/proof_reluBenchmark0.05650806427s_lemmas.json: true
+
+
+2024-02-08 11:35:23.721394: ==========
+
+2024-02-08 11:35:24.127689: Proof ./examples/proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-02-08 11:35:24.127766: Result for ./examples/proof_reluBenchmark0.15145778656s.json: true
+
+
+2024-02-08 11:35:24.127819: ==========
+
+2024-02-08 11:35:24.916251: Proof ./examples/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-02-08 11:35:24.916342: Result for ./examples/proof_reluBenchmark0.15145778656s_lemmas.json: false
+
+
+2024-02-08 11:35:24.916405: ==========
+
+2024-02-08 11:35:25.400631: Proof ./examples/proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-02-08 11:35:25.400688: Result for ./examples/proof_reluBenchmark0.19238615036s.json: true
+
+
+2024-02-08 11:35:25.400725: ==========
+
+2024-02-08 11:35:27.246583: Proof ./examples/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-02-08 11:35:27.246637: 
+c=0.539815
+Result for ./examples/proof_reluBenchmark0.19238615036s_lemmas.json: false
+
+
+2024-02-08 11:35:27.246673: ==========
+
+2024-02-08 11:35:27.873677: Proof ./examples/proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-02-08 11:35:27.873730: Result for ./examples/proof_reluBenchmark0.24204993248s.json: true
+
+
+2024-02-08 11:35:27.873767: ==========
+
+2024-02-08 11:35:39.470586: Proof ./examples/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-02-08 11:35:39.470665: 
+c=2.397846
+
+c=2.146751
+Result for ./examples/proof_reluBenchmark0.24204993248s_lemmas.json: false
+
+
+2024-02-08 11:35:39.470701: ==========
+
+2024-02-08 11:35:39.664863: Proof ./examples/proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-02-08 11:35:39.664913: Result for ./examples/proof_reluBenchmark0.24551987648s.json: true
+
+
+2024-02-08 11:35:39.664949: ==========
+
+2024-02-08 11:35:39.951128: Proof ./examples/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-02-08 11:35:39.951205: Result for ./examples/proof_reluBenchmark0.24551987648s_lemmas.json: false
+
+
+2024-02-08 11:35:39.951241: ==========
+
+2024-02-08 11:35:40.370616: Proof ./examples/proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-02-08 11:35:40.370700: Result for ./examples/proof_reluBenchmark0.359375s.json: true
+
+
+2024-02-08 11:35:40.370737: ==========
+
+2024-02-08 11:35:44.412233: Proof ./examples/proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-02-08 11:35:44.412326: 
+c=0.167325
+
+c=0.445432
+Result for ./examples/proof_reluBenchmark0.359375s_lemmas.json: false
+
+
+2024-02-08 11:35:44.412367: ==========
+
+2024-02-08 11:35:45.486940: Proof ./examples/proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-02-08 11:35:45.486995: Result for ./examples/proof_reluBenchmark0.479170084s.json: true
+
+
+2024-02-08 11:35:45.487143: ==========
+
+2024-02-08 11:35:54.041197: Proof ./examples/proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-02-08 11:35:54.041248: 
+c=0.059098
+
+c=0.107385
+
+c=0.001793
+Result for ./examples/proof_reluBenchmark0.479170084s_lemmas.json: false
+
+
+2024-02-08 11:35:54.041283: ==========

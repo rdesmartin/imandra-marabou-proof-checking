@@ -75,21 +75,21 @@ module BoundLemma = struct
     match bound_lemma with
     | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
         if
-            (caus_var = b && caus_bound_t = LOWER && row_bound >. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
-            (caus_var = f && caus_bound_t = LOWER && row_bound >=. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
+            (caus_var = b && caus_bound_t = LOWER && row_bound >=. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
+            (caus_var = f && caus_bound_t = LOWER && row_bound >. 0. && aff_var = aux && aff_bound_t = UPPER && value = 0.) ||
             (caus_var = aux && caus_bound_t = LOWER && row_bound >. 0. && aff_var = f && aff_bound_t = UPPER && value = 0.) ||
             (caus_var = f && caus_bound_t = LOWER && row_bound <. 0. && aff_var = f && aff_bound_t = LOWER && value = 0.) ||
-            (caus_var = b && caus_bound_t = UPPER && row_bound <=. 0.  && aff_var = f && aff_bound_t = UPPER && value >=. 0.)
+            (caus_var = b && caus_bound_t = UPPER && row_bound <=. 0.  && aff_var = f && aff_bound_t = UPPER && value = 0.)
         then
             (true, value)
         else if
             (caus_var = f && caus_bound_t = UPPER && aff_var = b && aff_bound_t = UPPER) ||
-            (caus_var = b && caus_bound_t = UPPER && row_bound >. 0. && aff_var = f && aff_bound_t = UPPER)
+            (caus_var = b && caus_bound_t = UPPER && row_bound >=. 0. && aff_var = f && aff_bound_t = UPPER)
         then
             (true, row_bound)
         else if
             (caus_var = aux && caus_bound_t = UPPER && aff_var = b && aff_bound_t = LOWER) ||
-            (caus_var = b && caus_bound_t = LOWER && aff_var = aux && aff_bound_t = UPPER && value >=. 0.)
+            (caus_var = b && caus_bound_t = LOWER && row_bound <=. 0. && aff_var = aux && aff_bound_t = UPPER)
         then
             (true, -. row_bound)
         else
