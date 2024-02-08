@@ -201,7 +201,7 @@ lemma mk_system_lemma_well_formed' expl tableau upper_bounds lower_bounds caus_v
     [@@disable Certificate.mk_geq_constraints_lemma, Certificate.mk_eq_constraints]
     [@@fc]
     
-(** we add equality conditions so that mk_system_lemma_well_formed' can be applied automatically when proving mk_system_lemma_well_formed'' *)
+(** we add equality conditions to the conclusion so that mk_system_lemma_well_formed' can be applied automatically when proving mk_system_lemma_well_formed'' *)
 lemma mk_system_lemma_equivalence expl tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system =
     let geq_constraints = mk_geq_constraints_lemma expl tableau upper_bounds lower_bounds caus_var caus_bound_t in
     let eq_constraints = mk_eq_constraints tableau in

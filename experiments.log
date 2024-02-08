@@ -334,3 +334,115 @@
 
 
 2024-01-29 16:45:37.629307: ==========
+
+2024-02-08 10:29:04.236448: Proof ./examples/proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-02-08 10:29:04.237067: Result for ./examples/proof_reluBenchmark0.05650806427s.json: true
+
+
+2024-02-08 10:29:04.237165: ==========
+
+2024-02-08 10:29:10.195461: Proof ./examples/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-02-08 10:29:10.195578: Result for ./examples/proof_reluBenchmark0.05650806427s_lemmas.json: true
+
+
+2024-02-08 10:29:10.195654: ==========
+
+2024-02-08 10:29:10.590317: Proof ./examples/proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-02-08 10:29:10.590392: Result for ./examples/proof_reluBenchmark0.15145778656s.json: true
+
+
+2024-02-08 10:29:10.590444: ==========
+
+2024-02-08 10:29:13.931630: Proof ./examples/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-02-08 10:29:13.931709: Result for ./examples/proof_reluBenchmark0.15145778656s_lemmas.json: true
+
+
+2024-02-08 10:29:13.931751: ==========
+
+2024-02-08 10:29:14.424158: Proof ./examples/proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-02-08 10:29:14.424237: Result for ./examples/proof_reluBenchmark0.19238615036s.json: false
+
+
+2024-02-08 10:29:14.424277: ==========
+
+2024-02-08 10:29:26.406428: Proof ./examples/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-02-08 10:29:26.406534: Result for ./examples/proof_reluBenchmark0.19238615036s_lemmas.json: true
+
+
+2024-02-08 10:29:26.406599: ==========
+
+2024-02-08 10:29:27.039994: Proof ./examples/proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-02-08 10:29:27.040049: Result for ./examples/proof_reluBenchmark0.24204993248s.json: false
+
+
+2024-02-08 10:29:27.040087: ==========
+
+2024-02-08 10:29:42.016267: Proof ./examples/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-02-08 10:29:42.016353: Result for ./examples/proof_reluBenchmark0.24204993248s_lemmas.json: true
+
+
+2024-02-08 10:29:42.016391: ==========
+
+2024-02-08 10:29:42.231221: Proof ./examples/proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-02-08 10:29:42.231278: Result for ./examples/proof_reluBenchmark0.24551987648s.json: true
+
+
+2024-02-08 10:29:42.231339: ==========
+
+2024-02-08 10:29:43.746524: Proof ./examples/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-02-08 10:29:43.746579: Result for ./examples/proof_reluBenchmark0.24551987648s_lemmas.json: true
+
+
+2024-02-08 10:29:43.746616: ==========
+
+2024-02-08 10:29:44.178307: Proof ./examples/proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-02-08 10:29:44.178408: Result for ./examples/proof_reluBenchmark0.359375s.json: true
+
+
+2024-02-08 10:29:44.178451: ==========
+
+2024-02-08 10:29:49.228181: Proof ./examples/proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-02-08 10:29:49.228255: Result for ./examples/proof_reluBenchmark0.359375s_lemmas.json: true
+
+
+2024-02-08 10:29:49.228295: ==========
+
+2024-02-08 10:29:50.290367: Proof ./examples/proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-02-08 10:29:50.290399: Result for ./examples/proof_reluBenchmark0.479170084s.json: false
+
+
+2024-02-08 10:29:50.290418: ==========
+
+2024-02-08 10:30:10.526301: Proof ./examples/proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-02-08 10:30:10.526415: Result for ./examples/proof_reluBenchmark0.479170084s_lemmas.json: true
+
+
+2024-02-08 10:30:10.526456: ==========

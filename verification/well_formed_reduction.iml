@@ -23,16 +23,6 @@ lemma good_poly_length_append row =
     [@@auto]
     [@@rw][@@fc]
 
-let rec equal_rows_length tableau size = 
-    match tableau with
-    | hd :: tl -> List.length hd = size && equal_rows_length tl size
-    | [] -> true
-
-let well_formed_tableau tableau = 
-    tableau <> [] &&
-    List.hd tableau <> [] && 
-    equal_rows_length tableau (List.length (List.hd tableau))
-
 lemma equal_row_length_empty_row row tableau =
     tableau <> [] && List.hd tableau = [] &&
     row <> []

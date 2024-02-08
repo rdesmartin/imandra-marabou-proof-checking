@@ -63,15 +63,24 @@ let rec check_node tableau upper_bounds lower_bounds constraints proof_node =
         let valid_contradiction = check_contradiction contradiction tableau upper_bounds'' lower_bounds'' in
         valid_bounds && valid_contradiction
 
+let rec equal_rows_length tableau size = 
+    match tableau with
+    | hd :: tl -> List.length hd = size && equal_rows_length tl size
+    | [] -> true
 
+let well_formed_tableau tableau = 
+    tableau <> [] &&
+    List.hd tableau <> [] && 
+    equal_rows_length tableau (List.length (List.hd tableau))
+    
 (* Return true if the dimensions of the bounds are the same and if the length of 
    the bounds is greater than the number of rows in the tableau
    todo: ask clarification about second condition
 *)
 let sanity_checks tableau upper_bounds lower_bounds =
     let valid_bounds_sizes = List.length upper_bounds = List.length lower_bounds && List.length lower_bounds <> 0 in
-    let check_tableau_size = List.length upper_bounds > List.length tableau in
-    check_tableau_size && valid_bounds_sizes
+    let tableau_well_formed = well_formed_tableau tableau in
+    valid_bounds_sizes && tableau_well_formed
 
 
 (* Main entry point to verify the proof tree.

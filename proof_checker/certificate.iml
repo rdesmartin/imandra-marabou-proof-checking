@@ -76,8 +76,8 @@ let mk_gt_constraint (size: int) ((var, value, bound_t): (int * real * bound_typ
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
 let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
   (mk_eq_constraints tableau) @ (mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds)
-(* let eq_constraints = mk_eq_constraints tableau in
-    let tableau_linear_combination = LinArith.compute_combination expl tableau in
+  (* let eq_constraints = mk_eq_constraints tableau in
+    let tableau_linear_combination = compute_combination expl tableau in
     let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
     eq_constraints @ geq_constraints *)
 
