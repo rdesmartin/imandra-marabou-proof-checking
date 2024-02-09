@@ -1,4 +1,5 @@
 open Utils
+open Farkas_lemma
 
 module LinArith = struct
     (** is_bounded returns true is the vector xs is bounded by us and ls, i.e. for each corresponding
@@ -34,23 +35,22 @@ module LinArith = struct
         | _ -> 0.
     
     (** Helper function for {!compute_combination} *)
-    let rec update_combination (lc: real list) (expl: real list) (tableau: real list list): real list = 
+    let rec update_combination (lc: real list) (expl: real list) (tableau: exp list): real list = 
         match expl, tableau with
-        | _, [] :: _ -> lc
         | _, [] | [], _ -> lc
-        | coeff :: expl', row :: tableau' -> update_combination (list_add lc (list_scale row coeff)) expl' tableau'
+        | coeff :: expl', row :: tableau' -> update_combination (list_add lc (list_scale (extract_poly row) coeff)) expl' tableau'
 
     (** Compute a linear combination of tableau rows with coefficients from the explanation vector `expl` 
-        (i.e. a bound-tightening lemma vector or a contradiction in a Leaf node) *)
-    let compute_combination (expl: real list) (tableau: real list list): real list =
-        if tableau = []
-        then
-            []
-        else
-            let linear_combination = (repeat 0. (List.length (List.hd tableau))) in
-            update_combination linear_combination expl tableau
+        (i.e. a bound-tightening lemma vector or a contradiction in a Leaf node) 
+        The initial zero vector accumulator has length (len p - 1) because the polynomials have a constant factor, 
+        and we want it to be the size of the variable vector
+        *)        
+    let compute_combination (expl: real list) (tableau: exp list): real list =
+        match tableau with
+        | [] -> []
+        | (hd::tl as tableau) -> update_combination (repeat 0. (List.length (extract_poly hd) - 1)) expl tableau
 
-    (** Helper function for {!compute_row_upper_bound} *)
+        (** Helper function for {!compute_row_upper_bound} *)
     let upper_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
         if coeff <. 0. 
         then 

@@ -33,9 +33,9 @@ def log(msg):
     with open(LOG_FILE, "a+") as f:
         f.write(f"\n{dt.now()}: {msg}\n")
 
-def record_result(input_config, status, time):
+def record_result(input_config, status, result, time):
     with open(RESULT_FILE, "a") as f:
-        f.write(f"{input_config};{status};{time}\n")    
+        f.write(f"{input_config};{status};{result};{time}\n")    
 
 def main():
     files = TEST_FILES
@@ -58,12 +58,12 @@ def main():
             end = dt.now()
             if res.returncode == 1:
                 status = "KO"
-
-            record_result(file_name,status, (end - start))
+            result = res.stdout.split()[-1]
+            record_result(file_name,status, result, (end - start))
             log(f"Proof {file_name} finished; status: {status}\n")
             log(res.stdout)
             log("==========")
-            print(f"{file_name}: {status}")
+            print(f"{file_name}: {status}; result: {result}")
     except KeyboardInterrupt:
         print('interrupted')
         sys.exit(1)

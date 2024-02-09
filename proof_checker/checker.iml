@@ -16,19 +16,11 @@ type query = {
     proof_tree: ProofTree.t;
 }
 
-(* check that the contradiction is a valid Farkas lemma vector in matrix/vector representation *)
-let check_contradiction' contradiction (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool =
-    let linear_combination = LinArith.compute_combination contradiction tableau in
-    let row_upper_bound = LinArith.compute_row_upper_bound linear_combination upper_bounds lower_bounds in
-    row_upper_bound <. 0.
-
 (* check contradiction with polynomials representation *)
-let check_contradiction (contradiction: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): bool = 
-    let sys = mk_system_contradiction contradiction tableau upper_bounds lower_bounds in
-    (* The original contradiction vector has 1 value per tableau row.
-       When we convert the tableau & bounds to the system, we add Geq constraints that we already scale. 
-       We append 1s at the end of the contradiction vector to account for these new constraints. *)
-    let contradiction' = contradiction @ (repeat 1. (List.length upper_bounds)) in
+let check_contradiction (contradiction: real list) (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list): bool = 
+    let sys = mk_system_contradiction tableau upper_bounds lower_bounds in
+    let lc = LinArith.compute_combination contradiction tableau in        
+    let contradiction' = contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc)) in
     let res = (check_cert sys contradiction') in
     res
 
@@ -93,10 +85,11 @@ let sanity_checks tableau upper_bounds lower_bounds =
 *)
 let check_proof_tree (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) (constraints: Constraint.t list) (proof_root: ProofTree.t) =
     let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
+    let tableau_system = mk_eq_constraints tableau in
     let check_tree = 
         match proof_root with
         | ProofTree.Node ([], bound_lemmas, _) | ProofTree.Leaf ([], bound_lemmas, _) ->
-            check_node tableau upper_bounds lower_bounds constraints proof_root
+            check_node tableau_system upper_bounds lower_bounds constraints proof_root
         | _ -> false
     in
     sanity_check_res && check_tree

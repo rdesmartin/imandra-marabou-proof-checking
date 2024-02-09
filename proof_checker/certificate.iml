@@ -3,6 +3,19 @@ open Arithmetic.LinArith
 open Tightening
 open Utils
 
+(* create certificate for Geq constraints corresponding to upper bounds *)
+let rec mk_upper_bound_certificate lc = 
+  match lc with 
+  | [] -> []
+  | hd :: tl -> (if hd >=. 0. then hd else 0. ) :: mk_upper_bound_certificate tl
+
+
+(* create certificate for Geq constraints corresponding to lower bounds *)
+let rec mk_lower_bound_certificate lc = 
+  match lc with 
+  | [] -> []
+  | hd :: tl -> (if hd <. 0. then (-. hd) else 0. ) :: mk_lower_bound_certificate tl
+
 (*
   Create a polynomial of size (size + 1) that represents the bound of variable i:
   all coefficients are 0, except at index i where it is  `coeff` (should be 1 for a lower bound
@@ -15,13 +28,6 @@ let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real): real lis
     let el = if i = 0 then coeff else 0. in
     el :: mk_bound_poly (size - 1) (i - 1) coeff bound
   )
-
-(* return the polynomial from the expression (just the coefficients) *)
-let extract_poly (e: exp): real list =
-  match e with
-  | Geq e -> e
-  | Eq e -> e
-  | Gt e -> e
 
 (* 
   transform the tableau into a list of Eq expressions, with 
@@ -41,30 +47,24 @@ let rec mk_eq_constraints (tableau: real list list): exp list =
   size = number of variables
 *)
 
-let mk_geq_poly c u l i size =
-  if (c >=. 0.)
-  then (
-    mk_bound_poly size i Real.(-1. * c) Real.(u * c)
-  ) else (
-    mk_bound_poly size i Real.(1. * -c) Real.(-l * -c)
-  )
+let rec mk_lower_bounds_constraints size i lower_bounds = 
+  match lower_bounds with
+  | [] -> []
+  | l::bounds -> Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints size (i + 1) bounds
 
 
-let rec mk_geq_constraints' (cs: real list) (upper_bounds: real list) (lower_bounds: real list) (i: int) (size: int): exp list =
-  match cs, upper_bounds, lower_bounds with
-  | [], [], [] -> []
-  | c :: cs, u :: us, l :: ls -> 
-      let p = mk_geq_poly c u l i size in 
-      Geq p :: mk_geq_constraints' cs us ls (i + 1) size
-  | _ -> []
+let rec mk_upper_bounds_constraints size i upper_bounds = 
+  match upper_bounds with
+  | [] -> []
+  | u::bounds -> Geq (mk_bound_poly size i (-1.) u) :: mk_upper_bounds_constraints size (i + 1) bounds
 
 (*
   Create Geq constraints corresponding to the variable bounds.
 *)
-let mk_geq_constraints (cs: real list) (upper_bounds: real list) (lower_bounds: real list): exp list =
-  let size = List.length cs in
-  mk_geq_constraints' cs upper_bounds lower_bounds 0 size
-
+let mk_geq_constraints (upper_bounds: real list) (lower_bounds: real list): exp list =
+  let size = List.length upper_bounds in
+  (mk_upper_bounds_constraints size 0 upper_bounds) @ (mk_lower_bounds_constraints size 0 lower_bounds)
+ 
 
 let mk_gt_constraint (size: int) ((var, value, bound_t): (int * real * bound_type)): exp = 
   match bound_t with
@@ -74,12 +74,8 @@ let mk_gt_constraint (size: int) ((var, value, bound_t): (int * real * bound_typ
              Gt p
 
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
-let mk_system_contradiction (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list): exp list =
-  (mk_eq_constraints tableau) @ (mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds)
-  (* let eq_constraints = mk_eq_constraints tableau in
-    let tableau_linear_combination = compute_combination expl tableau in
-    let geq_constraints = mk_geq_constraints tableau_linear_combination upper_bounds lower_bounds in
-    eq_constraints @ geq_constraints *)
+let mk_system_contradiction (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list): exp list =
+  tableau @ (mk_geq_constraints upper_bounds lower_bounds)
 
 (**
 * helper functions for mk_geq_constraints_lemma
@@ -100,29 +96,12 @@ let compute_linear_combination_lemmas expl tableau caus_bound_t caus_var =
   let lc = compute_combination_case expl tableau caus_bound_t in
   update_combination_case lc caus_var caus_bound_t
 
-let mk_geq_constraints_lemma expl tableau upper_bounds lower_bounds caus_var caus_bound_t =
-  mk_geq_constraints 
-    (compute_linear_combination_lemmas expl tableau caus_bound_t caus_var) 
-    upper_bounds 
-    lower_bounds
-
 (* Create the polynomial representation of the linear constraints from the matrix representation 
    for bound tightening lemma checking, i.e. with strict inequality constraints *)
-let mk_system_lemma (expl: real list) (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) ((caus_var, row_bound, caus_bound_t) as tightening: Tightening.t): exp list =
-  let eq_constraints = mk_eq_constraints tableau in
-  let geq_constraints = mk_geq_constraints_lemma expl tableau upper_bounds lower_bounds caus_var caus_bound_t in
-  let gt_constraint = mk_gt_constraint (List.length (List.hd tableau)) tightening in
-  gt_constraint :: (eq_constraints @ geq_constraints)
-  (* mk_system_lemma expl tableau upper_bounds lower_bounds tightening: expr list
-
-  equivalence lemma:
-  forall x
-  (eval expl tableau upper_bounds lower_bounds tightening x) 
-  =
-  s (mk_system_lemma expl tableau upper_bounds lower_bounds tightening) 
-  *)
-
-
+let mk_system_lemma (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list) ((caus_var, row_bound, caus_bound_t) as tightening: Tightening.t): exp list =
+  let geq_constraints = mk_geq_constraints upper_bounds lower_bounds in
+  let gt_constraint = mk_gt_constraint (List.length upper_bounds) tightening in
+  gt_constraint :: (tableau @ geq_constraints)
 
 (* Utils to_string functions for debugging *)
 let rec poly_to_string p = 
