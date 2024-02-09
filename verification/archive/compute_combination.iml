@@ -1,0 +1,254 @@
+lemma list_scale_len_invariant lc coeff row =
+    List.length lc = List.length row 
+    ==>
+    List.length lc  = List.length (Utils.list_scale row coeff)
+    [@@auto]
+    [@@fc]
+
+lemma list_add_scale_len_invariant_helper lc coeff row =
+    List.length lc = List.length (Utils.list_scale row coeff) 
+    ==>
+    List.length (Utils.list_add lc (Utils.list_scale row coeff)) = List.length lc
+    [@@auto]
+    [@@apply Utils.list_add_length_invariant lc (Utils.list_scale row coeff)]
+    [@@rw][@@fc]
+
+lemma list_add_scale_len_invariant (lc: real list) (coeff: real) (row: real list) =
+    List.length lc = List.length row
+    ==>
+    List.length (Utils.list_add lc (Utils.list_scale row coeff)) = List.length lc
+    [@@auto]
+    [@@rw][@@fc]
+
+lemma list_add_shorter_length_invariant (l1: real list) (l2: real list) =
+    List.length l1 = List.length l2 - 1
+    ==>
+    List.length (Utils.list_add l1 l2) = List.length l1
+    [@@auto]
+    [@@induct functional Utils.list_add]
+
+lemma list_add_scale_extract_poly_len_invariant (lc: real list) (coeff: real) (e: exp) =
+    List.length lc = (List.length (extract_poly e)) - 1
+    ==>
+    List.length (Utils.list_add lc (Utils.list_scale (extract_poly e) coeff)) = List.length lc
+    [@@auto]
+    [@@rw][@@fc]
+    [@@apply list_scale_len_invariant lc coeff (Farkas_lemma.extract_poly e),
+        list_add_shorter_length_invariant lc (Utils.list_scale (Farkas_lemma.extract_poly e) coeff)]
+    [@@disable Utils.list_add, Utils.list_scale, List.length]
+
+lemma update_combination_hd_len_invariant lc expl tableau =
+    List.length lc = (List.length (extract_poly (List.hd tableau))) - 1 &&
+    expl <> []
+    ==>
+    List.length (update_combination lc [List.hd expl] [List.hd tableau]) = List.length lc
+    [@@auto]
+    [@@induct functional induction_scheme_update_combination]
+    [@@apply list_add_scale_extract_poly_len_invariant lc (List.hd expl) (List.hd tableau)]
+    [@@rw][@@fc]
+
+lemma update_combination_single_coeff lc coeff tableau =
+    well_formed tableau lc
+    ==> 
+    update_combination lc [coeff] tableau = update_combination lc [coeff] [List.hd tableau]
+    [@@auto]
+    [@@fc]
+
+lemma update_combination_single_expression lc expl e =
+    expl <> [] 
+    ==> 
+    update_combination lc expl [e] = update_combination lc [List.hd expl] [e]
+    [@@auto]
+    [@@fc]
+
+lemma update_combination_expl_hd_len_invariant lc expl tableau =
+    well_formed tableau lc && 
+    List.length lc = (List.length (extract_poly (List.hd tableau))) - 1 &&
+    expl <> []
+    ==>
+    List.length (update_combination lc [List.hd expl] tableau) = List.length lc
+    [@@auto]
+    [@@apply update_combination_single_coeff lc (List.hd expl) tableau]
+    [@@rw][@@fc]
+
+lemma update_combination_len_invariant_helper lc expl tableau =
+    well_formed tableau lc && 
+    List.length lc = (List.length (extract_poly (List.hd tableau))) - 1 &&
+    expl <> []
+    ==>
+    List.length (update_combination lc expl [List.hd tableau]) = List.length lc
+    [@@auto]
+    [@@apply update_combination_single_expression lc expl (List.hd tableau)]
+    [@@rw][@@fc]
+
+lemma update_combination_length_invariant_helper lc tableau =
+    well_formed tableau lc && List.tl tableau <> [] &&
+    (List.length lc = (List.length (extract_poly (List.hd tableau))) - 1)
+    ==>
+    (List.length (extract_poly (List.hd (List.tl tableau)))) - 1 = List.length lc
+    [@@auto]
+    [@@fc]
+
+lemma update_combination_len_invariant (lc: real list) (expl: real list) (tableau: exp list) =
+    well_formed tableau lc &&
+    lc <> [] &&
+    expl <> [] &&
+    List.length lc = (List.length (extract_poly (List.hd tableau))) - 1
+    ==>
+    List.length (update_combination lc expl tableau) = List.length lc
+[@@auto]
+[@@induct functional induction_scheme_update_combination]
+[@@apply update_combination_length_invariant_helper lc tableau]
+[@@disable List.length, Utils.list_add, Utils.list_scale, Arithmetic.LinArith.update_combination]
+
+lemma compute_combination_length_invariant expl tableau =
+    well_formed_tableau tableau &&
+    expl <> []
+    ==>
+    List.length (compute_combination expl tableau) = List.length (List.hd tableau)
+[@@auto]
+[@@apply update_combination_len_invariant (repeat 0. (List.length (List.hd tableau))) expl tableau]
+[@@rw][@@fc]
+
+lemma update_combination_base_case (lc: real list) (expl: real list) (tableau: real list list) =
+    (expl = [] || tableau = [] || List.hd tableau = []) &&
+    lc <> [] 
+    ==>
+    update_combination lc expl tableau <> []
+    [@@auto]
+    [@@fc]
+
+(* needed for compute_combination_empty *)
+lemma update_combination_empty lc expl tableau = 
+    update_combination lc expl tableau = []
+    ==> 
+    lc = []
+    [@@auto]
+    [@@fc]
+
+(* needed for compute_combination_empty *)
+lemma update_combination_non_empty (lc: real list) (expl: real list) (tableau: real list list) =
+    well_formed_tableau tableau &&
+    expl <> [] && 
+    lc <> []
+    ==> 
+    update_combination lc expl tableau <> []
+    [@@auto]
+    [@@induct functional induction_scheme_update_combination]
+    [@@disable Utils.list_add, Utils.list_scale]
+
+(* needed for well_formed_mk_system_geq *)
+lemma compute_combination_non_empty expl tableau = 
+    tableau <> [] && 
+    List.hd tableau <> [] &&
+    expl <> [] 
+    ==> 
+    compute_combination expl tableau <> [] 
+    [@@auto][@@fc]
+
+    let rec induction_scheme_update_combination (lc: real list) (expl: real list) (tableau: exp list) = 
+    match expl, tableau with
+    | coeff:: expl', row::tableau' -> induction_scheme_update_combination (list_add lc (list_scale (extract_poly row) coeff)) expl' tableau'
+    | [], [] -> true
+    | [], hd :: tl -> true
+    | hd :: tl, [] -> true
+
+    lemma well_formed_combination_hd tableau x =
+    well_formed tableau x
+    ==>
+    List.length (repeat 0. (List.length (extract_poly (List.hd tableau)) - 1)) = List.length x
+[@@auto]
+[@@fc]
+
+lemma well_formed_extract_poly_size_invariant system e x = 
+    well_formed system x && List.mem e system
+    ==>
+    List.length (extract_poly e) - 1 = (List.length x)
+    [@@auto]
+    [@@apply well_formed_good_poly_length system e x,
+    good_poly_length_size (extract_poly e) x
+    ]
+    [@@disable Farkas_lemma.good_poly_length, Farkas_lemma.extract_poly]
+
+
+    lemma mk_geq_poly_size p c u l i size = 
+    size >= 0 &&
+    p = mk_geq_poly c u l i size
+    ==> 
+    List.length p = size + 1
+    [@@auto]
+    [@@fc]
+
+lemma good_poly_length_helper p x =
+    List.length p = (List.length x) + 1
+    ==>
+    good_poly_length p x
+    [@@auto]
+    [@@rw][@@fc]
+
+let rec well_formed_geq_induction_scheme coeffs upper_bounds lower_bounds i size system = 
+    match coeffs, upper_bounds, lower_bounds, system with
+    | c :: cs, u :: us, l :: ls, s :: ss -> well_formed_geq_induction_scheme cs us ls i size ss
+    | [], [], [], [] -> true
+    | _ -> true
+
+lemma well_formed_mk_geq_constraints_helper1 c u l i size poly x =
+    poly = mk_geq_poly c u l i size &&
+    List.length x = size
+    ==>
+    good_poly_length poly x
+[@@auto]
+[@@apply good_poly_length_helper poly x]
+[@@disable Certificate.mk_geq_poly]
+[@@fc]
+
+
+lemma well_formed_mk_geq_constraints_helper2 c u l i size poly x =
+    poly = mk_geq_poly c u l i size &&
+    List.length x = size
+    ==>
+    well_formed [Geq poly] x
+[@@auto]
+[@@apply well_formed_mk_geq_constraints_helper1 c u l i size poly x]
+[@@disable Certificate.mk_geq_poly]
+
+lemma well_formed_mk_geq_constraints_head coeffs upper_bounds lower_bounds i size system l =
+    system = mk_geq_constraints' coeffs upper_bounds lower_bounds i size &&
+    coeffs <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    List.length l = size
+    ==> 
+    good_poly_length (extract_poly (List.hd system)) l
+    [@@auto]
+    [@@disable Certificate.mk_geq_poly]
+
+lemma well_formed_mk_geq_constraints' coeffs upper_bounds lower_bounds i size system x =
+    system = mk_geq_constraints' coeffs upper_bounds lower_bounds i size &&
+    coeffs <> [] && upper_bounds <> [] && lower_bounds <> [] &&
+    List.length x = size
+    ==> 
+    well_formed system x
+    [@@auto]
+    [@@disable Certificate.mk_geq_poly]
+    [@@fc]
+
+lemma well_formed_mk_system_geq expl tableau upper_bounds lower_bounds geq_constraints =
+    geq_constraints = mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds &&
+    expl <> [] && tableau <> [] && List.hd tableau <> [] && upper_bounds <> [] && lower_bounds <> []
+    ==>
+    well_formed geq_constraints (compute_combination expl tableau)
+[@@auto]
+[@@apply well_formed_mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds geq_constraints]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
+[@@fc]
+
+lemma well_formed_mk_system_geq' expl tableau upper_bounds lower_bounds geq_constraints =
+    well_formed geq_constraints (compute_combination expl tableau) &&
+    well_formed_tableau tableau &&
+    expl <> [] && upper_bounds <> [] && lower_bounds <> []
+    ==>
+    well_formed geq_constraints (List.hd tableau)
+[@@auto]
+[@@apply compute_combination_length_invariant expl tableau,
+    well_formed_same_lengths geq_constraints (compute_combination expl tableau) (List.hd tableau)    
+]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
