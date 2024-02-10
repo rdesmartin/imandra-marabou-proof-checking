@@ -74,17 +74,156 @@ lemma system_relus_relu_lemma6_one_constraint s1 s2 b f aux bound_value b_var f_
         eval_system_concat_invariant s1 s2 x]
 
 
-    lemma system_relu_lemma6 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
-        List.nth f_var x = Some f &&
-        List.nth b_var x = Some b &&
-        List.nth aux_var x = Some aux &&
-        c = (b_var, f_var, aux_var) &&
-        s1 = [Geq (mk_bound_poly (List.length x) f_var (-1.) bound_value)] &&
-        s2 = [Geq (mk_bound_poly (List.length x) b_var (-1.) bound_value)] &&
-        eval_system_relus (s1 @ system) (c::cs) x 
-        ==> 
-        eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
-        [@@auto]
-        [@@apply 
-        system_relus_relu_lemma6_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
-            eval_system_concat_invariant s2 (s1 @ system) x]
+(* f <=. x ==> b <=. x *)
+lemma system_relu_lemma6 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    s1 = [Geq (mk_bound_poly (List.length x) f_var (-1.) bound_value)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) b_var (-1.) bound_value)] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma6_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]
+
+
+(* b >=. 0. ==> aux <=. 0. *)
+lemma system_relu_lemma1 system s1 s2 c cs b f aux b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    s1 = [Geq (mk_bound_poly (List.length x) b_var 1. 0.)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) aux_var (-1.) 0.)] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma1_one_constraint s1 s2 b f aux 0. b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]
+    
+
+(* f >. 0. ==> aux = 0.  *)
+lemma system_relu_lemma2 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    bound_value >. 0. &&
+    s1 = [Geq (mk_bound_poly (List.length x) f_var 1. bound_value)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) aux_var (-1.) 0.)] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma2_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]
+
+   
+(* aux >. 0. ==> f <=. 0. *)
+lemma system_relu_lemma3 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    bound_value >. 0. &&
+    s1 = [Geq (mk_bound_poly (List.length x) aux_var 1. bound_value)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) f_var (-1.) 0.)] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma3_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]       
+        
+(*  f <. 0. ==> f <=. 0. *)
+lemma system_relu_lemma4 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    bound_value <. 0. &&
+    s1 = [Geq (mk_bound_poly (List.length x) f_var (-1.) bound_value)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) f_var (-1.) 0.)] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma4_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]      
+        
+
+(*   b <=. 0. ==> f <=. 0. *)
+lemma system_relu_lemma5 system s1 s2 c cs b f aux b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    s1 = [Geq (mk_bound_poly (List.length x) b_var (-1.) 0.)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) f_var (-1.) 0.)] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma5_one_constraint s1 s2 b f aux 0. b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]      
+
+
+(* b <=. x && x >=. 0. ==> f <=. x*)
+lemma system_relu_lemma7 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    bound_value >=. 0. &&
+    s1 = [Geq (mk_bound_poly (List.length x) b_var (-1.) bound_value)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) f_var (-1.) bound_value)] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma7_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]
+
+(* aux <=. x ==> b >=. (-. x)*)
+lemma system_relu_lemma8 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    s1 = [Geq (mk_bound_poly (List.length x) aux_var (-1.) bound_value)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) b_var 1. (-. bound_value))] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma8_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]
+
+(* b >=. x && x <=. 0. ==> aux <=. (-. x))*)
+lemma system_relu_lemma9 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+    List.nth f_var x = Some f &&
+    List.nth b_var x = Some b &&
+    List.nth aux_var x = Some aux &&
+    c = (b_var, f_var, aux_var) &&
+    bound_value <=. 0. &&
+    s1 = [Geq (mk_bound_poly (List.length x) b_var 1. bound_value)] &&
+    s2 = [Geq (mk_bound_poly (List.length x) aux_var (-1.) (-. bound_value))] &&
+    eval_system_relus (s1 @ system) (c::cs) x 
+    ==> 
+    eval_system_relus (s2 @ (s1 @ system)) (c::cs) x
+    [@@auto]
+    [@@apply 
+    system_relus_relu_lemma9_one_constraint s1 s2 b f aux bound_value b_var f_var aux_var x,
+        eval_system_concat_invariant s2 (s1 @ system) x]
