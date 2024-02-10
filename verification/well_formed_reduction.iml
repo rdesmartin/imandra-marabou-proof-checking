@@ -9,10 +9,6 @@ open Farkas_lemma
 open Tightening
 open Bound_lemma
 
-(** Return true if the variable vector x is a solution to the tableau *)
-let is_solution (tableau: real list list) (x: real list) : bool =
-    Utils.all (List.map (fun row -> dot_product row x = 0.) tableau)
-
 (** 
 =========== well_formed_mk_eq_constraints ================================
  *)
@@ -350,15 +346,17 @@ lemma well_formed_mk_geq_constraints' upper_bounds lower_bounds u_constraints l_
 [@@disable Certificate.mk_lower_bounds_constraints, Certificate.mk_upper_bounds_constraints]
 [@@fc]
 
-
-
-axiom well_formed_mk_geq_constraints'' upper_bounds lower_bounds sys =
+lemma well_formed_mk_geq_constraints'' upper_bounds lower_bounds sys =
     sys = mk_geq_constraints upper_bounds lower_bounds &&
     upper_bounds <> [] && lower_bounds <> [] && 
     List.length upper_bounds = List.length lower_bounds
     ==>
     well_formed sys upper_bounds
 [@@auto]
+[@@apply well_formed_mk_geq_constraints' upper_bounds lower_bounds 
+        (mk_upper_bounds_constraints (List.length upper_bounds) 0 upper_bounds) 
+        (mk_lower_bounds_constraints (List.length upper_bounds) 0 lower_bounds)
+        ]
 [@@disable Certificate.mk_lower_bounds_constraints, 
 Certificate.mk_upper_bounds_constraints, Certificate.mk_geq_constraints]
 [@@fc]
@@ -419,6 +417,7 @@ lemma well_formed_conversion' tableau upper_bounds lower_bounds system =
     ==>
     well_formed system (List.hd tableau)
 [@@auto]
+[@@apply well_formed_conversion tableau upper_bounds lower_bounds (mk_eq_constraints tableau) (mk_geq_constraints upper_bounds lower_bounds)]
 [@@disable Certificate.mk_geq_constraints]
 [@@fc]
 

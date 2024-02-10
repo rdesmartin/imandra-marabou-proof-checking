@@ -56,7 +56,7 @@ axiom mk_bound_poly_eval var var_i value coeff x =
     [@@auto]
     [@@fc]
 
-lemma mk_bound_poly_pos var var_i value coeff x = 
+lemma mk_bound_poly_non_neg var var_i value coeff x = 
     x <> [] &&
     List.nth var_i x = Some var &&
     coeff *. var >=. value
@@ -73,8 +73,30 @@ lemma mk_bound_poly_eval_geq_true var var_i value coeff x =
     ==>
     eval_system [Geq (mk_bound_poly (List.length x) var_i coeff (-. value))] x
     [@@auto]
+    [@@apply mk_bound_poly_non_neg var var_i value coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+lemma mk_bound_poly_pos var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >. value
+    ==>
+    eval_poly (mk_bound_poly (List.length x) var_i coeff (-. value)) x >. 0.
+    [@@auto]
+    [@@apply mk_bound_poly_eval var var_i (-. value) coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+
+lemma mk_bound_poly_eval_gt_true var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >. value
+    ==>
+    eval_system [Gt (mk_bound_poly (List.length x) var_i coeff (-. value))] x
+    [@@auto]
     [@@apply mk_bound_poly_pos var var_i value coeff x]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
 
 lemma mk_bound_poly_eval_geq_true' var var_i value coeff x = 
     x <> [] &&
@@ -83,7 +105,7 @@ lemma mk_bound_poly_eval_geq_true' var var_i value coeff x =
     ==>
     eval_system [Geq (mk_bound_poly (List.length x) var_i coeff value)] x
     [@@auto]
-    [@@apply mk_bound_poly_pos var var_i (-. value) coeff x]
+    [@@apply mk_bound_poly_non_neg var var_i (-. value) coeff x]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
 
 lemma mk_bound_poly_eval_geq_true_conj var1 var1_i value1 coeff1 var2 var2_i value2 coeff2 x = 
