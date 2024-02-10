@@ -2,6 +2,13 @@ open Farkas_lemma
 open Tightening
 open Utils
 open Certificate
+open Relu
+
+lemma nth_size y_var y x = 
+    List.nth y_var x = Some y 
+    ==> 
+    y_var < (List.length x) 
+    [@@auto][@@fc]
 
 (* predicate stating that s' = s && (b <= 0) && (aux >= 0) *)
 let is_inactive_relu (s: exp list) (s': exp list) b f (size) =
@@ -17,8 +24,8 @@ let eval_relu ((b_var, f_var, aux_var): (int * int * int)) (x: real list) =
     let b = List.nth b_var x in
     let aux = List.nth aux_var x in
     match b, f, aux with
-    | Some b, Some f, Some aux -> f = relu b && aux +. b -. f = 0.
-    | _ -> false 
+    | Some b, Some f, Some aux -> (f = relu b) && (aux +. b -. f = 0.)
+    | _ -> false
 
 let rec eval_relus cs x = 
     match cs with
@@ -41,17 +48,8 @@ lemma mk_bound_poly_var size var var_i coeff value =
     var = coeff
     [@@auto]
 
-(* lemma mk_bound_poly_zero size var var_i i coeff value = 
-    size > 0 && var_i < size &&
-    i <> var_i && i <> size &&
-    List.nth i (mk_bound_poly size var_i coeff value) = Some var
-    ==>
-    var = 0.
-    [@@auto]
-    [@@induct functional Certificate.mk_bound_poly] *)
-
 axiom mk_bound_poly_eval var var_i value coeff x = 
-    x <> [] && var_i < (List.length x) &&
+    x <> [] &&
     List.nth var_i x = Some var
     ==>
     eval_poly (mk_bound_poly (List.length x) var_i coeff value) x = coeff *. var +. value
@@ -59,7 +57,7 @@ axiom mk_bound_poly_eval var var_i value coeff x =
     [@@fc]
 
 lemma mk_bound_poly_pos var var_i value coeff x = 
-    x <> [] && var_i < (List.length x) &&
+    x <> [] &&
     List.nth var_i x = Some var &&
     coeff *. var >=. value
     ==>
@@ -69,7 +67,7 @@ lemma mk_bound_poly_pos var var_i value coeff x =
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
 
 lemma mk_bound_poly_eval_geq_true var var_i value coeff x = 
-    x <> [] && var_i < (List.length x) &&
+    x <> [] &&
     List.nth var_i x = Some var &&
     coeff *. var >=. value
     ==>
@@ -78,10 +76,18 @@ lemma mk_bound_poly_eval_geq_true var var_i value coeff x =
     [@@apply mk_bound_poly_pos var var_i value coeff x]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
 
+lemma mk_bound_poly_eval_geq_true' var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >=. (-. value)
+    ==>
+    eval_system [Geq (mk_bound_poly (List.length x) var_i coeff value)] x
+    [@@auto]
+    [@@apply mk_bound_poly_pos var var_i (-. value) coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
 lemma mk_bound_poly_eval_geq_true_conj var1 var1_i value1 coeff1 var2 var2_i value2 coeff2 x = 
     x <> [] && 
-    var1_i < (List.length x) &&
-    var2_i < (List.length x) &&
     List.nth var1_i x = Some var1 &&
     List.nth var2_i x = Some var2 &&
     coeff1 *. var1 >=. value1 &&
@@ -97,9 +103,6 @@ lemma mk_bound_poly_eval_geq_true_conj var1 var1_i value1 coeff1 var2 var2_i val
 
 lemma relu_split_phases_eval b f aux b_var f_var aux_var x =
     x <> [] && 
-    b_var < (List.length x) &&
-    f_var < (List.length x) &&
-    aux_var < (List.length x) &&
     List.nth b_var x = Some b &&
     List.nth f_var x = Some f &&
     List.nth aux_var x = Some aux &&
@@ -127,9 +130,6 @@ lemma relu_split_phases_eval_concat s b f aux b_var f_var aux_var x =
     well_formed s x &&
     eval_system s x &&
     x <> [] && 
-    b_var < (List.length x) &&
-    f_var < (List.length x) &&
-    aux_var < (List.length x) &&
     List.nth b_var x = Some b &&
     List.nth f_var x = Some f &&
     List.nth aux_var x = Some aux &&
@@ -148,9 +148,6 @@ lemma relu_split_phases_eval_concat s b f aux b_var f_var aux_var x =
 
 lemma relu_split_phases_eval' s sl sr b f aux b_var f_var aux_var x =
     x <> [] &&
-    b_var < (List.length x) &&
-    f_var < (List.length x) &&
-    aux_var < (List.length x) &&
     List.nth b_var x = Some b &&
     List.nth f_var x = Some f &&
     List.nth aux_var x = Some aux &&
@@ -179,15 +176,11 @@ lemma eval_relus_tl c cs x =
 
 lemma relu_split_children_satisfy_linear_and_nonlinear_constraints s sl sr b f aux b_var f_var aux_var x cs =
     x <> [] &&
-    b_var < (List.length x) &&
-    f_var < (List.length x) &&
-    aux_var < (List.length x) &&
     List.nth b_var x = Some b &&
     List.nth f_var x = Some f &&
     List.nth aux_var x = Some aux &&
     eval_relu (b_var, f_var, aux_var) x &&
     well_formed s x &&
-    eval_system s x &&
     is_inactive_relu s sl b_var f_var (List.length x) &&
     is_active_relu s sr b_var aux_var (List.length x) &&
     eval_system_relus s ((b_var, f_var, aux_var)::cs) x  
@@ -201,7 +194,7 @@ lemma relu_split_children_satisfy_linear_and_nonlinear_constraints s sl sr b f a
 [@@disable Farkas_lemma.eval_system, Certificate.mk_bound_poly, List.nth, List.length]
 
 
-lemma relu_split_sat_invariant (s: exp list) (sl: exp list) (sr: exp list) x cs ((b, f, aux) as c) =
+let relu_split_sat_invariant (s: exp list) (sl: exp list) (sr: exp list) x cs ((b, f, aux) as c) =
     well_formed s x && well_formed sl x && well_formed sr x && (* good sizes assumptions *)
     eval_system_relus s (c::cs) x && (* x satisfies the system and all relu constraints in the parent node *)
     is_inactive_relu s sl f b (List.length x) && (* the system of the left child corresponds to the inactive phase of a relu split *)
