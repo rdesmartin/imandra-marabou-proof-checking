@@ -1,0 +1,185 @@
+open Farkas_lemma
+open Tightening
+open Utils
+open Certificate
+open Arithmetic.LinArith
+
+lemma is_upper_bounded_tl x u = 
+    is_upper_bounded x u
+    ==> 
+    is_upper_bounded (List.tl x) (List.tl u)
+    [@@auto]
+    [@@fc]
+
+lemma is_upper_bounded_hd x u = 
+    is_upper_bounded x u 
+    ==> 
+    (List.hd u) -. (List.hd x)  >=. 0.
+[@@auto]
+[@@fc]
+
+lemma is_upper_bounded_nth x xn u un n =
+    List.length x = List.length u &&
+    is_upper_bounded x u &&
+    Some xn = List.nth n x &&
+    Some un = List.nth n u
+    ==>   
+    -. xn >=. -. un 
+    [@@auto]
+
+lemma mk_bound_poly_length size var_i coeff value =
+    size >= 0
+    ==>
+    List.length (mk_bound_poly size var_i coeff value) = size + 1
+    [@@auto]
+
+lemma mk_bound_poly_var size var var_i coeff value = 
+    size > 0 && var_i < size &&
+    List.nth var_i (mk_bound_poly size var_i coeff value) = Some var
+    ==>
+    var = coeff
+    [@@auto]
+
+axiom mk_bound_poly_eval_gal size var var_i value coeff x = 
+    x <> [] &&
+    size >= (List.length x) &&
+    List.nth var_i x = Some var
+    ==>
+    eval_poly (mk_bound_poly size var_i coeff value) x = coeff *. var +. value
+    [@@auto]
+    [@@fc]
+
+lemma mk_bound_poly_eval var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var
+    ==>
+    eval_poly (mk_bound_poly (List.length x) var_i coeff value) x = coeff *. var +. value
+    [@@auto]
+    [@@apply mk_bound_poly_eval_gal (List.length x) var var_i value coeff x]
+    [@@fc]
+
+lemma mk_bound_poly_eval_size_invariant size var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    size >= List.length x
+    ==>
+    eval_poly (mk_bound_poly size var_i coeff value) x = eval_poly (mk_bound_poly (List.length x) var_i coeff value) x
+    [@@auto]
+    [@@apply mk_bound_poly_eval_gal (List.length x) var var_i value coeff x,
+             mk_bound_poly_eval_gal size var var_i value coeff x
+    ]
+
+lemma mk_bound_poly_eval_geq_size_invariant size var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    size >= List.length x
+    ==>
+    eval_system [Geq (mk_bound_poly (List.length x) var_i coeff value)] x =
+     eval_system [Geq (mk_bound_poly size var_i coeff value)] x
+[@@auto]
+[@@apply mk_bound_poly_eval_size_invariant size var var_i value coeff x]
+[@@fc]
+
+lemma mk_bound_poly_non_neg var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >=. value
+    ==>
+    eval_poly (mk_bound_poly (List.length x) var_i coeff (-. value)) x >=. 0.
+    [@@auto]
+    [@@apply mk_bound_poly_eval var var_i (-. value) coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+lemma mk_bound_poly_eval_geq_true var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >=. value
+    ==>
+    eval_system [Geq (mk_bound_poly (List.length x) var_i coeff (-. value))] x
+    [@@auto]
+    [@@apply mk_bound_poly_non_neg var var_i value coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+lemma mk_bound_poly_pos var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >. value
+    ==>
+    eval_poly (mk_bound_poly (List.length x) var_i coeff (-. value)) x >. 0.
+    [@@auto]
+    [@@apply mk_bound_poly_eval var var_i (-. value) coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+lemma mk_bound_poly_eval_gt_true var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >. value
+    ==>
+    eval_system [Gt (mk_bound_poly (List.length x) var_i coeff (-. value))] x
+    [@@auto]
+    [@@apply mk_bound_poly_pos var var_i value coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+
+lemma mk_bound_poly_eval_geq_true' var var_i value coeff x = 
+    x <> [] &&
+    List.nth var_i x = Some var &&
+    coeff *. var >=. (-. value)
+    ==>
+    eval_system [Geq (mk_bound_poly (List.length x) var_i coeff value)] x
+    [@@auto]
+    [@@apply mk_bound_poly_non_neg var var_i (-. value) coeff x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+
+lemma mk_bound_poly_eval_geq_true'' x u = 
+    x <> [] &&
+    List.hd x <=. List.hd u
+    ==>
+    eval_system [Geq (mk_bound_poly (List.length x) 0 (-1.) (List.hd u))] x
+    [@@auto]
+    [@@apply mk_bound_poly_non_neg (List.hd x) 0 (-. (List.hd u)) (-1.) x]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+    [@@fc]
+
+lemma mk_bound_poly_eval_geq_true_any_size x u size = 
+    x <> [] &&
+    List.length u = List.length x &&
+    eval_system [Geq (mk_bound_poly (List.length x) 0 (-1.) (List.hd u))] x &&
+    size >= (List.length x)
+    ==>
+    eval_system [Geq (mk_bound_poly size 0 (-1.) (List.hd u))] x
+    [@@auto]
+    [@@apply mk_bound_poly_eval_geq_true'' x u,
+        mk_bound_poly_eval_geq_size_invariant size (List.hd x) 0 (List.hd u) (-1.) x]
+    [@@fc]
+
+lemma mk_bound_poly_eval_geq_true_conj var1 var1_i value1 coeff1 var2 var2_i value2 coeff2 x = 
+    x <> [] && 
+    List.nth var1_i x = Some var1 &&
+    List.nth var2_i x = Some var2 &&
+    coeff1 *. var1 >=. value1 &&
+    coeff2 *. var2 >=. value2
+    ==>
+    eval_system ((Geq (mk_bound_poly (List.length x) var1_i coeff1 (-. value1))) :: [Geq (mk_bound_poly (List.length x) var2_i coeff2 (-. value2))]) x
+    [@@auto]
+    [@@apply mk_bound_poly_eval_geq_true var1 var1_i value1 coeff1 x,
+        mk_bound_poly_eval_geq_true var2 var2_i value2 coeff2 x
+    ]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+
+lemma mk_upper_bounds_constraints_soundness_hd_helper upper_bounds x = 
+    List.length x = List.length upper_bounds &&
+    upper_bounds <> [] &&
+    is_upper_bounded x upper_bounds
+    ==> 
+    (-1.) *. (List.hd x) >=. (-. List.hd upper_bounds) 
+    [@@auto]
+
+(* High-level proof goal *)
+let mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
+    List.length x = List.length upper_bounds &&
+    List.length x = List.length lower_bounds && 
+    is_bounded x upper_bounds lower_bounds
+    ==>
+    eval_system (mk_geq_constraints upper_bounds lower_bounds) x

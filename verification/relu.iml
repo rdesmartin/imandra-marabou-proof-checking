@@ -4,15 +4,15 @@ module Relu = struct
 
     let relu x = if x >=. 0. then x else 0. 
 
-    let eval_relu ((f_var, b_var, aux_var): t) x =
-        let f = List.nth f_var x in
+    let eval_relu ((b_var, f_var, aux_var): t) x =
         let b = List.nth b_var x in
+        let f = List.nth f_var x in
         let aux = List.nth aux_var x in
         match b, f, aux with
         | Some b, Some f, Some aux -> f = relu b && aux +. b -. f = 0.
         | _ -> false
 
-        theorem relu_b_non_neg f b aux = 
+        theorem relu_b_non_neg b f aux = 
             f = relu b && aux +. b -. f = 0. 
             ==> 
             f >=. 0.

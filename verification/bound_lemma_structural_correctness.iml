@@ -26,8 +26,8 @@ lemma mk_bound_poly_mks_bound_system y y_var coeff bound x =
 (* if f <=. bound and eval_relu (b, f, aux) then eval_system [Geq -b bound] *)
 lemma relu_lemma6_exp b f aux bound_value b_var f_var aux_var x =
     x <> [] &&
-    List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
+    List.nth f_var x = Some f &&
     List.nth aux_var x = Some aux &&
     f <=. bound_value &&
     eval_relu (b_var, f_var, aux_var) x
@@ -92,7 +92,7 @@ lemma system_relu_lemma6 system s1 s2 c cs b f aux bound_value b_var f_var aux_v
 
 
 (* b >=. 0. ==> aux <=. 0. *)
-lemma system_relu_lemma1 system s1 s2 c cs b f aux b_var f_var aux_var x =
+let system_relu_lemma1 system s1 s2 c cs b f aux b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&
@@ -109,7 +109,7 @@ lemma system_relu_lemma1 system s1 s2 c cs b f aux b_var f_var aux_var x =
     
 
 (* f >. 0. ==> aux = 0.  *)
-lemma system_relu_lemma2 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+let system_relu_lemma2 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&
@@ -127,7 +127,7 @@ lemma system_relu_lemma2 system s1 s2 c cs b f aux bound_value b_var f_var aux_v
 
    
 (* aux >. 0. ==> f <=. 0. *)
-lemma system_relu_lemma3 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+let system_relu_lemma3 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&
@@ -144,7 +144,7 @@ lemma system_relu_lemma3 system s1 s2 c cs b f aux bound_value b_var f_var aux_v
         eval_system_concat_invariant s2 (s1 @ system) x]       
         
 (*  f <. 0. ==> f <=. 0. *)
-lemma system_relu_lemma4 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+let system_relu_lemma4 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&
@@ -162,7 +162,7 @@ lemma system_relu_lemma4 system s1 s2 c cs b f aux bound_value b_var f_var aux_v
         
 
 (*   b <=. 0. ==> f <=. 0. *)
-lemma system_relu_lemma5 system s1 s2 c cs b f aux b_var f_var aux_var x =
+let system_relu_lemma5 system s1 s2 c cs b f aux b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&
@@ -179,7 +179,7 @@ lemma system_relu_lemma5 system s1 s2 c cs b f aux b_var f_var aux_var x =
 
 
 (* b <=. x && x >=. 0. ==> f <=. x*)
-lemma system_relu_lemma7 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+let system_relu_lemma7 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&
@@ -196,7 +196,7 @@ lemma system_relu_lemma7 system s1 s2 c cs b f aux bound_value b_var f_var aux_v
         eval_system_concat_invariant s2 (s1 @ system) x]
 
 (* aux <=. x ==> b >=. (-. x)*)
-lemma system_relu_lemma8 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+let system_relu_lemma8 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&
@@ -212,7 +212,7 @@ lemma system_relu_lemma8 system s1 s2 c cs b f aux bound_value b_var f_var aux_v
         eval_system_concat_invariant s2 (s1 @ system) x]
 
 (* b >=. x && x <=. 0. ==> aux <=. (-. x))*)
-lemma system_relu_lemma9 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
+let system_relu_lemma9 system s1 s2 c cs b f aux bound_value b_var f_var aux_var x =
     List.nth f_var x = Some f &&
     List.nth b_var x = Some b &&
     List.nth aux_var x = Some aux &&

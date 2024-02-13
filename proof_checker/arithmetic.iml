@@ -4,7 +4,12 @@ open Farkas_lemma
 module LinArith = struct
     (** is_bounded returns true is the vector xs is bounded by us and ls, i.e. for each corresponding
         elements x_i, l_i, u_i, l_i <= x <= u_i *)
-    let is_upper_bounded x u = all @@ List.map (fun (a, b) -> a <=. b) (zip x u)
+    let rec is_upper_bounded x u = 
+    match x, u with
+    | [], [] -> true
+    | [x], [u] -> x <=. u
+    | x :: xs, u :: us -> x <=. u && is_upper_bounded xs us
+    | _ -> false
 
     lemma is_upper_bounded_elem x u n = 
         is_upper_bounded x u
