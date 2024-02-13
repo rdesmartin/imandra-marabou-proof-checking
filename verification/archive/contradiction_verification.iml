@@ -12,7 +12,7 @@ let rec is_bounded (vars: real list) (upper_bounds: real list) (lower_bounds: re
             x_hd >=. l_hd && x_hd <=. u_hd && is_bounded x_tl u_tl l_tl
         | _ -> false
 
-let rec dot_product x y =
+    let rec dot_product x y =
         match x, y with
         | [], [] -> 0.
         | x_hd :: x_tl, y_hd :: y_tl -> x_hd *. y_hd +. (dot_product x_tl y_tl)

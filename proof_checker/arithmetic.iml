@@ -28,16 +28,6 @@ module LinArith = struct
         | (Some x), (Some u), (Some l) -> l <=. x && x <=. u
         | _ -> true
     [@@auto][@@apply is_upper_bounded_elem l x n, is_upper_bounded_elem x u n]
-
-    (** dot-product (or scalar product) of vector x and y, defined with List.map and zip *)
-    let dot_product x y = List.fold_left (+.) 0. (List.map (fun (a, b) -> a *. b) (zip x y))
-    
-    (** dot-product (or scalar product) of vector x and y, defined recursively (legacy) *)
-    let rec dot_product' x y =
-        match x, y with
-        | [], [] -> 0.
-        | x1::xs, y1::ys -> x1 *. y1 +. (dot_product' xs ys)
-        | _ -> 0.
     
     (** Helper function for {!compute_combination} *)
     let rec update_combination (lc: real list) (expl: real list) (tableau: exp list): real list = 
@@ -76,13 +66,6 @@ module LinArith = struct
         match x, row with
         | x_h :: x_t, row_h :: row_t -> upper_bound_induct_scheme x_t row_t
         | _ -> true
-
-    (* lemma upper_bound_for_bounded_row x row us ls u =
-        is_bounded x us ls &&
-        compute_row_upper_bound row us ls = u
-        ==>
-        dot_product x row <=. u
-    [@@induct functional upper_bound_induct_scheme] *)
 
     (** Helper function for {!compute_row_lower_bound}  *)
     let lower_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =

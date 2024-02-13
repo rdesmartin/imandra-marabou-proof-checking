@@ -51,26 +51,6 @@ let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =
     )
 ;;
 
-(* set list element at given index to x *)
-let rec set_nth' (l: 'a list) (n: int) (x: 'a): 'a list =    
-    if n < 0 then l
-    else
-    match l with
-    | [] -> []
-    | [_] when n=0 -> [x]
-    | hd::tl ->
-    if n = 0 then (
-        x :: tl
-    ) else (
-        hd :: set_nth' tl (n-1) x
-    )
-;;
-
-(* lemma set_nth'_set_nth_eq l n a = 
-    set_nth' l n a = set_nth l n a
-[@@auto] [@@rw]
-;; *)
-
 lemma get_set_nth l n a =
     n >= 0 && n < List.length l
      ==>
@@ -83,18 +63,6 @@ lemma set_nth_unchanged l n m a =
   ==>
   List.nth m (set_nth l n a) = List.nth m l
 [@@auto]
-
-let rec induct_scheme l m n =
-    match l with
-    | [] -> true
-    | hd::tl -> induct_scheme tl (m-1) (n-1)
-
-lemma set_nth'_unchanged l n m a =
-  n <> m
-  ==>
-  List.nth m (set_nth' l n a) = List.nth m l
-  [@@induct functional induct_scheme]
-
 
 (* increment list element at given index by 1 *)
 let increment_elem (l: real list) (n: int): real list =
@@ -182,7 +150,6 @@ lemma zip_cat x1 x2 y1 y2 =
 let list_geq (l1: real list) (l2: real list): bool =
     all (List.map (fun (a, b) -> a >=. b) (zip l1 l2))
 
-(*
 (* Utils to_string functions for debugging *)
 let rec poly_to_string p = 
   match p with 
@@ -197,4 +164,3 @@ let rec system_to_string system =
   | Eq e :: es -> "Eq " ^ poly_to_string e ^ system_to_string es
   | Gt e :: es -> "Gt " ^ poly_to_string e ^ system_to_string es
 [@@program]
-*)

@@ -69,9 +69,6 @@ let rec scale_system (es: system) (cs: Real.t list) : poly list =
     match es, cs with
     | Eq e :: es , c :: cs -> p_scale e c :: scale_system es cs
     | Geq e :: es , c :: cs ->
-        (* if (c = 0.) then (
-            scale_system es cs
-        ) *)
         if (c >=. 0.) then (
             p_scale e c :: scale_system es cs
         ) else (

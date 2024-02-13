@@ -8,14 +8,6 @@ open Constraint
 open Farkas_lemma
 open Certificate
 
-type query = {
-    tableau: real list list;
-    upper_bounds: real list;
-    lower_bounds: real list;
-    constraints: Constraint.t list;
-    proof_tree: ProofTree.t;
-}
-
 (* check contradiction with polynomials representation *)
 let check_contradiction (contradiction: real list) (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list): bool = 
     let sys = mk_system_contradiction tableau upper_bounds lower_bounds in

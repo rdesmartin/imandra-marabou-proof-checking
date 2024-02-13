@@ -38,28 +38,21 @@ let rec mk_eq_constraints (tableau: real list list): exp list =
   | hd :: tl -> Eq (hd @ [0.]) :: mk_eq_constraints tl
   | [] -> []
 
-(* 
-  recursively iterate over the coeffs computed with w^T . A. 
-  For each coeff, create a Geq expr for the upper bounds if positive, 
-  Geq expr for the lower bound if negative.
-  For now, we scale by the coeff here and add 1 to the final 
-  certificate coefficients vector.
-  size = number of variables
+(** Creates a Geq constraint of the form `x_n - l_n >= 0` for each bound l_n in the lower_bound vector
+    size = number of variables
 *)
-
 let rec mk_lower_bounds_constraints size i lower_bounds = 
   match lower_bounds with
   | [] -> []
   | l::bounds -> Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints size (i + 1) bounds
 
-
+(** Iden for upper_bounds *)
 let rec mk_upper_bounds_constraints size i upper_bounds = 
   match upper_bounds with
   | [] -> []
   | u::bounds -> Geq (mk_bound_poly size i (-1.) u) :: mk_upper_bounds_constraints size (i + 1) bounds
 
-(*
-  Create Geq constraints corresponding to the variable bounds.
+(** Create Geq constraints corresponding to the variable bounds.
 *)
 let mk_geq_constraints (upper_bounds: real list) (lower_bounds: real list): exp list =
   let size = List.length upper_bounds in
@@ -77,43 +70,9 @@ let mk_gt_constraint (size: int) ((var, value, bound_t): (int * real * bound_typ
 let mk_system_contradiction (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list): exp list =
   tableau @ (mk_geq_constraints upper_bounds lower_bounds)
 
-(**
-* helper functions for mk_geq_constraints_lemma
-* We need to split mk_geq_constraints_lemma in sub-functions in order to be able to reason about it.
-*)
-
-let compute_combination_case expl tableau caus_bound_t = 
-  if caus_bound_t = UPPER
-    then compute_combination expl tableau
-    else compute_combination (list_scale expl (-1.)) tableau
-
-let update_combination_case lc caus_var caus_bound_t =
-  if caus_bound_t = UPPER
-    then increment_elem lc caus_var
-    else decrement_elem lc caus_var
-
-let compute_linear_combination_lemmas expl tableau caus_bound_t caus_var = 
-  let lc = compute_combination_case expl tableau caus_bound_t in
-  update_combination_case lc caus_var caus_bound_t
-
 (* Create the polynomial representation of the linear constraints from the matrix representation 
    for bound tightening lemma checking, i.e. with strict inequality constraints *)
 let mk_system_lemma (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list) ((caus_var, row_bound, caus_bound_t) as tightening: Tightening.t): exp list =
   let geq_constraints = mk_geq_constraints upper_bounds lower_bounds in
   let gt_constraint = mk_gt_constraint (List.length upper_bounds) tightening in
   gt_constraint :: (tableau @ geq_constraints)
-
-(* Utils to_string functions for debugging *)
-let rec poly_to_string p = 
-  match p with 
-  | [] -> "\n"
-  | p :: ps -> Printf.sprintf "%f; " (Q.to_float p) ^ poly_to_string ps
-[@@program]
-
-let rec system_to_string system = 
-  match system with 
-  | [] -> "\n"
-  | Geq e :: es -> "Geq " ^ poly_to_string e ^ system_to_string es
-  | Eq e :: es -> "Eq " ^ poly_to_string e ^ system_to_string es
-  | Gt e :: es -> "Gt " ^ poly_to_string e ^ system_to_string es
-[@@program]

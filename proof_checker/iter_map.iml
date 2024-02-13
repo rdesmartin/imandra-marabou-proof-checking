@@ -35,8 +35,6 @@ module Iter_map = struct
     if len < 0 then []
     else
     (to_list (len - 1) m) @ [(get len m)]
-
-    (* let print (m: (int, real) t) = List.map (fun k -> let () = Printf.printf "(%d, %f); " (Z.to_int k) (Q.to_float @@ get k m) in k) m.keys *)
 end
 
 module Iter_map_lemmas = struct

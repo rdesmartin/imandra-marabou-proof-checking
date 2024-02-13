@@ -33,8 +33,8 @@ module BoundLemma = struct
                 (Q.to_float value) 
     [@@program]
 
-        (** Check with the verified [check_cert] function that a bound-tightening lemma is valid, i.e. that the  
-        certificate given by the explanation vector implies unsatisfiability *)
+    (** Check with the verified [check_cert] function that a bound-tightening lemma is valid, i.e. that the  
+    certificate given by the explanation vector implies unsatisfiability *)
     let check_lemma bound_lemma tableau upper_bounds lower_bounds =
     match bound_lemma with
     | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
