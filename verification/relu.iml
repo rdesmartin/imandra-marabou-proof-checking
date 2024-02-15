@@ -12,11 +12,22 @@ module Relu = struct
         | Some b, Some f, Some aux -> f = relu b && aux +. b -. f = 0.
         | _ -> false
 
-        theorem relu_b_non_neg b f aux = 
-            f = relu b && aux +. b -. f = 0. 
-            ==> 
-            f >=. 0.
-        [@@fc]
+    let relu x = if x >=. 0. then x else 0. 
+
+    let rec eval_relus cs x = 
+        match cs with
+        | [] -> true
+        | c :: cs -> eval_relu c x && eval_relus cs x
+
+    let eval_system_relus s cs x = 
+        eval_system s x && eval_relus cs x    
+
+
+    theorem relu_b_non_neg b f aux = 
+        f = relu b && aux +. b -. f = 0. 
+        ==> 
+        f >=. 0.
+    [@@fc]
 
         theorem relu_aux_pos b f aux = 
             f = relu b && aux +. b -. f = 0. 
@@ -36,20 +47,20 @@ module Relu = struct
             ==>
             b >=. 0. ==> aux <=. 0.
 
-        theorem relu_lemmas_2 b f aux = 
-            f = relu b && aux +. b -. f = 0. 
+        theorem relu_lemmas_2 b f aux x = 
+            f = relu b && aux +. b -. f = 0.
             ==>
-            f >. 0. ==> aux = 0. 
+            f >=. x && x >. 0. ==> aux <=. 0. 
             
-        theorem relu_lemmas_3 b f aux = 
+        theorem relu_lemmas_3 b f aux x = 
             f = relu b && aux +. b -. f = 0. 
             ==> 
-            aux >. 0. ==> f <=. 0.
+            aux >=. x && x >. 0. ==> f <=. 0.
 
-        theorem relu_lemmas_4 b f aux = 
+        theorem relu_lemmas_4 b f aux x = 
             f = relu b && aux +. b -. f = 0. 
             ==>
-            f <. 0. ==> f <=. 0.
+            f <=. x && x <. 0. ==> f <=. 0.
 
         theorem relu_lemmas_5 b f aux = 
             f = relu b && aux +. b -. f = 0. 

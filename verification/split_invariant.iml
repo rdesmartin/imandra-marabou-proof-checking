@@ -17,24 +17,6 @@ let is_inactive_relu (s: exp list) (s': exp list) b f (size) =
 let is_active_relu (s: exp list) (s': exp list) b aux (size) =
     s' = (Geq (mk_bound_poly size b 1. 0.)) :: [Geq (mk_bound_poly size aux (-1.) 0.)] @ s
 
-let relu x = if x >=. 0. then x else 0. 
-
-let eval_relu ((b_var, f_var, aux_var): (int * int * int)) (x: real list) =
-    let f = List.nth f_var x in
-    let b = List.nth b_var x in
-    let aux = List.nth aux_var x in
-    match b, f, aux with
-    | Some b, Some f, Some aux -> (f = relu b) && (aux +. b -. f = 0.)
-    | _ -> false
-
-let rec eval_relus cs x = 
-    match cs with
-    | [] -> true
-    | c :: cs -> eval_relu c x && eval_relus cs x
-
-let eval_system_relus s cs x = 
-    eval_system s x && eval_relus cs x    
-
 lemma relu_split_phases_eval b f aux b_var f_var aux_var x =
     x <> [] && 
     List.nth b_var x = Some b &&
