@@ -21,8 +21,7 @@ let check_children_splits children constraints =
     let children_tightenings = List.map ProofTree.get_tightening children in
     let non_empty_children_splits = all ((List.map ProofTree.non_empty_tightening) children) in
     let valid_relu_split = check_relu_split children_tightenings constraints in
-    let valid_single_var_split = check_single_var_split children_tightenings in
-    non_empty_children_splits && (valid_relu_split || valid_single_var_split)
+    non_empty_children_splits && valid_relu_split 
 
 (** Recursively check nodes in the proof tree
     First, update the bounds according to the split.

@@ -1,11 +1,5 @@
 open Utils
 
-(* check that some split corresponds to a single variable split *)
-let check_single_var_split children_splits =
-    match children_splits with
-    | [[(var1, value1, bound_type1)]; [(var2, value2, bound_type2)]] -> var1 = var2 && value1 = value2 && bound_type1 <> bound_type2
-    | _ -> false
-
 (** Match a given split with a constraint from a list of known ReLU constraints*)
 let rec match_relu_constraint children_splits constraints =
     match constraints with
