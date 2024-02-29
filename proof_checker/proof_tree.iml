@@ -3,21 +3,17 @@ open Bound_lemma
 
 module ProofTree = struct
   type t = 
-    (* tightening, bounds lemmas, children *)
-    | Node of Tightening.t list * BoundLemma.t list * t list
+    (* tightening, bounds lemmas, left child, right child *)
+    | Node of Tightening.t list * BoundLemma.t list * t * t
     (* tightening, bounds lemmas, contradiction vector *)
     | Leaf of Tightening.t list * BoundLemma.t list * real list
 
   let non_empty_tightening n = match n with
-    | Node ([], _, _) | Leaf ([], _, _) -> false
+    | Node ([], _, _, _) | Leaf ([], _, _) -> false
     | _ -> true
 
   let get_tightening n = match n with
-    | Node (t, _, _) 
-    | Leaf (t, _, _) -> t
+    | Node (tightening, _, _, _)
+    | Leaf (tightening, _, _) -> tightening
 
-  let get_children n = 
-  match n with
-    | Node (_, _, c) -> c
-    | Leaf _ -> []
 end

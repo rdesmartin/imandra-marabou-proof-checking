@@ -21,6 +21,7 @@ type constraint_type =
     | SIGN
     | DISJUNCTION
     | ABSOLUTE_VALUE
+    | LEAKY_RELU
     | UNDEFINED
 
 let all (l: bool list) = List.fold_left (fun x y -> x && y) true l
@@ -151,6 +152,7 @@ let list_geq (l1: real list) (l2: real list): bool =
     all (List.map (fun (a, b) -> a >=. b) (zip l1 l2))
 
 (* Utils to_string functions for debugging *)
+
 (* let rec poly_to_string p = 
   match p with 
   | [] -> "\n"

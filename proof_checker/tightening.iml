@@ -14,6 +14,12 @@ module Tightening = struct
         | (_, _, LOWER) -> true
         | _ -> false
 
+    let tightening_to_string (tight :t) = 
+        match tight with 
+        | (n, r, bt) ->  Printf.sprintf "n: %d r: %f bt: %s" (Z.to_int n) (Q.to_float r)  (bound_type_to_str bt)
+        | _ -> "invalid"
+      [@@program]
+      
     (* update a single bound according to a list of tightenings *)
     let rec update_bounds_by_tightenings (tightenings: t list) (bounds: real list): real list =
         match tightenings with
@@ -28,4 +34,5 @@ module Tightening = struct
         let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in
         let updated_lower = update_bounds_by_tightenings lower_tightenings lower_bounds in
         (updated_upper, updated_lower)
+        
     end

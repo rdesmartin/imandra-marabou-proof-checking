@@ -107,7 +107,7 @@ module JSON_decoder = struct
             let* splits = field "split" (list split_decoder) in
             let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
             let* children = field "children" (list (proof_node_decoder proof_size)) in
-            succeed (ProofTree.Node (splits, lemmas, children))
+            succeed (ProofTree.Node (splits, lemmas, List.hd children, List.hd (List.tl children)))
           );
           ( "leaf",
             let* splits = field "split" (list split_decoder) in
@@ -124,7 +124,7 @@ module JSON_decoder = struct
       ( "node",
         let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
         let* children = field "children" (list (proof_node_decoder proof_size)) in
-        succeed (ProofTree.Node ([], lemmas, children))
+        succeed (ProofTree.Node ([], lemmas, List.hd children, List.hd (List.tl children)))
       );
       ( "leaf",
         let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in

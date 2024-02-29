@@ -17,11 +17,13 @@ let check_contradiction (contradiction: real list) (tableau: exp list) (upper_bo
     res
 
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
-let check_children_splits children constraints =
-    let children_tightenings = List.map ProofTree.get_tightening children in
-    let non_empty_children_splits = all ((List.map ProofTree.non_empty_tightening) children) in
-    let valid_relu_split = check_relu_split children_tightenings constraints in
-    non_empty_children_splits && valid_relu_split 
+let check_children_splits left_child right_child constraints =
+    let l_t = ProofTree.get_tightening left_child in
+    let r_t = ProofTree.get_tightening right_child in
+    let non_empty_children_splits = ProofTree.non_empty_tightening left_child && ProofTree.non_empty_tightening right_child in
+    let valid_relu_split = check_relu_split l_t r_t constraints in
+    let valid_single_var_split = check_single_var_split l_t r_t in
+    non_empty_children_splits && (valid_relu_split || valid_single_var_split)
 
 (** Recursively check nodes in the proof tree
     First, update the bounds according to the split.
@@ -34,11 +36,12 @@ let check_children_splits children constraints =
     *)
 let rec check_node tableau upper_bounds lower_bounds constraints proof_node =
     match proof_node with
-    | ProofTree.Node (tightenings, bound_lemmas, children) ->
+    | ProofTree.Node (tightenings, bound_lemmas, left_child, right_child) ->
         let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
         let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
-        let valid_children_splits = check_children_splits children constraints in
-        let valid_children = all (List.map (check_node tableau upper_bounds'' lower_bounds'' constraints) children) in
+        let valid_children_splits = check_children_splits left_child right_child constraints in
+        let valid_children = (check_node tableau upper_bounds'' lower_bounds'' constraints left_child) &&
+            (check_node tableau upper_bounds'' lower_bounds'' constraints right_child) in
         valid_bounds && valid_children_splits && valid_children
     | ProofTree.Leaf (tightenings, bound_lemmas, contradiction) ->
         let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
@@ -80,7 +83,7 @@ let check_proof_tree (tableau: real list list) (upper_bounds: real list) (lower_
     let tableau_system = mk_eq_constraints tableau in
     let check_tree = 
         match proof_root with
-        | ProofTree.Node ([], bound_lemmas, _) | ProofTree.Leaf ([], bound_lemmas, _) ->
+        | ProofTree.Node ([], bound_lemmas, _, _) | ProofTree.Leaf ([], bound_lemmas, _) ->
             check_node tableau_system upper_bounds lower_bounds constraints proof_root
         | _ -> false
     in

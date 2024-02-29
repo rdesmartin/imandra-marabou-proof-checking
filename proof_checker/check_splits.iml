@@ -1,12 +1,20 @@
+open Tightening
 open Utils
 
+(* check that some split corresponds to a single variable split *)
+let check_single_var_split l_t r_t =
+    match l_t, r_t with
+    | [(var1, value1, bound_type1)], [(var2, value2, bound_type2)] -> var1 = var2 && value1 = value2 && bound_type1 <> bound_type2
+    | _ -> false
+
+
 (** Match a given split with a constraint from a list of known ReLU constraints*)
-let rec match_relu_constraint children_splits constraints =
+let rec match_relu_constraint r_tightening l_tightening constraints =
     match constraints with
     | [] -> []
     | (RELU, l)::tl-> (
-        match children_splits with
-        | [[(var1, _, _); (var2, _, _)]; [(var3, _, _); (var4, _, _)]] ->
+        match r_tightening, l_tightening with
+        | [(var1, _, _); (var2, _, _)], [(var3, _, _); (var4, _, _)] ->
             if
                 List.exists (fun x -> x = var1) l &&
                 List.exists (fun x -> x = var2) l &&
@@ -15,10 +23,10 @@ let rec match_relu_constraint children_splits constraints =
             then
                 l
             else
-                match_relu_constraint children_splits tl
-        | _ -> match_relu_constraint children_splits tl
+                match_relu_constraint r_tightening l_tightening tl
+        | _ -> match_relu_constraint r_tightening l_tightening tl
     )
-    | (_::tl) -> match_relu_constraint children_splits tl
+    | (_::tl) -> match_relu_constraint r_tightening l_tightening tl
 
 (* find a constraint given two participating variables *)
 let rec match_constraint var1 var2 constraints =
@@ -41,8 +49,8 @@ let is_inactive split f b = match split with
     | _ -> false
 
 (* Check whether a proof tree node's split correspond to a known ReLU constraint *)
-let check_relu_split children_splits constraints =
-    let matched_constraint = match_relu_constraint children_splits constraints in
-    match matched_constraint, children_splits with
-        | [b; f; aux; _], [split1; split2] -> (is_active split1 b aux && is_inactive split2 f b) || (is_active split2 b aux && is_inactive split1 f b)
+let check_relu_split (l_tightening : Tightening.t list) (r_tightening : Tightening.t list) constraints =
+    let matched_constraint = match_relu_constraint l_tightening r_tightening constraints in
+    match matched_constraint with
+        | [b; f; aux; _] -> (is_active l_tightening b aux && is_inactive r_tightening f b) || (is_active r_tightening b aux && is_inactive l_tightening f b)
         | _ -> false
