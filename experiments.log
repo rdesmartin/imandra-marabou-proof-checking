@@ -1,0 +1,1762 @@
+
+2024-02-22 11:07:43.389467: Proof ./examples/proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-02-22 11:07:43.389746: Result for ./examples/proof_reluBenchmark0.05650806427s.json: true
+
+
+2024-02-22 11:07:43.389952: ==========
+
+2024-02-22 11:07:49.895659: Proof ./examples/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-02-22 11:07:49.895746: Result for ./examples/proof_reluBenchmark0.05650806427s_lemmas.json: true
+
+
+2024-02-22 11:07:49.895803: ==========
+
+2024-02-22 11:07:50.262609: Proof ./examples/proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-02-22 11:07:50.262666: Result for ./examples/proof_reluBenchmark0.15145778656s.json: true
+
+
+2024-02-22 11:07:50.262706: ==========
+
+2024-02-22 11:07:54.457026: Proof ./examples/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-02-22 11:07:54.457132: Result for ./examples/proof_reluBenchmark0.15145778656s_lemmas.json: true
+
+
+2024-02-22 11:07:54.457200: ==========
+
+2024-02-22 11:07:55.219002: Proof ./examples/proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-02-22 11:07:55.219032: Result for ./examples/proof_reluBenchmark0.19238615036s.json: true
+
+
+2024-02-22 11:07:55.219052: ==========
+
+2024-02-22 11:08:16.945868: Proof ./examples/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-02-22 11:08:16.945958: Result for ./examples/proof_reluBenchmark0.19238615036s_lemmas.json: true
+
+
+2024-02-22 11:08:16.946016: ==========
+
+2024-02-22 11:08:18.036352: Proof ./examples/proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-02-22 11:08:18.036422: Result for ./examples/proof_reluBenchmark0.24204993248s.json: true
+
+
+2024-02-22 11:08:18.036463: ==========
+
+2024-02-22 11:08:45.152394: Proof ./examples/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-02-22 11:08:45.152566: Result for ./examples/proof_reluBenchmark0.24204993248s_lemmas.json: true
+
+
+2024-02-22 11:08:45.152753: ==========
+
+2024-02-22 11:08:45.446714: Proof ./examples/proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-02-22 11:08:45.446749: Result for ./examples/proof_reluBenchmark0.24551987648s.json: true
+
+
+2024-02-22 11:08:45.446789: ==========
+
+2024-02-22 11:08:48.012498: Proof ./examples/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-02-22 11:08:48.012704: Result for ./examples/proof_reluBenchmark0.24551987648s_lemmas.json: true
+
+
+2024-02-22 11:08:48.012874: ==========
+
+2024-02-22 11:08:48.694325: Proof ./examples/proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-02-22 11:08:48.694577: Result for ./examples/proof_reluBenchmark0.359375s.json: true
+
+
+2024-02-22 11:08:48.694698: ==========
+
+2024-02-22 11:08:57.521828: Proof ./examples/proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-02-22 11:08:57.521924: Result for ./examples/proof_reluBenchmark0.359375s_lemmas.json: true
+
+
+2024-02-22 11:08:57.522024: ==========
+
+2024-02-22 11:08:59.529495: Proof ./examples/proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-02-22 11:08:59.529524: Result for ./examples/proof_reluBenchmark0.479170084s.json: true
+
+
+2024-02-22 11:08:59.529584: ==========
+
+2024-02-22 11:09:35.042493: Proof ./examples/proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-02-22 11:09:35.042528: Result for ./examples/proof_reluBenchmark0.479170084s_lemmas.json: true
+
+
+2024-02-22 11:09:35.042555: ==========
+
+2024-02-26 11:39:09.915599: Proof PPO_id239_ep17701_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:09.915975: Error opening proof file PPO_id239_ep17701_forward_collision_k_1_ipq_proof.json
+Result for PPO_id239_ep17701_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:09.916060: ==========
+
+2024-02-26 11:39:09.953313: Proof PPO_id502_ep13575_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:09.953349: Error opening proof file PPO_id502_ep13575_left_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13575_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:09.953389: ==========
+
+2024-02-26 11:39:09.994521: Proof PPO_id425_ep32806_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:09.994551: Error opening proof file PPO_id425_ep32806_left_collision_k_1_ipq_proof.json
+Result for PPO_id425_ep32806_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:09.994570: ==========
+
+2024-02-26 11:39:10.054060: Proof DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.054104: Error opening proof file DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.054123: ==========
+
+2024-02-26 11:39:10.092406: Proof PPO_id240_ep43701_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.092541: Error opening proof file PPO_id240_ep43701_right_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep43701_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.092573: ==========
+
+2024-02-26 11:39:10.140295: Proof PPO_id240_ep73010_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.140331: Error opening proof file PPO_id240_ep73010_right_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep73010_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.140356: ==========
+
+2024-02-26 11:39:10.203804: Proof PPO_id381_ep8730_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.203917: Error opening proof file PPO_id381_ep8730_right_collision_k_1_ipq_proof.json
+Result for PPO_id381_ep8730_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.203995: ==========
+
+2024-02-26 11:39:10.238056: Proof PPO_id379_ep22249_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.238110: Error opening proof file PPO_id379_ep22249_left_collision_k_1_ipq_proof.json
+Result for PPO_id379_ep22249_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.238147: ==========
+
+2024-02-26 11:39:10.281255: Proof PPO_id240_ep26126_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.281354: Error opening proof file PPO_id240_ep26126_right_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep26126_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.281417: ==========
+
+2024-02-26 11:39:10.322193: Proof PPO_id286_ep22990_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.322480: Error opening proof file PPO_id286_ep22990_forward_collision_k_1_ipq_proof.json
+Result for PPO_id286_ep22990_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.322596: ==========
+
+2024-02-26 11:39:10.366149: Proof PPO_id90_ep11133_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.366179: Error opening proof file PPO_id90_ep11133_left_collision_k_1_ipq_proof.json
+Result for PPO_id90_ep11133_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.366197: ==========
+
+2024-02-26 11:39:10.402446: Proof DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.402476: Error opening proof file DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.402496: ==========
+
+2024-02-26 11:39:10.444157: Proof DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.444309: Error opening proof file DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.444483: ==========
+
+2024-02-26 11:39:10.482123: Proof DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.482163: Error opening proof file DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json
+Result for DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.482193: ==========
+
+2024-02-26 11:39:10.522158: Proof PPO_id379_ep27426_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.522196: Error opening proof file PPO_id379_ep27426_left_collision_k_1_ipq_proof.json
+Result for PPO_id379_ep27426_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.522215: ==========
+
+2024-02-26 11:39:10.556644: Proof PPO_id381_ep8730_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.556717: Error opening proof file PPO_id381_ep8730_left_collision_k_1_ipq_proof.json
+Result for PPO_id381_ep8730_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.556770: ==========
+
+2024-02-26 11:39:10.593260: Proof PPO_id90_ep11133_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.593288: Error opening proof file PPO_id90_ep11133_forward_collision_k_1_ipq_proof.json
+Result for PPO_id90_ep11133_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.593307: ==========
+
+2024-02-26 11:39:10.654637: Proof REI_id77_ep49509_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.654781: Error opening proof file REI_id77_ep49509_forward_collision_k_1_ipq_proof.json
+Result for REI_id77_ep49509_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.654885: ==========
+
+2024-02-26 11:39:10.689445: Proof PPO_id73_ep10941_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.689711: Error opening proof file PPO_id73_ep10941_right_collision_k_1_ipq_proof.json
+Result for PPO_id73_ep10941_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.689910: ==========
+
+2024-02-26 11:39:10.730540: Proof PPO_id77_ep27458_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.730596: Error opening proof file PPO_id77_ep27458_forward_collision_k_1_ipq_proof.json
+Result for PPO_id77_ep27458_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.730662: ==========
+
+2024-02-26 11:39:10.768686: Proof PPO_id549_ep16970_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.768769: Error opening proof file PPO_id549_ep16970_forward_collision_k_1_ipq_proof.json
+Result for PPO_id549_ep16970_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.768834: ==========
+
+2024-02-26 11:39:10.825848: Proof PPO_id240_ep26126_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.825947: Error opening proof file PPO_id240_ep26126_left_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep26126_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.825986: ==========
+
+2024-02-26 11:39:10.859632: Proof PPO_id286_ep18520_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.859757: Error opening proof file PPO_id286_ep18520_forward_collision_k_1_ipq_proof.json
+Result for PPO_id286_ep18520_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.859872: ==========
+
+2024-02-26 11:39:10.895605: Proof REI_id158_ep59378_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.895667: Error opening proof file REI_id158_ep59378_forward_collision_k_1_ipq_proof.json
+Result for REI_id158_ep59378_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.895690: ==========
+
+2024-02-26 11:39:10.932075: Proof PPO_id90_ep11133_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.932133: Error opening proof file PPO_id90_ep11133_right_collision_k_1_ipq_proof.json
+Result for PPO_id90_ep11133_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.932173: ==========
+
+2024-02-26 11:39:10.966627: Proof DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:10.966659: Error opening proof file DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:10.966681: ==========
+
+2024-02-26 11:39:11.005712: Proof PPO_id381_ep8763_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.005770: Error opening proof file PPO_id381_ep8763_left_collision_k_1_ipq_proof.json
+Result for PPO_id381_ep8763_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.005812: ==========
+
+2024-02-26 11:39:11.050554: Proof PPO_id444_ep35805_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.050600: Error opening proof file PPO_id444_ep35805_right_collision_k_1_ipq_proof.json
+Result for PPO_id444_ep35805_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.050628: ==========
+
+2024-02-26 11:39:11.091667: Proof REI_id158_ep53499_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.091707: Error opening proof file REI_id158_ep53499_right_collision_k_1_ipq_proof.json
+Result for REI_id158_ep53499_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.091735: ==========
+
+2024-02-26 11:39:11.129967: Proof PPO_id379_ep29231_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.129995: Error opening proof file PPO_id379_ep29231_right_collision_k_1_ipq_proof.json
+Result for PPO_id379_ep29231_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.130014: ==========
+
+2024-02-26 11:39:11.166094: Proof PPO_id234_ep13751_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.166149: Error opening proof file PPO_id234_ep13751_forward_collision_k_1_ipq_proof.json
+Result for PPO_id234_ep13751_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.166192: ==========
+
+2024-02-26 11:39:11.200523: Proof PPO_id240_ep80772_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.200554: Error opening proof file PPO_id240_ep80772_right_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep80772_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.200574: ==========
+
+2024-02-26 11:39:11.244218: Proof PPO_id381_ep8763_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.244247: Error opening proof file PPO_id381_ep8763_forward_collision_k_1_ipq_proof.json
+Result for PPO_id381_ep8763_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.244268: ==========
+
+2024-02-26 11:39:11.290023: Proof PPO_id379_ep22249_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.290080: Error opening proof file PPO_id379_ep22249_right_collision_k_1_ipq_proof.json
+Result for PPO_id379_ep22249_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.290120: ==========
+
+2024-02-26 11:39:11.328463: Proof PPO_id444_ep38082_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.328590: Error opening proof file PPO_id444_ep38082_right_collision_k_1_ipq_proof.json
+Result for PPO_id444_ep38082_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.328637: ==========
+
+2024-02-26 11:39:11.392444: Proof REI_id158_ep53113_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.392472: Error opening proof file REI_id158_ep53113_forward_collision_k_1_ipq_proof.json
+Result for REI_id158_ep53113_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.392491: ==========
+
+2024-02-26 11:39:11.436359: Proof REI_id77_ep75183_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.436388: Error opening proof file REI_id77_ep75183_forward_collision_k_1_ipq_proof.json
+Result for REI_id77_ep75183_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.436435: ==========
+
+2024-02-26 11:39:11.473426: Proof DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.473477: Error opening proof file DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.473503: ==========
+
+2024-02-26 11:39:11.512394: Proof PPO_id239_ep17701_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.512493: Error opening proof file PPO_id239_ep17701_left_collision_k_1_ipq_proof.json
+Result for PPO_id239_ep17701_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.512536: ==========
+
+2024-02-26 11:39:11.551562: Proof PPO_id381_ep8730_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.551635: Error opening proof file PPO_id381_ep8730_forward_collision_k_1_ipq_proof.json
+Result for PPO_id381_ep8730_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.551677: ==========
+
+2024-02-26 11:39:11.588270: Proof DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.588360: Error opening proof file DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json
+Result for DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.588436: ==========
+
+2024-02-26 11:39:11.625211: Proof REI_id77_ep49509_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.625366: Error opening proof file REI_id77_ep49509_left_collision_k_1_ipq_proof.json
+Result for REI_id77_ep49509_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.625419: ==========
+
+2024-02-26 11:39:11.661539: Proof PPO_id502_ep13597_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.661620: Error opening proof file PPO_id502_ep13597_right_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13597_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.661659: ==========
+
+2024-02-26 11:39:11.709818: Proof PPO_id240_ep43701_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.709913: Error opening proof file PPO_id240_ep43701_forward_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep43701_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.709977: ==========
+
+2024-02-26 11:39:11.749132: Proof DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.749189: Error opening proof file DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.749230: ==========
+
+2024-02-26 11:39:11.811507: Proof PPO_id286_ep26930_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.811561: Error opening proof file PPO_id286_ep26930_forward_collision_k_1_ipq_proof.json
+Result for PPO_id286_ep26930_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.811600: ==========
+
+2024-02-26 11:39:11.874396: Proof PPO_id549_ep15436_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.874458: Error opening proof file PPO_id549_ep15436_forward_collision_k_1_ipq_proof.json
+Result for PPO_id549_ep15436_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.874543: ==========
+
+2024-02-26 11:39:11.911326: Proof DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.911362: Error opening proof file DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.911385: ==========
+
+2024-02-26 11:39:11.947341: Proof PPO_id379_ep27426_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.947396: Error opening proof file PPO_id379_ep27426_right_collision_k_1_ipq_proof.json
+Result for PPO_id379_ep27426_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.947435: ==========
+
+2024-02-26 11:39:11.985601: Proof DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:11.985631: Error opening proof file DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:11.985652: ==========
+
+2024-02-26 11:39:12.023170: Proof PPO_id502_ep13597_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.023252: Error opening proof file PPO_id502_ep13597_forward_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13597_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.023345: ==========
+
+2024-02-26 11:39:12.060566: Proof PPO_id512_ep20664_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.060621: Error opening proof file PPO_id512_ep20664_left_collision_k_1_ipq_proof.json
+Result for PPO_id512_ep20664_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.060682: ==========
+
+2024-02-26 11:39:12.095652: Proof PPO_id502_ep15459_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.095685: Error opening proof file PPO_id502_ep15459_right_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep15459_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.095704: ==========
+
+2024-02-26 11:39:12.132732: Proof PPO_id240_ep43701_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.132862: Error opening proof file PPO_id240_ep43701_left_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep43701_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.132914: ==========
+
+2024-02-26 11:39:12.167932: Proof PPO_id239_ep17701_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.168024: Error opening proof file PPO_id239_ep17701_right_collision_k_1_ipq_proof.json
+Result for PPO_id239_ep17701_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.168090: ==========
+
+2024-02-26 11:39:12.217466: Proof PPO_id502_ep13753_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.217497: Error opening proof file PPO_id502_ep13753_left_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13753_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.217542: ==========
+
+2024-02-26 11:39:12.251124: Proof PPO_id240_ep26126_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.251221: Error opening proof file PPO_id240_ep26126_forward_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep26126_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.251291: ==========
+
+2024-02-26 11:39:12.286438: Proof REI_id158_ep53554_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.286471: Error opening proof file REI_id158_ep53554_forward_collision_k_1_ipq_proof.json
+Result for REI_id158_ep53554_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.286493: ==========
+
+2024-02-26 11:39:12.322981: Proof DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.323055: Error opening proof file DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.323078: ==========
+
+2024-02-26 11:39:12.359803: Proof PPO_id502_ep16596_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.359896: Error opening proof file PPO_id502_ep16596_right_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep16596_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.359932: ==========
+
+2024-02-26 11:39:12.397458: Proof PPO_id502_ep13753_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.397633: Error opening proof file PPO_id502_ep13753_forward_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13753_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.397770: ==========
+
+2024-02-26 11:39:12.432803: Proof PPO_id381_ep8763_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.432963: Error opening proof file PPO_id381_ep8763_right_collision_k_1_ipq_proof.json
+Result for PPO_id381_ep8763_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.432990: ==========
+
+2024-02-26 11:39:12.469479: Proof PPO_id286_ep18520_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.469519: Error opening proof file PPO_id286_ep18520_right_collision_k_1_ipq_proof.json
+Result for PPO_id286_ep18520_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.469543: ==========
+
+2024-02-26 11:39:12.534243: Proof REI_id158_ep53113_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.534459: Error opening proof file REI_id158_ep53113_left_collision_k_1_ipq_proof.json
+Result for REI_id158_ep53113_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.534570: ==========
+
+2024-02-26 11:39:12.599126: Proof PPO_id379_ep28018_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.599191: Error opening proof file PPO_id379_ep28018_left_collision_k_1_ipq_proof.json
+Result for PPO_id379_ep28018_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.599258: ==========
+
+2024-02-26 11:39:12.637061: Proof PPO_id234_ep13098_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.637121: Error opening proof file PPO_id234_ep13098_forward_collision_k_1_ipq_proof.json
+Result for PPO_id234_ep13098_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.637163: ==========
+
+2024-02-26 11:39:12.672124: Proof REI_id158_ep53113_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.672303: Error opening proof file REI_id158_ep53113_right_collision_k_1_ipq_proof.json
+Result for REI_id158_ep53113_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.672490: ==========
+
+2024-02-26 11:39:12.708258: Proof PPO_id240_ep83225_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.708488: Error opening proof file PPO_id240_ep83225_right_collision_k_1_ipq_proof.json
+Result for PPO_id240_ep83225_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.708683: ==========
+
+2024-02-26 11:39:12.743961: Proof PPO_id502_ep15459_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.744059: Error opening proof file PPO_id502_ep15459_left_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep15459_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.744116: ==========
+
+2024-02-26 11:39:12.780826: Proof PPO_id502_ep15459_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.780886: Error opening proof file PPO_id502_ep15459_forward_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep15459_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.780945: ==========
+
+2024-02-26 11:39:12.819965: Proof REI_id158_ep53499_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.820064: Error opening proof file REI_id158_ep53499_forward_collision_k_1_ipq_proof.json
+Result for REI_id158_ep53499_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.820144: ==========
+
+2024-02-26 11:39:12.855506: Proof PPO_id502_ep13597_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.855602: Error opening proof file PPO_id502_ep13597_left_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13597_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.855670: ==========
+
+2024-02-26 11:39:12.889188: Proof PPO_id234_ep13140_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.889244: Error opening proof file PPO_id234_ep13140_left_collision_k_1_ipq_proof.json
+Result for PPO_id234_ep13140_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.889283: ==========
+
+2024-02-26 11:39:12.923545: Proof DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.923672: Error opening proof file DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.923714: ==========
+
+2024-02-26 11:39:12.962223: Proof PPO_id77_ep28078_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.962283: Error opening proof file PPO_id77_ep28078_forward_collision_k_1_ipq_proof.json
+Result for PPO_id77_ep28078_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.962325: ==========
+
+2024-02-26 11:39:12.997206: Proof PPO_id444_ep36332_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:12.997300: Error opening proof file PPO_id444_ep36332_right_collision_k_1_ipq_proof.json
+Result for PPO_id444_ep36332_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:12.997356: ==========
+
+2024-02-26 11:39:13.044112: Proof PPO_id502_ep13753_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.044207: Error opening proof file PPO_id502_ep13753_right_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13753_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.044249: ==========
+
+2024-02-26 11:39:13.102730: Proof DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.102852: Error opening proof file DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.102903: ==========
+
+2024-02-26 11:39:13.137887: Proof PPO_id234_ep14428_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.137916: Error opening proof file PPO_id234_ep14428_forward_collision_k_1_ipq_proof.json
+Result for PPO_id234_ep14428_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.137937: ==========
+
+2024-02-26 11:39:13.178182: Proof PPO_id425_ep37270_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.178213: Error opening proof file PPO_id425_ep37270_left_collision_k_1_ipq_proof.json
+Result for PPO_id425_ep37270_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.178232: ==========
+
+2024-02-26 11:39:13.213010: Proof PPO_id502_ep13575_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.213038: Error opening proof file PPO_id502_ep13575_forward_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep13575_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.213059: ==========
+
+2024-02-26 11:39:13.253393: Proof PPO_id502_ep16596_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.253428: Error opening proof file PPO_id502_ep16596_forward_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep16596_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.253448: ==========
+
+2024-02-26 11:39:13.291052: Proof PPO_id234_ep13140_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.291127: Error opening proof file PPO_id234_ep13140_forward_collision_k_1_ipq_proof.json
+Result for PPO_id234_ep13140_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.291210: ==========
+
+2024-02-26 11:39:13.355196: Proof DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.355415: Error opening proof file DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.355539: ==========
+
+2024-02-26 11:39:13.389616: Proof PPO_id457_ep22066_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.389669: Error opening proof file PPO_id457_ep22066_right_collision_k_1_ipq_proof.json
+Result for PPO_id457_ep22066_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.389708: ==========
+
+2024-02-26 11:39:13.426200: Proof PPO_id286_ep26974_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.426265: Error opening proof file PPO_id286_ep26974_forward_collision_k_1_ipq_proof.json
+Result for PPO_id286_ep26974_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.426313: ==========
+
+2024-02-26 11:39:13.464303: Proof PPO_id502_ep16596_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.464397: Error opening proof file PPO_id502_ep16596_left_collision_k_1_ipq_proof.json
+Result for PPO_id502_ep16596_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.464448: ==========
+
+2024-02-26 11:39:13.501053: Proof PPO_id457_ep22066_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.501118: Error opening proof file PPO_id457_ep22066_left_collision_k_1_ipq_proof.json
+Result for PPO_id457_ep22066_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.501193: ==========
+
+2024-02-26 11:39:13.538574: Proof PPO_id379_ep29231_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.538609: Error opening proof file PPO_id379_ep29231_left_collision_k_1_ipq_proof.json
+Result for PPO_id379_ep29231_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.538640: ==========
+
+2024-02-26 11:39:13.580196: Proof PPO_id444_ep37351_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-26 11:39:13.580408: Error opening proof file PPO_id444_ep37351_right_collision_k_1_ipq_proof.json
+Result for PPO_id444_ep37351_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-26 11:39:13.580565: ==========
+
+2024-02-27 11:46:28.233693: Proof proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-02-27 11:46:28.233800: Error opening proof file proof_reluBenchmark0.24204993248s.json
+Result for proof_reluBenchmark0.24204993248s.json: false
+
+
+2024-02-27 11:46:28.233841: ==========
+
+2024-02-27 11:46:28.273319: Proof proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:28.273404: Error opening proof file proof_reluBenchmark0.19238615036s_lemmas.json
+Result for proof_reluBenchmark0.19238615036s_lemmas.json: false
+
+
+2024-02-27 11:46:28.273445: ==========
+
+2024-02-27 11:46:28.332016: Proof proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-02-27 11:46:28.332045: Error opening proof file proof_reluBenchmark0.24551987648s.json
+Result for proof_reluBenchmark0.24551987648s.json: false
+
+
+2024-02-27 11:46:28.332066: ==========
+
+2024-02-27 11:46:28.368156: Proof proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-02-27 11:46:28.368318: Error opening proof file proof_reluBenchmark0.479170084s.json
+Result for proof_reluBenchmark0.479170084s.json: false
+
+
+2024-02-27 11:46:28.368407: ==========
+
+2024-02-27 11:46:28.406518: Proof proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-02-27 11:46:28.406613: Error opening proof file proof_reluBenchmark0.359375s.json
+Result for proof_reluBenchmark0.359375s.json: false
+
+
+2024-02-27 11:46:28.406640: ==========
+
+2024-02-27 11:46:28.442398: Proof proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-02-27 11:46:28.442438: Error opening proof file proof_reluBenchmark0.15145778656s.json
+Result for proof_reluBenchmark0.15145778656s.json: false
+
+
+2024-02-27 11:46:28.442466: ==========
+
+2024-02-27 11:46:28.478517: Proof proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:28.478586: Error opening proof file proof_reluBenchmark0.05650806427s_lemmas.json
+Result for proof_reluBenchmark0.05650806427s_lemmas.json: false
+
+
+2024-02-27 11:46:28.478627: ==========
+
+2024-02-27 11:46:28.516138: Proof proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-02-27 11:46:28.516169: Error opening proof file proof_reluBenchmark0.19238615036s.json
+Result for proof_reluBenchmark0.19238615036s.json: false
+
+
+2024-02-27 11:46:28.516188: ==========
+
+2024-02-27 11:46:28.551734: Proof proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:28.551798: Error opening proof file proof_reluBenchmark0.359375s_lemmas.json
+Result for proof_reluBenchmark0.359375s_lemmas.json: false
+
+
+2024-02-27 11:46:28.551841: ==========
+
+2024-02-27 11:46:28.599309: Proof proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:28.599373: Error opening proof file proof_reluBenchmark0.479170084s_lemmas.json
+Result for proof_reluBenchmark0.479170084s_lemmas.json: false
+
+
+2024-02-27 11:46:28.599439: ==========
+
+2024-02-27 11:46:28.639732: Proof proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:28.639770: Error opening proof file proof_reluBenchmark0.15145778656s_lemmas.json
+Result for proof_reluBenchmark0.15145778656s_lemmas.json: false
+
+
+2024-02-27 11:46:28.639792: ==========
+
+2024-02-27 11:46:28.675027: Proof proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-02-27 11:46:28.675058: Error opening proof file proof_reluBenchmark0.05650806427s.json
+Result for proof_reluBenchmark0.05650806427s.json: false
+
+
+2024-02-27 11:46:28.675078: ==========
+
+2024-02-27 11:46:28.735556: Proof proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:28.735682: Error opening proof file proof_reluBenchmark0.24204993248s_lemmas.json
+Result for proof_reluBenchmark0.24204993248s_lemmas.json: false
+
+
+2024-02-27 11:46:28.735743: ==========
+
+2024-02-27 11:46:28.775928: Proof proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:28.775970: Error opening proof file proof_reluBenchmark0.24551987648s_lemmas.json
+Result for proof_reluBenchmark0.24551987648s_lemmas.json: false
+
+
+2024-02-27 11:46:28.775995: ==========
+
+2024-02-27 11:46:34.279311: Proof proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-02-27 11:46:34.279561: Error opening proof file proof_reluBenchmark0.24204993248s.json
+Result for proof_reluBenchmark0.24204993248s.json: false
+
+
+2024-02-27 11:46:34.279738: ==========
+
+2024-02-27 11:46:34.316363: Proof proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:34.316466: Error opening proof file proof_reluBenchmark0.19238615036s_lemmas.json
+Result for proof_reluBenchmark0.19238615036s_lemmas.json: false
+
+
+2024-02-27 11:46:34.316531: ==========
+
+2024-02-27 11:46:34.354415: Proof proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-02-27 11:46:34.354447: Error opening proof file proof_reluBenchmark0.24551987648s.json
+Result for proof_reluBenchmark0.24551987648s.json: false
+
+
+2024-02-27 11:46:34.354468: ==========
+
+2024-02-27 11:46:34.396856: Proof proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-02-27 11:46:34.396946: Error opening proof file proof_reluBenchmark0.479170084s.json
+Result for proof_reluBenchmark0.479170084s.json: false
+
+
+2024-02-27 11:46:34.396977: ==========
+
+2024-02-27 11:46:34.434513: Proof proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-02-27 11:46:34.434587: Error opening proof file proof_reluBenchmark0.359375s.json
+Result for proof_reluBenchmark0.359375s.json: false
+
+
+2024-02-27 11:46:34.434609: ==========
+
+2024-02-27 11:46:34.470746: Proof proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-02-27 11:46:34.470844: Error opening proof file proof_reluBenchmark0.15145778656s.json
+Result for proof_reluBenchmark0.15145778656s.json: false
+
+
+2024-02-27 11:46:34.470870: ==========
+
+2024-02-27 11:46:34.507495: Proof proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:34.507585: Error opening proof file proof_reluBenchmark0.05650806427s_lemmas.json
+Result for proof_reluBenchmark0.05650806427s_lemmas.json: false
+
+
+2024-02-27 11:46:34.507608: ==========
+
+2024-02-27 11:46:34.570850: Proof proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-02-27 11:46:34.570889: Error opening proof file proof_reluBenchmark0.19238615036s.json
+Result for proof_reluBenchmark0.19238615036s.json: false
+
+
+2024-02-27 11:46:34.570912: ==========
+
+2024-02-27 11:46:34.637672: Proof proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:34.637718: Error opening proof file proof_reluBenchmark0.359375s_lemmas.json
+Result for proof_reluBenchmark0.359375s_lemmas.json: false
+
+
+2024-02-27 11:46:34.637745: ==========
+
+2024-02-27 11:46:34.674254: Proof proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:34.674288: Error opening proof file proof_reluBenchmark0.479170084s_lemmas.json
+Result for proof_reluBenchmark0.479170084s_lemmas.json: false
+
+
+2024-02-27 11:46:34.674309: ==========
+
+2024-02-27 11:46:34.708491: Proof proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:34.708569: Error opening proof file proof_reluBenchmark0.15145778656s_lemmas.json
+Result for proof_reluBenchmark0.15145778656s_lemmas.json: false
+
+
+2024-02-27 11:46:34.708608: ==========
+
+2024-02-27 11:46:34.746532: Proof proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-02-27 11:46:34.746568: Error opening proof file proof_reluBenchmark0.05650806427s.json
+Result for proof_reluBenchmark0.05650806427s.json: false
+
+
+2024-02-27 11:46:34.746590: ==========
+
+2024-02-27 11:46:34.784090: Proof proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:34.784135: Error opening proof file proof_reluBenchmark0.24204993248s_lemmas.json
+Result for proof_reluBenchmark0.24204993248s_lemmas.json: false
+
+
+2024-02-27 11:46:34.784156: ==========
+
+2024-02-27 11:46:34.822072: Proof proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:46:34.822131: Error opening proof file proof_reluBenchmark0.24551987648s_lemmas.json
+Result for proof_reluBenchmark0.24551987648s_lemmas.json: false
+
+
+2024-02-27 11:46:34.822171: ==========
+
+2024-02-27 11:49:24.896604: Proof proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-02-27 11:49:24.896694: Error opening proof file proof_reluBenchmark0.24204993248s.json
+Result for proof_reluBenchmark0.24204993248s.json: false
+
+
+2024-02-27 11:49:24.896738: ==========
+
+2024-02-27 11:49:24.938927: Proof proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:49:24.938969: Error opening proof file proof_reluBenchmark0.19238615036s_lemmas.json
+Result for proof_reluBenchmark0.19238615036s_lemmas.json: false
+
+
+2024-02-27 11:49:24.938999: ==========
+
+2024-02-27 11:49:24.982938: Proof proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-02-27 11:49:24.983043: Error opening proof file proof_reluBenchmark0.24551987648s.json
+Result for proof_reluBenchmark0.24551987648s.json: false
+
+
+2024-02-27 11:49:24.983092: ==========
+
+2024-02-27 11:49:25.023822: Proof proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-02-27 11:49:25.023963: Error opening proof file proof_reluBenchmark0.479170084s.json
+Result for proof_reluBenchmark0.479170084s.json: false
+
+
+2024-02-27 11:49:25.024049: ==========
+
+2024-02-27 11:49:25.071465: Proof proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-02-27 11:49:25.071520: Error opening proof file proof_reluBenchmark0.359375s.json
+Result for proof_reluBenchmark0.359375s.json: false
+
+
+2024-02-27 11:49:25.071539: ==========
+
+2024-02-27 11:49:25.112423: Proof proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-02-27 11:49:25.112489: Error opening proof file proof_reluBenchmark0.15145778656s.json
+Result for proof_reluBenchmark0.15145778656s.json: false
+
+
+2024-02-27 11:49:25.112532: ==========
+
+2024-02-27 11:49:25.164350: Proof proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:49:25.164391: Error opening proof file proof_reluBenchmark0.05650806427s_lemmas.json
+Result for proof_reluBenchmark0.05650806427s_lemmas.json: false
+
+
+2024-02-27 11:49:25.164417: ==========
+
+2024-02-27 11:49:25.205779: Proof proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-02-27 11:49:25.205846: Error opening proof file proof_reluBenchmark0.19238615036s.json
+Result for proof_reluBenchmark0.19238615036s.json: false
+
+
+2024-02-27 11:49:25.205888: ==========
+
+2024-02-27 11:49:25.249385: Proof proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:49:25.249424: Error opening proof file proof_reluBenchmark0.359375s_lemmas.json
+Result for proof_reluBenchmark0.359375s_lemmas.json: false
+
+
+2024-02-27 11:49:25.249449: ==========
+
+2024-02-27 11:49:25.289393: Proof proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:49:25.289545: Error opening proof file proof_reluBenchmark0.479170084s_lemmas.json
+Result for proof_reluBenchmark0.479170084s_lemmas.json: false
+
+
+2024-02-27 11:49:25.289607: ==========
+
+2024-02-27 11:49:25.329244: Proof proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:49:25.329325: Error opening proof file proof_reluBenchmark0.15145778656s_lemmas.json
+Result for proof_reluBenchmark0.15145778656s_lemmas.json: false
+
+
+2024-02-27 11:49:25.329344: ==========
+
+2024-02-27 11:49:25.374283: Proof proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-02-27 11:49:25.374338: Error opening proof file proof_reluBenchmark0.05650806427s.json
+Result for proof_reluBenchmark0.05650806427s.json: false
+
+
+2024-02-27 11:49:25.374362: ==========
+
+2024-02-27 11:49:25.412846: Proof proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:49:25.413045: Error opening proof file proof_reluBenchmark0.24204993248s_lemmas.json
+Result for proof_reluBenchmark0.24204993248s_lemmas.json: false
+
+
+2024-02-27 11:49:25.413097: ==========
+
+2024-02-27 11:49:25.453276: Proof proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:49:25.453413: Error opening proof file proof_reluBenchmark0.24551987648s_lemmas.json
+Result for proof_reluBenchmark0.24551987648s_lemmas.json: false
+
+
+2024-02-27 11:49:25.453471: ==========
+
+2024-02-27 11:50:51.380265: Proof ./examples/proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-02-27 11:50:51.380375: Result for ./examples/proof_reluBenchmark0.05650806427s.json: true
+
+
+2024-02-27 11:50:51.380395: ==========
+
+2024-02-27 11:50:58.400358: Proof ./examples/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:50:58.400420: Result for ./examples/proof_reluBenchmark0.05650806427s_lemmas.json: true
+
+
+2024-02-27 11:50:58.400462: ==========
+
+2024-02-27 11:50:58.813701: Proof ./examples/proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-02-27 11:50:58.813784: Result for ./examples/proof_reluBenchmark0.15145778656s.json: true
+
+
+2024-02-27 11:50:58.813824: ==========
+
+2024-02-27 11:51:03.573061: Proof ./examples/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:51:03.573441: Result for ./examples/proof_reluBenchmark0.15145778656s_lemmas.json: true
+
+
+2024-02-27 11:51:03.573489: ==========
+
+2024-02-27 11:51:04.427591: Proof ./examples/proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-02-27 11:51:04.427830: Result for ./examples/proof_reluBenchmark0.19238615036s.json: true
+
+
+2024-02-27 11:51:04.427992: ==========
+
+2024-02-27 11:51:28.233622: Proof ./examples/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:51:28.233658: Result for ./examples/proof_reluBenchmark0.19238615036s_lemmas.json: true
+
+
+2024-02-27 11:51:28.233679: ==========
+
+2024-02-27 11:51:29.376622: Proof ./examples/proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-02-27 11:51:29.376683: Result for ./examples/proof_reluBenchmark0.24204993248s.json: true
+
+
+2024-02-27 11:51:29.376724: ==========
+
+2024-02-27 11:51:59.202655: Proof ./examples/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:51:59.202687: Result for ./examples/proof_reluBenchmark0.24204993248s_lemmas.json: true
+
+
+2024-02-27 11:51:59.202706: ==========
+
+2024-02-27 11:51:59.498124: Proof ./examples/proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-02-27 11:51:59.498155: Result for ./examples/proof_reluBenchmark0.24551987648s.json: true
+
+
+2024-02-27 11:51:59.498175: ==========
+
+2024-02-27 11:52:02.353733: Proof ./examples/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:52:02.353792: Result for ./examples/proof_reluBenchmark0.24551987648s_lemmas.json: true
+
+
+2024-02-27 11:52:02.353833: ==========
+
+2024-02-27 11:52:03.048615: Proof ./examples/proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-02-27 11:52:03.048678: Result for ./examples/proof_reluBenchmark0.359375s.json: true
+
+
+2024-02-27 11:52:03.048732: ==========
+
+2024-02-27 11:52:12.532305: Proof ./examples/proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:52:12.532517: Result for ./examples/proof_reluBenchmark0.359375s_lemmas.json: true
+
+
+2024-02-27 11:52:12.532720: ==========
+
+2024-02-27 11:52:14.641339: Proof ./examples/proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-02-27 11:52:14.641369: Result for ./examples/proof_reluBenchmark0.479170084s.json: true
+
+
+2024-02-27 11:52:14.641387: ==========
+
+2024-02-27 11:52:51.324671: Proof ./examples/proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-02-27 11:52:51.324734: Result for ./examples/proof_reluBenchmark0.479170084s_lemmas.json: true
+
+
+2024-02-27 11:52:51.324790: ==========
+
+2024-02-27 11:57:12.875140: Proof DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:12.875203: Error opening proof file DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json
+Result for DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:12.875229: ==========
+
+2024-02-27 11:57:12.914215: Proof DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:12.914280: Error opening proof file DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json
+Result for DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:12.914318: ==========
+
+2024-02-27 11:57:12.950825: Proof DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:12.950883: Error opening proof file DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:12.950924: ==========
+
+2024-02-27 11:57:12.986091: Proof DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:12.986124: Error opening proof file DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:12.986145: ==========
+
+2024-02-27 11:57:13.033075: Proof DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.033113: Error opening proof file DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.033134: ==========
+
+2024-02-27 11:57:13.073567: Proof DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.073603: Error opening proof file DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.073626: ==========
+
+2024-02-27 11:57:13.110194: Proof DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.110240: Error opening proof file DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.110273: ==========
+
+2024-02-27 11:57:13.146482: Proof DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.146516: Error opening proof file DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.146536: ==========
+
+2024-02-27 11:57:13.183951: Proof DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.183982: Error opening proof file DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.184004: ==========
+
+2024-02-27 11:57:13.220795: Proof DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.220830: Error opening proof file DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.220852: ==========
+
+2024-02-27 11:57:13.257397: Proof DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.257438: Error opening proof file DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.257462: ==========
+
+2024-02-27 11:57:13.293602: Proof DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.293643: Error opening proof file DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.293666: ==========
+
+2024-02-27 11:57:13.329811: Proof DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.329945: Error opening proof file DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.330051: ==========
+
+2024-02-27 11:57:13.388703: Proof DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 11:57:13.388842: Error opening proof file DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json
+Result for DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json: false
+
+
+2024-02-27 11:57:13.388932: ==========
+
+2024-02-27 12:01:15.944519: Proof ./examples/robotics_proofs/DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:01:15.944578: Result for ./examples/robotics_proofs/DDQN_id215_ep43595_right_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:01:15.944599: ==========
+
+2024-02-27 12:02:59.479211: Proof ./examples/robotics_proofs/DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:02:59.479244: Result for ./examples/robotics_proofs/DDQN_id352_ep25386_left_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:02:59.479267: ==========
+
+2024-02-27 12:05:06.126352: Proof ./examples/robotics_proofs/DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:05:06.126410: Result for ./examples/robotics_proofs/DDQN_id35_ep25031_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:05:06.126449: ==========
+
+2024-02-27 12:08:52.777868: Proof ./examples/robotics_proofs/DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:08:52.777899: Result for ./examples/robotics_proofs/DDQN_id35_ep27214_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:08:52.777950: ==========
+
+2024-02-27 12:10:56.592160: Proof ./examples/robotics_proofs/DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:10:56.592191: Result for ./examples/robotics_proofs/DDQN_id418_ep26849_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:10:56.592208: ==========
+
+2024-02-27 12:12:30.358554: Proof ./examples/robotics_proofs/DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:12:30.358584: Result for ./examples/robotics_proofs/DDQN_id425_ep46171_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:12:30.358601: ==========
+
+2024-02-27 12:14:47.800426: Proof ./examples/robotics_proofs/DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:14:47.800457: Result for ./examples/robotics_proofs/DDQN_id444_ep31867_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:14:47.800476: ==========
+
+2024-02-27 12:17:02.281013: Proof ./examples/robotics_proofs/DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:17:02.281044: Result for ./examples/robotics_proofs/DDQN_id491_ep31556_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:17:02.281064: ==========
+
+2024-02-27 12:22:34.458202: Proof ./examples/robotics_proofs/DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:22:34.458266: Result for ./examples/robotics_proofs/DDQN_id502_ep62496_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:22:34.458302: ==========
+
+2024-02-27 12:27:25.452763: Proof ./examples/robotics_proofs/DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:27:25.452796: Result for ./examples/robotics_proofs/DDQN_id502_ep62529_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:27:25.452851: ==========
+
+2024-02-27 12:28:29.391628: Proof ./examples/robotics_proofs/DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:28:29.391718: Result for ./examples/robotics_proofs/DDQN_id518_ep33724_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:28:29.391778: ==========
+
+2024-02-27 12:32:51.624653: Proof ./examples/robotics_proofs/DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:32:51.624801: Result for ./examples/robotics_proofs/DDQN_id530_ep73981_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:32:51.624829: ==========
+
+2024-02-27 12:34:04.074510: Proof ./examples/robotics_proofs/DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:34:04.074539: Result for ./examples/robotics_proofs/DDQN_id530_ep77583_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:34:04.074558: ==========
+
+2024-02-27 12:34:17.621360: Proof ./examples/robotics_proofs/DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json finished; status: OK
+
+
+2024-02-27 12:34:17.621388: Result for ./examples/robotics_proofs/DDQN_id530_ep92129_forward_collision_k_1_ipq_proof.json: true
+
+
+2024-02-27 12:34:17.621407: ==========
+
+2024-03-07 10:21:47.773818: Proof ./examples/proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2024-03-07 10:21:47.774069: Result for ./examples/proof_reluBenchmark0.05650806427s.json: true
+
+
+2024-03-07 10:21:47.774226: ==========
+
+2024-03-07 10:21:51.670833: Proof ./examples/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2024-03-07 10:21:51.670887: Result for ./examples/proof_reluBenchmark0.05650806427s_lemmas.json: true
+
+
+2024-03-07 10:21:51.670918: ==========
+
+2024-03-07 10:21:51.974702: Proof ./examples/proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2024-03-07 10:21:51.974729: Result for ./examples/proof_reluBenchmark0.15145778656s.json: true
+
+
+2024-03-07 10:21:51.974748: ==========
+
+2024-03-07 10:21:54.715346: Proof ./examples/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2024-03-07 10:21:54.715434: Result for ./examples/proof_reluBenchmark0.15145778656s_lemmas.json: true
+
+
+2024-03-07 10:21:54.715545: ==========
+
+2024-03-07 10:21:55.701223: Proof ./examples/proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2024-03-07 10:21:55.701301: Result for ./examples/proof_reluBenchmark0.19238615036s.json: true
+
+
+2024-03-07 10:21:55.701343: ==========
+
+2024-03-07 10:22:08.498797: Proof ./examples/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2024-03-07 10:22:08.498912: Result for ./examples/proof_reluBenchmark0.19238615036s_lemmas.json: true
+
+
+2024-03-07 10:22:08.498958: ==========
+
+2024-03-07 10:22:09.189176: Proof ./examples/proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2024-03-07 10:22:09.189204: Result for ./examples/proof_reluBenchmark0.24204993248s.json: true
+
+
+2024-03-07 10:22:09.189260: ==========
+
+2024-03-07 10:22:25.243669: Proof ./examples/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2024-03-07 10:22:25.243925: Result for ./examples/proof_reluBenchmark0.24204993248s_lemmas.json: true
+
+
+2024-03-07 10:22:25.244029: ==========
+
+2024-03-07 10:22:25.472798: Proof ./examples/proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2024-03-07 10:22:25.472894: Result for ./examples/proof_reluBenchmark0.24551987648s.json: true
+
+
+2024-03-07 10:22:25.472956: ==========
+
+2024-03-07 10:22:27.072953: Proof ./examples/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2024-03-07 10:22:27.073015: Result for ./examples/proof_reluBenchmark0.24551987648s_lemmas.json: true
+
+
+2024-03-07 10:22:27.073066: ==========
+
+2024-03-07 10:22:27.531289: Proof ./examples/proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2024-03-07 10:22:27.531359: Result for ./examples/proof_reluBenchmark0.359375s.json: true
+
+
+2024-03-07 10:22:27.531405: ==========
+
+2024-03-07 10:22:32.844566: Proof ./examples/proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2024-03-07 10:22:32.845850: Result for ./examples/proof_reluBenchmark0.359375s_lemmas.json: true
+
+
+2024-03-07 10:22:32.845886: ==========
+
+2024-03-07 10:22:34.048165: Proof ./examples/proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2024-03-07 10:22:34.048303: Result for ./examples/proof_reluBenchmark0.479170084s.json: true
+
+
+2024-03-07 10:22:34.048416: ==========
+
+2024-03-07 10:22:55.384849: Proof ./examples/proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2024-03-07 10:22:55.385010: Result for ./examples/proof_reluBenchmark0.479170084s_lemmas.json: true
+
+
+2024-03-07 10:22:55.385125: ==========

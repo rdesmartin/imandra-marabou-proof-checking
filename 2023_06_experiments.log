@@ -1,0 +1,80 @@
+
+2023-06-06 16:32:03.796906: Proof json/acasxu_2_9_p3_NL.json finished; status: OK
+
+
+2023-06-06 16:32:03.796994: Result for json/acasxu_2_9_p3_NL.json: true
+
+
+2023-06-06 16:32:03.797030: ==========
+
+2023-06-06 16:35:30.472732: Proof json/acasxu_2_9_p4_NL.json finished; status: OK
+
+
+2023-06-06 16:35:30.472818: Result for json/acasxu_2_9_p4_NL.json: true
+
+
+2023-06-06 16:35:30.472885: ==========
+
+2023-06-06 16:40:30.081243: Proof json/acasxu_3_7_p3_NL.json finished; status: OK
+
+
+2023-06-06 16:40:30.081276: Result for json/acasxu_3_7_p3_NL.json: true
+
+
+2023-06-06 16:40:30.081291: ==========
+
+2023-06-06 16:41:28.369360: Proof json/acasxu_5_7_p3_NL.json finished; status: OK
+
+
+2023-06-06 16:41:28.369393: Result for json/acasxu_5_7_p3_NL.json: true
+
+
+2023-06-06 16:41:28.369409: ==========
+
+2023-06-06 16:48:33.185833: Proof json/acasxu_5_9_p3_NL.json finished; status: OK
+
+
+2023-06-06 16:48:33.185891: Result for json/acasxu_5_9_p3_NL.json: true
+
+
+2023-06-06 16:48:33.185926: ==========
+
+2023-06-06 17:07:39.171011: Proof json/acasxu_2_9_3_LEMMAS.json finished; status: OK
+
+
+2023-06-06 17:07:39.171086: Result for json/acasxu_2_9_3_LEMMAS.json: true
+
+
+2023-06-06 17:07:39.171121: ==========
+
+2023-06-06 17:32:32.934598: Proof json/acasxu_3_7_3_LEMMAS.json finished; status: OK
+
+
+2023-06-06 17:32:32.935385: Result for json/acasxu_3_7_3_LEMMAS.json: true
+
+
+2023-06-06 17:32:32.935426: ==========
+
+2023-06-06 17:37:44.031500: Proof json/acasxu_5_7_3_LEMMAS.json finished; status: OK
+
+
+2023-06-06 17:37:44.031550: Result for json/acasxu_5_7_3_LEMMAS.json: true
+
+
+2023-06-06 17:37:44.031584: ==========
+
+2023-06-06 18:14:34.509663: Proof json/acasxu_5_9_3_LEMMAS.json finished; status: OK
+
+
+2023-06-06 18:14:34.510428: Result for json/acasxu_5_9_3_LEMMAS.json: true
+
+
+2023-06-06 18:14:34.510449: ==========
+
+2023-06-06 18:31:34.281235: Proof json/acasxu_2_9_4_LEMMAS.json finished; status: OK
+
+
+2023-06-06 18:31:34.281426: Result for json/acasxu_2_9_4_LEMMAS.json: true
+
+
+2023-06-06 18:31:34.281572: ==========

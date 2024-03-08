@@ -36,6 +36,11 @@ let check_children_splits left_child right_child constraints =
     *)
 let rec check_node tableau upper_bounds lower_bounds constraints proof_node =
     match proof_node with
+    | ProofTree.Leaf (tightenings, bound_lemmas, contradiction) ->
+        let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
+        let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
+        let valid_contradiction = check_contradiction contradiction tableau upper_bounds'' lower_bounds'' in
+        valid_bounds && valid_contradiction
     | ProofTree.Node (tightenings, bound_lemmas, left_child, right_child) ->
         let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
         let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
@@ -43,11 +48,7 @@ let rec check_node tableau upper_bounds lower_bounds constraints proof_node =
         let valid_children = (check_node tableau upper_bounds'' lower_bounds'' constraints left_child) &&
             (check_node tableau upper_bounds'' lower_bounds'' constraints right_child) in
         valid_bounds && valid_children_splits && valid_children
-    | ProofTree.Leaf (tightenings, bound_lemmas, contradiction) ->
-        let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
-        let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
-        let valid_contradiction = check_contradiction contradiction tableau upper_bounds'' lower_bounds'' in
-        valid_bounds && valid_contradiction
+    [@@adm proof_node]
 
 let rec equal_rows_length tableau size = 
     match tableau with
@@ -65,9 +66,9 @@ let well_formed_tableau tableau =
 *)
 let sanity_checks tableau upper_bounds lower_bounds =
     let valid_bounds_sizes = List.length upper_bounds = List.length lower_bounds && List.length lower_bounds <> 0 in
-    let tablaue_bounds_match = List.length upper_bounds = List.length (List.hd tableau) in
+    let tableau_bounds_match = List.length upper_bounds = List.length (List.hd tableau) in
     let tableau_well_formed = well_formed_tableau tableau in
-    valid_bounds_sizes && tableau_well_formed && tablaue_bounds_match
+    valid_bounds_sizes && tableau_well_formed && tableau_bounds_match
 
 
 (* Main entry point to verify the proof tree.

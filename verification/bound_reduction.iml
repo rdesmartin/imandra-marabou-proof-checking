@@ -24,20 +24,7 @@ lemma is_upper_bounded_nth x xn u un n =
     Some xn = List.nth n x &&
     Some un = List.nth n u
     ==>   
-    -. xn >=. -. un 
-    [@@auto]
-
-lemma mk_bound_poly_length size var_i coeff value =
-    size >= 0
-    ==>
-    List.length (mk_bound_poly size var_i coeff value) = size + 1
-    [@@auto]
-
-lemma mk_bound_poly_var size var var_i coeff value = 
-    size > 0 && var_i < size &&
-    List.nth var_i (mk_bound_poly size var_i coeff value) = Some var
-    ==>
-    var = coeff
+    -. xn >=. -. un
     [@@auto]
 
 axiom mk_bound_poly_eval_gal size var var_i value coeff x = 

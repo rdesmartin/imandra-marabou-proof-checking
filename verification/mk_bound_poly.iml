@@ -1,0 +1,97 @@
+open Farkas_lemma
+open Certificate
+open Utils
+
+
+let rec induct_scheme n x =
+    match x with 
+    | [x] -> true
+    | [] -> true
+    | x :: xs -> induct_scheme (n - 1) xs
+
+lemma eval_poly_zero n x =
+    eval_poly (repeat 0. n) x = 0.
+[@@auto]
+[@@induct functional induct_scheme]
+[@@rw][@@fc]
+
+let rec induct_scheme' size i coeff bound xs =
+    match xs with 
+    | [x] -> true
+    | [] -> true
+    | x :: xs -> induct_scheme' (size - 1) (i - 1) coeff bound xs
+
+lemma mk_bound_poly_eval_i_neg size i coeff bound xs = 
+    size = List.length xs &&
+    i < 0
+    ==> 
+    eval_poly (mk_bound_poly size i coeff bound) xs = bound
+    [@@auto]
+    [@@induct functional induct_scheme']
+    [@@rw][@@fc]
+
+lemma mk_bound_poly_i_null size i coeff bound =
+    size > 0 &&
+    i = 0
+    ==>
+    mk_bound_poly size i coeff bound = coeff :: (mk_bound_poly (size - 1) (i - 1) coeff bound)
+    [@@auto]
+    [@@rw]
+
+lemma eval_poly_hd ps xs =
+    xs <> [] &&
+    good_poly_length ps xs
+    ==>
+    eval_poly ps xs = (List.hd ps) *. (List.hd xs) +. (eval_poly (List.tl ps) (List.tl xs))
+    [@@rw]
+    [@@fc]
+
+lemma mk_bound_poly_eval_i_null_helper size i coeff bound xs = 
+    xs <> [] &&
+    size = List.length xs &&
+    i = 0
+    ==>
+    eval_poly (mk_bound_poly size i coeff bound) xs = 
+        coeff *. (List.hd xs) +. (eval_poly ((mk_bound_poly (size - 1) (i - 1) coeff bound)) (List.tl xs))
+    [@@auto]
+    [@@rw][@@fc]
+
+lemma mk_bound_poly_eval_i_null size i coeff bound xs = 
+    xs <> [] &&
+    size = List.length xs &&
+    i = 0
+    ==>
+    eval_poly (mk_bound_poly size i coeff bound) xs = coeff *. (List.hd xs) +. bound
+    [@@auto]
+    [@@disable Farkas_lemma.eval_poly]
+    [@@apply mk_bound_poly_eval_i_null_helper size i coeff bound xs,
+    mk_bound_poly_eval_i_neg (size - 1) (i - 1) coeff bound (List.tl xs)]
+    [@@rw][@@fc]
+
+lemma mk_bound_poly_eval_i_pos size i coeff bound xs = 
+    xs <> [] &&
+    size = List.length xs &&
+    i > 0 
+    ==>
+    eval_poly (mk_bound_poly size i coeff bound) xs = 
+        eval_poly (mk_bound_poly (size - 1) (i - 1) coeff bound) (List.tl xs)
+    [@@auto]
+    [@@rw][@@fc]
+
+let rec induct_scheme'' size i coeff bound xs xi =
+    match xs with 
+    | [x] -> true
+    | [] -> true
+    | x :: xs -> induct_scheme'' (size - 1) (i - 1) coeff bound xs xi
+
+lemma mk_bound_poly_eval_gal size i coeff bound xs xi = 
+    xs <> [] &&
+    size = (List.length xs) &&
+    List.nth i xs = Some xi
+    ==>
+    eval_poly (mk_bound_poly size i coeff bound) xs = coeff *. xi +. bound
+[@@auto]
+[@@apply mk_bound_poly_eval_i_pos size i coeff bound xs,
+    mk_bound_poly_eval_i_null size i coeff bound xs,
+    mk_bound_poly_eval_i_neg size i coeff bound xs]
+[@@induct functional induct_scheme'']

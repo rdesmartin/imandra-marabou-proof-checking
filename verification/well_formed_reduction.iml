@@ -116,14 +116,29 @@ lemma well_formed_mk_eq_constraints tableau system =
     [@@auto]
     [@@rw][@@fc]
 
+lemma list_append_length l1 l2 = 
+    List.length (List.append l1 l2) = (List.length l1) + (List.length l2) 
+[@@auto]
+[@@rw][@@fc]
 
-lemma mk_bound_poly_size p size i coeff bound =
-    size >= 0 &&
-    p = mk_bound_poly size i coeff bound
+lemma repeat_length x n = 
+    n >= 0
+    ==>
+    List.length (repeat x n) = n
+[@@auto]
+[@@rw][@@fc]
+   
+
+#enable Certificate.mk_bound_poly
+lemma mk_bound_poly_size size i coeff bound =
+    size >= 0
     ==> 
-    List.length p = size + 1
+    List.length (mk_bound_poly size i coeff bound) = size + 1
     [@@auto]
-    [@@fc]
+    [@@disable Utils.repeat, List.append]
+    [@@rw][@@fc]
+
+#disable Certificate.mk_bound_poly
 
 let is_geq p = match p with
     | Geq _ -> true

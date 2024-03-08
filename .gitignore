@@ -1,6 +1,7 @@
 
 .imandra_init.log
 _build/*
+_build/
 test_env/bin/python
 test_env/bin/python3
 test_env/bin/python3.9

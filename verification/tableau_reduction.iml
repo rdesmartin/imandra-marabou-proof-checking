@@ -1,0 +1,49 @@
+open Certificate
+open Checker
+open Utils
+open Farkas_lemma
+
+let rec dot_product x y =
+match x, y with
+    | [], [] -> 0.
+    | x_hd :: x_tl, y_hd :: y_tl -> x_hd *. y_hd +. (dot_product x_tl y_tl)
+    | _ -> 0.
+
+let rec is_in_kernel tableau x =
+    match tableau with
+    | [] -> true
+    | row :: rows -> dot_product row x = 0. && is_in_kernel rows x
+
+lemma kernel_row_eval_poly row x =
+    List.length x = List.length row
+    ==>
+    dot_product row x = eval_poly (row @ [0.]) x
+    [@@auto]
+    [@@fc]
+
+lemma kernel_row_eval_system row x =
+    List.length x = List.length row &&
+    dot_product row x = 0.
+    ==>
+    eval_system [Eq (row @ [0.])] x
+    [@@auto]
+    [@@apply kernel_row_eval_poly row x]
+    [@@fc]
+
+lemma kernel_head_zero_dot_product tableau x = 
+    List.length x = List.length (List.hd tableau) &&
+    well_formed_tableau tableau &&
+    is_in_kernel tableau x
+    ==>
+    dot_product (List.hd tableau) x = 0.
+    [@@auto]
+    [@@fc]
+
+theorem tableau_reduction_soundness tableau x =
+    List.length x = List.length (List.hd tableau) &&
+    well_formed_tableau tableau &&
+    is_in_kernel tableau x
+    ==>
+    eval_system (mk_eq_constraints tableau) x
+    [@@auto]
+    [@@induct structural tableau]

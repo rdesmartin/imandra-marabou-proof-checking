@@ -1,0 +1,51 @@
+(* lemma check_contradiction_soundness tableau upper_bounds_lower_bounds relu_constraints x = 
+    let s = mk_system_contradiction tableau upper_bounds lower_bounds in
+    check_contradiction tableau upper_bounds lower_bounds
+    ==>
+    eval_system_relu s relu_constraints x = false
+ *)
+
+axiom valid_children_split tableau upper_bounds_lower_bounds relu_constraints node =
+    let s = mk_system_contradiction tableau upper_bounds lower_bounds in
+    match node with
+    | Leaf _ -> true
+    | ProofTree.Node (tightenings, bound_lemmas, child_l, child_r) ->
+        let sl = mk_system_contradiction tableau (upper_bounds) (lower_bounds) (relu_constraints) in
+        let sr = mk_node_system child_r in
+        check_children_splits children relu_constraints &&
+        eval_system_relus s relu_constraints x
+        ==>
+        eval_system_relus sl relu_constraints x || eval_system_relus sr relu_constraints x
+
+axiom bound_propagation_sat_invariant tableau upper_bounds_lower_bounds relu_constraints bound_lemmas x = 
+    let (valid_bounds, upper_bounds', lower_bounds') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds relu_constraints in
+    let s = mk_system_contradiction tableau upper_bounds lower_bounds in
+    let s' = mk_system_contradiction tableau upper_bounds' lower_bounds' in
+    eval_system_relu s relu_constraints x
+    ==>
+    eval_system_relu s' relu_constraints x
+
+axiom check_leaf_soundness tableau upper_bounds lower_bounds relu_constraints proof_tree x = 
+    match proof_tree with 
+    | Node _ -> true
+    | Leaf (tightenings, bound_lemmas, contradiction) ->
+        check_node tableau upper_bounds lower_bounds constraints proof_node
+        ==> 
+        (is_in_kernel tableau x && 
+        is_bounded upper_bounds lower_bounds x &&
+        satisfied_relus relu_constraints x) = false
+ 
+lemma reduction_soundness tableau upper_bounds lower_bounds relu_constraints x =
+    s = mk_system_contradiction tableau upper_bounds lower_bounds &&
+    eval_system_relu s relu_constraints x = false
+    ==>
+    (is_in_kernel tableau x && 
+    is_bounded upper_bounds lower_bounds x &&
+    satisfied_relus relu_constraints x) = false
+
+theorem checker_soundness tableau upper_bounds lower_bounds relu_constraints proof_tree x = 
+    check_proof_tree tableau upper_bounds lower_bounds relu_constraints proof_tree
+    ==>
+    (is_in_kernel tableau x && 
+    is_bounded upper_bounds lower_bounds x &&
+    satisfied_relus relu_constraints x) = false

@@ -24,10 +24,15 @@ let rec mk_lower_bound_certificate lc =
 let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real): real list =
   if size < 0 then []
   else if size = 0 then [bound]
-  else (
-    let el = if i = 0 then coeff else 0. in
-    el :: mk_bound_poly (size - 1) (i - 1) coeff bound
-  )
+  else if (i = 0) then coeff :: mk_bound_poly (size - 1) (i - 1) coeff bound
+  else 0. :: mk_bound_poly (size - 1) (i - 1) coeff bound
+
+(* let mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real) =
+  if (size < 0) then []
+  else if size = 0 then [bound]
+  else if (size <= i) || (i < 0) then (repeat 0. size) @ [bound]
+  else
+    (repeat 0. i) @ [coeff] @ (repeat 0. (size - i - 1)) @ [bound] *)
 
 (* 
   transform the tableau into a list of Eq expressions, with 
