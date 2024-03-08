@@ -27,45 +27,15 @@ lemma is_upper_bounded_nth x xn u un n =
     -. xn >=. -. un
     [@@auto]
 
-axiom mk_bound_poly_eval_gal size var var_i value coeff x = 
-    x <> [] &&
-    size >= (List.length x) &&
-    List.nth var_i x = Some var
-    ==>
-    eval_poly (mk_bound_poly size var_i coeff value) x = coeff *. var +. value
-    [@@auto]
-    [@@fc]
-
+(* this lemma depends on mk_bound_poly_eval_gal, defined in verification/mk_bound_poly.iml *)
 lemma mk_bound_poly_eval var var_i value coeff x = 
     x <> [] &&
     List.nth var_i x = Some var
     ==>
     eval_poly (mk_bound_poly (List.length x) var_i coeff value) x = coeff *. var +. value
     [@@auto]
-    [@@apply mk_bound_poly_eval_gal (List.length x) var var_i value coeff x]
+    [@@apply mk_bound_poly_eval_gal (List.length x) var_i coeff value x var]
     [@@fc]
-
-lemma mk_bound_poly_eval_size_invariant size var var_i value coeff x = 
-    x <> [] &&
-    List.nth var_i x = Some var &&
-    size >= List.length x
-    ==>
-    eval_poly (mk_bound_poly size var_i coeff value) x = eval_poly (mk_bound_poly (List.length x) var_i coeff value) x
-    [@@auto]
-    [@@apply mk_bound_poly_eval_gal (List.length x) var var_i value coeff x,
-             mk_bound_poly_eval_gal size var var_i value coeff x
-    ]
-
-lemma mk_bound_poly_eval_geq_size_invariant size var var_i value coeff x = 
-    x <> [] &&
-    List.nth var_i x = Some var &&
-    size >= List.length x
-    ==>
-    eval_system [Geq (mk_bound_poly (List.length x) var_i coeff value)] x =
-     eval_system [Geq (mk_bound_poly size var_i coeff value)] x
-[@@auto]
-[@@apply mk_bound_poly_eval_size_invariant size var var_i value coeff x]
-[@@fc]
 
 lemma mk_bound_poly_non_neg var var_i value coeff x = 
     x <> [] &&
@@ -107,7 +77,6 @@ lemma mk_bound_poly_eval_gt_true var var_i value coeff x =
     [@@apply mk_bound_poly_pos var var_i value coeff x]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
 
-
 lemma mk_bound_poly_eval_geq_true' var var_i value coeff x = 
     x <> [] &&
     List.nth var_i x = Some var &&
@@ -117,29 +86,6 @@ lemma mk_bound_poly_eval_geq_true' var var_i value coeff x =
     [@@auto]
     [@@apply mk_bound_poly_non_neg var var_i (-. value) coeff x]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
-
-
-lemma mk_bound_poly_eval_geq_true'' x u = 
-    x <> [] &&
-    List.hd x <=. List.hd u
-    ==>
-    eval_system [Geq (mk_bound_poly (List.length x) 0 (-1.) (List.hd u))] x
-    [@@auto]
-    [@@apply mk_bound_poly_non_neg (List.hd x) 0 (-. (List.hd u)) (-1.) x]
-    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
-    [@@fc]
-
-lemma mk_bound_poly_eval_geq_true_any_size x u size = 
-    x <> [] &&
-    List.length u = List.length x &&
-    eval_system [Geq (mk_bound_poly (List.length x) 0 (-1.) (List.hd u))] x &&
-    size >= (List.length x)
-    ==>
-    eval_system [Geq (mk_bound_poly size 0 (-1.) (List.hd u))] x
-    [@@auto]
-    [@@apply mk_bound_poly_eval_geq_true'' x u,
-        mk_bound_poly_eval_geq_size_invariant size (List.hd x) 0 (List.hd u) (-1.) x]
-    [@@fc]
 
 lemma mk_bound_poly_eval_geq_true_conj var1 var1_i value1 coeff1 var2 var2_i value2 coeff2 x = 
     x <> [] && 
@@ -154,14 +100,6 @@ lemma mk_bound_poly_eval_geq_true_conj var1 var1_i value1 coeff1 var2 var2_i val
         mk_bound_poly_eval_geq_true var2 var2_i value2 coeff2 x
     ]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
-
-lemma mk_upper_bounds_constraints_soundness_hd_helper upper_bounds x = 
-    List.length x = List.length upper_bounds &&
-    upper_bounds <> [] &&
-    is_upper_bounded x upper_bounds
-    ==> 
-    (-1.) *. (List.hd x) >=. (-. List.hd upper_bounds) 
-    [@@auto]
 
 (* High-level proof goal *)
 let mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
