@@ -1,17 +1,17 @@
+open Utils
 open Farkas_lemma
 open Arithmetic.LinArith
 open Tightening
-open Utils
 
 (* create certificate for Geq constraints corresponding to upper bounds *)
-let rec mk_upper_bound_certificate lc = 
+let rec mk_upper_bound_certificate (lc: Real.t list) = 
   match lc with 
   | [] -> []
   | hd :: tl -> (if hd >=. 0. then hd else 0. ) :: mk_upper_bound_certificate tl
 
 
 (* create certificate for Geq constraints corresponding to lower bounds *)
-let rec mk_lower_bound_certificate lc = 
+let rec mk_lower_bound_certificate (lc: Real.t list) = 
   match lc with 
   | [] -> []
   | hd :: tl -> (if hd <. 0. then (-. hd) else 0. ) :: mk_lower_bound_certificate tl
@@ -21,24 +21,17 @@ let rec mk_lower_bound_certificate lc =
   all coefficients are 0, except at index i where it is  `coeff` (should be 1 for a lower bound
   and -1 for an upper bound). The constant is the value of the bound.
 *)
-let rec mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real): real list =
+let rec mk_bound_poly (size: int) (i: int) (coeff: Real.t) (bound: Real.t): Real.t list =
   if size < 0 then []
   else if size = 0 then [bound]
   else if (i = 0) then coeff :: mk_bound_poly (size - 1) (i - 1) coeff bound
   else 0. :: mk_bound_poly (size - 1) (i - 1) coeff bound
 
-(* let mk_bound_poly (size: int) (i: int) (coeff: real) (bound: real) =
-  if (size < 0) then []
-  else if size = 0 then [bound]
-  else if (size <= i) || (i < 0) then (repeat 0. size) @ [bound]
-  else
-    (repeat 0. i) @ [coeff] @ (repeat 0. (size - i - 1)) @ [bound] *)
-
 (* 
   transform the tableau into a list of Eq expressions, with 
   an added 0. for the constant at the end 
 *)
-let rec mk_eq_constraints (tableau: real list list): exp list =
+let rec mk_eq_constraints (tableau: Real.t list list): exp list =
   match tableau with 
   | hd :: tl -> Eq (hd @ [0.]) :: mk_eq_constraints tl
   | [] -> []
@@ -51,7 +44,7 @@ let rec mk_lower_bounds_constraints size i lower_bounds =
   | [] -> []
   | l::bounds -> Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints size (i + 1) bounds
 
-(** Iden for upper_bounds *)
+(** Idem for upper_bounds *)
 let rec mk_upper_bounds_constraints size i upper_bounds = 
   match upper_bounds with
   | [] -> []
@@ -59,25 +52,25 @@ let rec mk_upper_bounds_constraints size i upper_bounds =
 
 (** Create Geq constraints corresponding to the variable bounds.
 *)
-let mk_geq_constraints (upper_bounds: real list) (lower_bounds: real list): exp list =
+let mk_geq_constraints (upper_bounds: Real.t list) (lower_bounds: Real.t list): exp list =
   let size = List.length upper_bounds in
   (mk_upper_bounds_constraints size 0 upper_bounds) @ (mk_lower_bounds_constraints size 0 lower_bounds)
  
 
-let mk_gt_constraint (size: int) ((var, value, bound_t): (int * real * bound_type)): exp = 
+let mk_gt_constraint (size: int) ((var, value, bound_t): (int * Real.t * bound_type)): exp = 
   match bound_t with
-  | UPPER -> let p: real list = mk_bound_poly size var 1. (-. value) in
+  | UPPER -> let p: Real.t list = mk_bound_poly size var 1. (-. value) in
              Gt p
-  | LOWER -> let p: real list = mk_bound_poly size var (-1.) value in
+  | LOWER -> let p: Real.t list = mk_bound_poly size var (-1.) value in
              Gt p
 
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
-let mk_system_contradiction (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list): exp list =
+let mk_system_contradiction (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): exp list =
   tableau @ (mk_geq_constraints upper_bounds lower_bounds)
 
 (* Create the polynomial representation of the linear constraints from the matrix representation 
    for bound tightening lemma checking, i.e. with strict inequality constraints *)
-let mk_system_lemma (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list) ((caus_var, row_bound, caus_bound_t) as tightening: Tightening.t): exp list =
+let mk_system_lemma (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) ((caus_var, row_bound, caus_bound_t) as tightening: Tightening.t): exp list =
   let geq_constraints = mk_geq_constraints upper_bounds lower_bounds in
   let gt_constraint = mk_gt_constraint (List.length upper_bounds) tightening in
   gt_constraint :: (tableau @ geq_constraints)

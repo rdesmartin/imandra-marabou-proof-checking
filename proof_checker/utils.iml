@@ -66,13 +66,13 @@ lemma set_nth_unchanged l n m a =
 [@@auto]
 
 (* increment list element at given index by 1 *)
-let increment_elem (l: real list) (n: int): real list =
+let increment_elem (l: Real.t list) (n: int): Real.t list =
     match List.nth n l with
     | None -> l
     | Some value -> set_nth l n (value +. 1.)
 
 (* decrement list element at given index by 1 *)
-let decrement_elem (l: real list) (n: int): real list =
+let decrement_elem (l: Real.t list) (n: int): Real.t list =
     match List.nth n l with
     | None -> l
     | Some value -> set_nth l n (value -. 1.)
@@ -95,8 +95,8 @@ lemma zip_map x y f n =
         | None -> true
 [@@auto]
 
-    (* Add 2 lists of reals element-wise *)
-let rec list_add (x: real list) (y: real list): real list = 
+    (* Add 2 lists of Real.ts element-wise *)
+let rec list_add (x: Real.t list) (y: Real.t list): Real.t list = 
     match x, y with
     | [], [] -> []
     | x :: xs, y :: ys -> x +. y :: list_add xs ys
@@ -108,8 +108,8 @@ lemma list_add_length_invariant l1 l2 =
     List.length (list_add l1 l2) = List.length l1
     [@@auto][@@induct functional list_add]
 
-(* Multiply all elements in a list of reals by a constant *)
-let rec list_scale (x: real list) (c: real): real list = 
+(* Multiply all elements in a list of Real.ts by a constant *)
+let rec list_scale (x: Real.t list) (c: Real.t): Real.t list = 
     match x with
     | [] -> []
     | x :: xs -> x *. c :: list_scale xs c
@@ -148,7 +148,7 @@ lemma zip_cat x1 x2 y1 y2 =
 [@@auto]
 
 (** returns true if all elements of l1 are gte to corresponding elements of l2  *)
-let list_geq (l1: real list) (l2: real list): bool =
+let list_geq (l1: Real.t list) (l2: Real.t list): bool =
     all (List.map (fun (a, b) -> a >=. b) (zip l1 l2))
 
 (* Utils to_string functions for debugging *)

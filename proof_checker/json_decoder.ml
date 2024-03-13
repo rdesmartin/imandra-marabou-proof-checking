@@ -1,5 +1,5 @@
-open Iter_map
 open Utils
+open Iter_map
 open Constraint
 open Tightening
 open Bound_lemma
@@ -17,21 +17,21 @@ module JSON_decoder = struct
     let+ i = int in
     Z.of_int i
 
-  let float_decoder: Q.t D.decoder =
+  let float_decoder: Real.t D.decoder =
     let open D in
     let+ f = float in
-    Q.of_float f
+    Real.of_float f
 
 
   (* Tableau decoder *)
 
-  let sparse_matrix_element_decoder: (int * real) D.decoder =
+  let sparse_matrix_element_decoder: (int * Real.t) D.decoder =
     let open D in
     let* var = field "var" int_decoder in
     let* value = field "val" float_decoder in
     succeed (var, value)
 
-  let sparse_row_decoder: ((int, real) M.t) D.decoder =
+  let sparse_row_decoder: ((int, Real.t) M.t) D.decoder =
     let open D in
     list_fold_left (fun x ->
         (* pattern match directly here? *)
@@ -39,7 +39,7 @@ module JSON_decoder = struct
         el |> (fun (k, v) -> M.add k v x)
       ) M.empty
 
-  let sparse_matrix_decoder (matrix_width: int): ((real list list) D.decoder) =
+  let sparse_matrix_decoder (matrix_width: int): ((Real.t list list) D.decoder) =
     let open D in
     list @@ map (M.to_list (matrix_width - (Z.of_int 1))) sparse_row_decoder
   
@@ -74,7 +74,7 @@ module JSON_decoder = struct
     let* bound_type = field "bound" bound_decoder in
     succeed (var, value, bound_type)
 
-  let explanation_decoder (proof_size: int): real list D.decoder =
+  let explanation_decoder (proof_size: int): Real.t list D.decoder =
     let open D in
     map (M.to_list (proof_size - (Z.of_int 1))) sparse_row_decoder
   
@@ -137,8 +137,8 @@ module JSON_decoder = struct
 
   let proof_decoder : ('a D.decoder) =
     let open D in
-    let* upper_bounds = field "upperBounds" @@ list (map Q.of_float float) in
-    let* lower_bounds = field "lowerBounds" @@ list (map Q.of_float float) in
+    let* upper_bounds = field "upperBounds" @@ list (map Real.of_float float) in
+    let* lower_bounds = field "lowerBounds" @@ list (map Real.of_float float) in
     let* tableau_width = succeed @@ List.length upper_bounds in
     let* tableau = field "tableau" (sparse_matrix_decoder tableau_width) in
     let* proof_size = succeed @@ List.length tableau in

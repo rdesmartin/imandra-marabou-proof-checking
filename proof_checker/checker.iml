@@ -9,7 +9,7 @@ open Farkas_lemma
 open Certificate
 
 (* check contradiction with polynomials representation *)
-let check_contradiction (contradiction: real list) (tableau: exp list) (upper_bounds: real list) (lower_bounds: real list): bool = 
+let check_contradiction (contradiction: Real.t list) (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): bool = 
     let sys = mk_system_contradiction tableau upper_bounds lower_bounds in
     let lc = LinArith.compute_combination contradiction tableau in        
     let contradiction' = contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc)) in
@@ -34,19 +34,28 @@ let check_children_splits left_child right_child constraints =
 
     If the node is a Leaf, we check that the saved proof vector leads to a contradiction
     *)
-let rec check_node tableau upper_bounds lower_bounds constraints proof_node =
+let rec check_node (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_node: ProofTree.t) =
     match proof_node with
     | ProofTree.Leaf (tightenings, bound_lemmas, contradiction) ->
         let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
         let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
         let valid_contradiction = check_contradiction contradiction tableau upper_bounds'' lower_bounds'' in
-        valid_bounds && valid_contradiction
+        if not (valid_bounds && valid_contradiction) then (
+            let () = Printf.printf "invalid contradiction\n" in
+            false
+        ) else true
     | ProofTree.Node (tightenings, bound_lemmas, left_child, right_child) ->
         let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
         let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
         let valid_children_splits = check_children_splits left_child right_child constraints in
         let valid_children = (check_node tableau upper_bounds'' lower_bounds'' constraints left_child) &&
             (check_node tableau upper_bounds'' lower_bounds'' constraints right_child) in
+        if not valid_bounds then 
+        let () = Printf.printf "invalid bounds\n" in
+        false
+        else if not valid_children_splits then
+        let () = Printf.printf "invalid split\n" in false
+        else
         valid_bounds && valid_children_splits && valid_children
     [@@adm proof_node]
 
@@ -79,7 +88,7 @@ let sanity_checks tableau upper_bounds lower_bounds =
    it means that the proof is valid, i.e.all the bound tightenings are correct and 
    all the contradiction vectors correpond to a contradiction. 
 *)
-let check_proof_tree (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) (constraints: Constraint.t list) (proof_root: ProofTree.t) =
+let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_root: ProofTree.t) =
     let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
     let tableau_system = mk_eq_constraints tableau in
     let check_tree = 

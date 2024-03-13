@@ -3,7 +3,7 @@ open Utils
 (* Dynamic bound tightenings *)
 module Tightening = struct
     (* index of value to tighten, new value, bound type (UPPER or LOWER) *)
-    type t = (int * real * bound_type)
+    type t = (int * Real.t * bound_type)
     let compare (var1, _, _) (var2, _, _) = var1 <= var2
 
     let is_upper = function
@@ -16,19 +16,19 @@ module Tightening = struct
 
     let tightening_to_string (tight :t) = 
         match tight with 
-        | (n, r, bt) ->  Printf.sprintf "n: %d r: %f bt: %s" (Z.to_int n) (Q.to_float r)  (bound_type_to_str bt)
+        | (n, r, bt) ->  Printf.sprintf "n: %d r: %f bt: %s" (Z.to_int n) (Real.to_float r)  (bound_type_to_str bt)
         | _ -> "invalid"
       [@@program]
       
     (* update a single bound according to a list of tightenings *)
-    let rec update_bounds_by_tightenings (tightenings: t list) (bounds: real list): real list =
+    let rec update_bounds_by_tightenings (tightenings: t list) (bounds: Real.t list): Real.t list =
         match tightenings with
             | []                    -> bounds
             | (var, value, _) :: tl -> let updated_bounds = set_nth bounds var value in
                     update_bounds_by_tightenings tl updated_bounds
 
     (* update the bounds according to a list of tightenings *)
-    let update_bounds (tightenings: t list) (upper_bounds: real list) (lower_bounds: real list): (real list * real list) =
+    let update_bounds (tightenings: t list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): (Real.t list * Real.t list) =
         let upper_tightenings = List.filter is_upper tightenings in
         let lower_tightenings = List.filter (fun a -> not (is_upper a)) tightenings in
         let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in

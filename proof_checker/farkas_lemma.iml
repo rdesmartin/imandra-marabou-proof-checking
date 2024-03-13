@@ -1,3 +1,5 @@
+open Utils
+
 type poly = Real.t list
 
 type var_vect = Real.t list
@@ -8,7 +10,7 @@ type exp =
   | Gt of poly
 
 
-let extract_poly (e: exp): real list =
+let extract_poly (e: exp): Real.t list =
     match e with
     | Geq p -> p
     | Eq p -> p
