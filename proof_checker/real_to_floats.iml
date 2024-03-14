@@ -1,6 +1,6 @@
 module Real = struct
     include Float
-    let mk_of_string (s: string): t = Float.of_string s
+    let mk_of_string (s: string): t = Q.to_float (Q.of_string s)
     let to_float x = x
     let of_float x = x
 end
