@@ -4,10 +4,10 @@ open Bound_lemma
 
 module ProofTree = struct
   type t = 
-    (* bounds lemmas, left child, right child, left tightening, right tightening*)
-    | Node of BoundLemma.t list * t * t * Tightening.t list * Tightening.t list
+    (* tightening, bounds lemmas, left child, right child *)
+    | Node of Tightening.t list * BoundLemma.t list * t * t
     (* tightening, bounds lemmas, contradiction vector *)
-    | Leaf of BoundLemma.t list * real list
+    | Leaf of Tightening.t list * BoundLemma.t list * real list
 
   let non_empty_tightening n = match n with
     | Node ([], _, _, _) | Leaf ([], _, _) -> false
