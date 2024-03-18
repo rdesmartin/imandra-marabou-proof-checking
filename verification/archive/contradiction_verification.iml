@@ -1,5 +1,5 @@
 open Checker
-open Arithmetic.LinArith
+open Arithmetic
 
 let list_add = Utils.list_add
 let list_mult = Utils.list_mult

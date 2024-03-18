@@ -38,15 +38,15 @@ module BoundLemma = struct
     let check_lemma (bound_lemma: t) (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =
     match bound_lemma with
     | Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, expl) ->
-        let linear_combination = LinArith.compute_combination expl tableau in
+        let linear_combination = compute_combination expl tableau in
         (* We add 1 to the coeff of the bound lemma's causing variable to reflect the Gt constraint added later when computing the upper bound*)
         let updated_lc = increment_elem linear_combination caus_var in
         let row_bound =
             if caus_bound_t = UPPER
             then
-                LinArith.compute_row_upper_bound updated_lc upper_bounds lower_bounds 
+                compute_row_upper_bound updated_lc upper_bounds lower_bounds 
             else
-                LinArith.compute_row_lower_bound updated_lc upper_bounds lower_bounds
+                compute_row_lower_bound updated_lc upper_bounds lower_bounds
             in
         let system = mk_system_lemma tableau upper_bounds lower_bounds (caus_var, row_bound, caus_bound_t) in
         (*  When computing the proof of UNSAT, the coeffs for the Gt and the Geq constraint polynomials are 1, 

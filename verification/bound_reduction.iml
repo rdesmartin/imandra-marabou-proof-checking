@@ -2,7 +2,7 @@ open Farkas_lemma
 open Tightening
 open Utils
 open Certificate
-open Arithmetic.LinArith
+open Arithmetic
 
 lemma is_upper_bounded_tl x u = 
     is_upper_bounded x u
@@ -140,7 +140,7 @@ lemma mk_lower_bounds_constraints_eval (bounds: Real.t list) (xs: Real.t list) (
     eval_system (mk_lower_bounds_constraints (List.length bounds) i bounds) xs
     [@@auto]
     [@@induct functional induct_scheme]
-    [@@apply LinArith.is_upper_bounded_elem bounds xs ]
+    [@@apply is_upper_bounded_elem bounds xs ]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
 
 (* High-level proof goal *)

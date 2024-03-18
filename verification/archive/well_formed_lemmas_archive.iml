@@ -5,7 +5,7 @@ lemma compute_combination_case_len_invariant lc caus_bound_t expl tableau =
     ==>
     List.length lc = List.length (List.hd tableau)
 [@@auto]
-[@@disable Arithmetic.LinArith.compute_combination]
+[@@disable Arithmetic.compute_combination]
 [@@fc]
 
 #disable compute_combination_case

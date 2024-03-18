@@ -1,6 +1,6 @@
 open Utils
 open Farkas_lemma
-open Arithmetic.LinArith
+open Arithmetic
 open Tightening
 
 (* create certificate for Geq constraints corresponding to upper bounds *)

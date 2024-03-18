@@ -9,7 +9,7 @@
 [@@@import "proof_checker/check_splits.iml"];;
 [@@@import "proof_checker/certificate.iml"];;
 [@@@import "proof_checker/bound_lemma.iml"];;
-[@@@import "proof_checker/proof_tree.iml"];;
 [@@@import "proof_checker/proof_tree_old.iml"];;
+[@@@import "proof_checker/proof_tree.iml"];;
 [@@@import "proof_checker/json_decoder.ml"];;
 [@@@import "proof_checker/checker.iml"];;

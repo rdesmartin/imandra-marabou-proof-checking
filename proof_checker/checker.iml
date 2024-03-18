@@ -11,7 +11,7 @@ open Certificate
 (* check contradiction with polynomials representation *)
 let check_contradiction (contradiction: Real.t list) (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): bool = 
     let sys = mk_system_contradiction tableau upper_bounds lower_bounds in
-    let lc = LinArith.compute_combination contradiction tableau in        
+    let lc = compute_combination contradiction tableau in        
     let contradiction' = contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc)) in
     let res = (check_cert sys contradiction') in
     res
@@ -23,7 +23,7 @@ let check_children_splits (l_t: Tightening.t list) (r_t: Tightening.t list) (con
     let valid_single_var_split = check_single_var_split l_t r_t in
     non_empty_children_splits && (valid_relu_split || valid_single_var_split)
 
-let check_update_bounds (child_info: ProofTree.child_info) tableau upper_bounds lower_bounds constraints =
+let update_child_bounds (child_info: ProofTree.child_info) tableau upper_bounds lower_bounds constraints =
     let (ub', lb') = Tightening.update_bounds child_info.tightenings upper_bounds lower_bounds in
     let (valid_bounds, ub'', lb'') = BoundLemma.check_bound_lemmas child_info.bound_lemmas tableau ub' lb' constraints in
     (valid_bounds, ub'', lb'')
@@ -44,16 +44,10 @@ let rec check_node (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds
         valid_contradiction
     | ProofTree.Node (left, right) ->
         let valid_children_splits = check_children_splits left.tightenings right.tightenings constraints in
-        let (valid_bounds_l, ub_left, lb_left) = check_update_bounds left tableau upper_bounds lower_bounds constraints in
-        let (valid_bounds_r, ub_right, lb_right) = check_update_bounds right tableau upper_bounds lower_bounds constraints in
+        let (valid_bounds_l, ub_left, lb_left) = update_child_bounds left tableau upper_bounds lower_bounds constraints in
+        let (valid_bounds_r, ub_right, lb_right) = update_child_bounds right tableau upper_bounds lower_bounds constraints in
         let valid_children = (check_node tableau ub_left lb_left constraints left.ptr) &&
             (check_node tableau ub_right lb_right constraints right.ptr) in
-        if not (valid_bounds_l && valid_bounds_r) then 
-        let () = Printf.printf "invalid bounds\n" in
-        false
-        else if not valid_children_splits then
-        let () = Printf.printf "invalid split\n" in false
-        else
         valid_bounds_l && valid_bounds_r && valid_children_splits && valid_children
     [@@adm proof_node]
 

@@ -1,34 +1,12 @@
-(* lemma check_contradiction_soundness tableau upper_bounds_lower_bounds relu_constraints x = 
-    let s = mk_system_contradiction tableau upper_bounds lower_bounds in
-    check_contradiction tableau upper_bounds lower_bounds
-    ==>
-    eval_system_relu s relu_constraints x = false
- *)
 open Utils
 open Constraint
-open Proof_tree.ProofTree
+open Proof_tree
+open Check_splits
+open Certificate
 open Checker
-open Arithmetic.LinArith
+open Arithmetic
 
-(* axiom valid_children_split tableau upper_bounds lower_bounds relu_constraints node =
-    let s = mk_system_contradiction tableau upper_bounds lower_bounds in
-    match node with
-    | Leaf _ -> true
-    | ProofTree.Node (tightenings, bound_lemmas, child_l, child_r) ->
-        let sl = mk_system_contradiction tableau (upper_bounds) (lower_bounds) (relu_constraints) in
-        let sr = mk_node_system child_r in
-        check_children_splits children relu_constraints &&
-        eval_system_relus s relu_constraints x
-        ==>
-        eval_system_relus sl relu_constraints x || eval_system_relus sr relu_constraints x *)
-
-(* axiom bound_propagation_sat_invariant tableau upper_bounds_lower_bounds relu_constraints bound_lemmas x = 
-    let (valid_bounds, upper_bounds', lower_bounds') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds relu_constraints in
-    let s = mk_system_contradiction tableau upper_bounds lower_bounds in
-    let s' = mk_system_contradiction tableau upper_bounds' lower_bounds' in
-    eval_system_relu s relu_constraints x
-    ==>
-    eval_system_relu s' relu_constraints x *)
+let check_relu_constraints = Constraint.check_relu_constraints
 
 let unsat tableau upper_bounds lower_bounds relu_constraints x =
     (is_in_kernel tableau x &&
@@ -44,39 +22,6 @@ let unsat_rw tableau upper_bounds lower_bounds relu_constraints x =
     unsat tableau upper_bounds lower_bounds relu_constraints x = not (sat tableau upper_bounds lower_bounds relu_constraints x )
     [@@rw]
 
-lemma contraposition a b =
-    (a ==> b) = ((not b) ==> (not a))
-    [@@auto]
-    [@@rw]
-
-lemma soundness_node_cp tableau upper_bounds lower_bounds relu_constraints x tightenings bound_lemmas left_child right_child =
-    let (valid_bounds, upper_bounds', lower_bounds') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints in
-    sat tableau upper_bounds lower_bounds relu_constraints x
-    ==>
-    sat tableau upper_bounds_left lower_bounds_left relu_constraints x ||
-    sat tableau upper_bounds_right lower_bounds_right relu_constraints x
-
-    not (check_node (mk_eq_constraints tableau) upper_bounds' lower_bounds' relu_constraints left_child) || 
-    not (check_node (mk_eq_constraints tableau) upper_bounds' lower_bounds' relu_constraints right_child)
-    [@@fc]
-
-        (* not (check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints Node (tightenings, bound_lemmas, left_child, right_child)) *)
-
-
-axiom soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
-    match proof_tree with
-    | Leaf _ -> true
-    | Node (bound_lemmas, left_child, right_child, left_tight, right_tight) ->
-        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
-        ==>
-        unsat tableau upper_bounds lower_bounds relu_constraints x
-    [@@disable sat, unsat, Checker.check_node]
-    [@@apply
-        contraposition (sat tableau upper_bounds lower_bounds relu_constraints x) 
-            (not (check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree))
-    ]
-    [@@fc]
-    [@@auto]
 
 (* 
     TODO: these might be assumptions we need:
@@ -85,22 +30,98 @@ axiom soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_
 
     | ProofTree.Node ([], bound_lemmas, _, _) | ProofTree.Leaf ([], bound_lemmas, _) ->
  *)
-axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+ axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    let open ProofTree in
     match proof_tree with
     | Node _ -> true
-    | (Leaf (tightenings, bound_lemmas, contradiction)) ->
+    | (Leaf contradiction) ->
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
         ==> 
         unsat tableau upper_bounds lower_bounds relu_constraints x
     [@@fc]
 
-(* lemma reduction_soundness tableau upper_bounds lower_bounds relu_constraints x =
-    s = mk_system_contradiction tableau upper_bounds lower_bounds &&
-    eval_system_relu s relu_constraints x = false
-    ==>
-    (is_in_kernel tableau x && 
-    is_bounded upper_bounds lower_bounds x &&
-    satisfied_relus relu_constraints x) = false *)
+(* This states that if a node is sat, then one of its children is sat -> version of this proved in `split_invariant.iml` *)
+axiom invariant_relu_split_sat tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    let open ProofTree in
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (left, right) ->
+        let (_, ub_left, lb_left) = Checker.update_child_bounds left (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints in
+        let (_, ub_right, lb_right) = Checker.update_child_bounds right (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints in
+        check_children_splits left.tightenings right.tightenings relu_constraints &&
+        sat tableau upper_bounds lower_bounds relu_constraints x
+        ==>
+        sat tableau ub_left lb_left relu_constraints x ||
+        sat tableau ub_right lb_right relu_constraints x
+    [@@fc]
+
+(* This states that if at least one child of a node is sat, then `check_node` is false -> is this 
+something we proved? If not, how do we prove this? *)
+axiom sat_child_implies_not_check_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    let open ProofTree in
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (left, right) ->
+        let (_, ub_left, lb_left) = Checker.update_child_bounds left (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints in
+        let (_, ub_right, lb_right) = Checker.update_child_bounds right (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints in
+        check_children_splits left.tightenings right.tightenings relu_constraints &&
+        (sat tableau ub_left lb_left relu_constraints x ||
+        sat tableau ub_right lb_right relu_constraints x)
+        ==>
+        not (check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree)
+    [@@fc]
+
+lemma soundness_check_node_contra_valid_split tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    let open ProofTree in
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (left, right) -> 
+        check_children_splits left.tightenings right.tightenings relu_constraints &&
+        sat tableau upper_bounds lower_bounds relu_constraints x
+        ==>
+        not (check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree)
+    [@@auto]
+    [@@disable sat, Checker.check_node, Checker.check_children_splits]
+    [@@apply invariant_relu_split_sat tableau upper_bounds lower_bounds relu_constraints x proof_tree,
+        sat_child_implies_not_check_node tableau upper_bounds lower_bounds relu_constraints x proof_tree]
+    [@@fc]
+
+lemma soundness_check_node_contra_invalid_split tableau upper_bounds lower_bounds relu_constraints proof_tree = 
+    let open ProofTree in
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (left, right) -> 
+        not (check_children_splits left.tightenings right.tightenings relu_constraints)
+        ==>
+        not (check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree)
+    [@@auto]
+    [@@disable Checker.check_node, Checker.check_children_splits]
+    [@@fc]
+
+lemma soundness_node_contra tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    let open ProofTree in
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (left, right) ->
+        sat tableau upper_bounds lower_bounds relu_constraints x
+        ==>
+        not (check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree)
+    [@@auto]
+    [@@disable sat, Checker.update_child_bounds]
+    [@@apply ]
+    [@@fc]
+
+lemma soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    let open ProofTree in
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (left, right) ->
+        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+        ==>
+        not (sat tableau upper_bounds lower_bounds relu_constraints x)
+    [@@auto]
+    [@@disable sat, Checker.check_node, Certificate.mk_eq_constraints]
+    [@@fc]
 
 lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
         (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) (x: real list) =
@@ -112,17 +133,3 @@ lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (
     [@@induct structural proof_tree]
     [@@apply soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree,
         soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree]
-
-
-(* theorem checker_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
-        (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) (x: real list) =
-    check_proof_tree tableau upper_bounds lower_bounds relu_constraints proof_tree
-    ==>
-    (is_in_kernel tableau x && 
-    is_bounded upper_bounds lower_bounds x &&
-    check_relu_constraints relu_constraints x) = false
-    [@@auto]
-    [@@simp]
-    [@@induct structural proof_tree]
-    [@@apply soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree,
-        soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree] *)
