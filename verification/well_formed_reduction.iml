@@ -1,5 +1,5 @@
 open Utils
-open Arithmetic.LinArith
+open Arithmetic
 open Constraint
 open Proof_tree
 open Checker
@@ -420,7 +420,7 @@ lemma well_formed_conversion tableau upper_bounds lower_bounds eq_constraints ge
 [@@apply well_formed_mk_geq_constraints'' upper_bounds lower_bounds geq_constraints,
          well_formed_mk_eq_constraints tableau eq_constraints,
          well_formed_concat_invariant eq_constraints geq_constraints (List.hd tableau)]
-[@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
+[@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.compute_combination, List.hd, Farkas_lemma.good_poly_length]
 [@@fc]
 
 lemma well_formed_conversion' tableau upper_bounds lower_bounds system =

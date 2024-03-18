@@ -99,7 +99,7 @@ lemma update_combination_len_invariant (lc: real list) (expl: real list) (tablea
 [@@auto]
 [@@induct functional induction_scheme_update_combination]
 [@@apply update_combination_length_invariant_helper lc tableau]
-[@@disable List.length, Utils.list_add, Utils.list_scale, Arithmetic.LinArith.update_combination]
+[@@disable List.length, Utils.list_add, Utils.list_scale, Arithmetic.update_combination]
 
 lemma compute_combination_length_invariant expl tableau =
     well_formed_tableau tableau &&
@@ -238,7 +238,7 @@ lemma well_formed_mk_system_geq expl tableau upper_bounds lower_bounds geq_const
     well_formed geq_constraints (compute_combination expl tableau)
 [@@auto]
 [@@apply well_formed_mk_geq_constraints (compute_combination expl tableau) upper_bounds lower_bounds geq_constraints]
-[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.compute_combination]
 [@@fc]
 
 lemma well_formed_mk_system_geq' expl tableau upper_bounds lower_bounds geq_constraints =
@@ -251,4 +251,4 @@ lemma well_formed_mk_system_geq' expl tableau upper_bounds lower_bounds geq_cons
 [@@apply compute_combination_length_invariant expl tableau,
     well_formed_same_lengths geq_constraints (compute_combination expl tableau) (List.hd tableau)    
 ]
-[@@disable Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
+[@@disable Certificate.mk_geq_constraints, Arithmetic.compute_combination, List.hd, Farkas_lemma.good_poly_length]

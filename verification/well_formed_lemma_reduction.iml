@@ -80,7 +80,7 @@ lemma mk_system_lemmas_gt_eq_geq_well_formed tableau upper_bounds lower_bounds e
          well_formed_mk_eq_constraints tableau eq_constraints,
          mk_gt_constraint_good_poly_length gt_constraint (List.length upper_bounds) caus_var lemma_bound caus_bound_t x,
          well_formed_prepend_concat_invariant gt_constraint eq_constraints geq_constraints x]
-[@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.LinArith.compute_combination, List.hd, Farkas_lemma.good_poly_length]
+[@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.compute_combination, List.hd, Farkas_lemma.good_poly_length]
 [@@fc]
     
 (** we add equality conditions to the conclusion so that mk_system_lemma_well_formed' can be applied automatically when proving mk_system_lemma_well_formed'' *)
