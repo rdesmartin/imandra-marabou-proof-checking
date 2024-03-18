@@ -16,4 +16,9 @@ module ProofTree = struct
   let get_tightening n = match n with
     | Node (tightening, _, _, _)
     | Leaf (tightening, _, _) -> tightening
+
+    let get_bound_lemmas n = match n with
+    | Node (_, bound_lemmas, _, _)
+    | Leaf (_, bound_lemmas, _) -> bound_lemmas
+
 end
