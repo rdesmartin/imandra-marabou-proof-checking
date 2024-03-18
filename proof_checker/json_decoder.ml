@@ -3,7 +3,7 @@ open Iter_map
 open Constraint
 open Tightening
 open Bound_lemma
-open Proof_tree
+open Proof_tree_old
 open Result
 
 module JSON_decoder = struct
@@ -107,19 +107,35 @@ module JSON_decoder = struct
             let* splits = field "split" (list split_decoder) in
             let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
             let* children = field "children" (list (proof_node_decoder proof_size)) in
-            succeed (ProofTree.Node (lemmas, List.hd children, List.hd (List.tl children), left_split, right_split))
+            let left_child = List.hd children in
+            let right_child = List.hd (List.tl children) in
+            succeed (ProofTree.Node (splits, lemmas, left_child, right_child))
           );
           ( "leaf",
             let* splits = field "split" (list split_decoder) in
             let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
             let* contradiction = field "contradiction" (explanation_decoder proof_size) in
-            succeed (ProofTree.Leaf (lemmas, contradiction))
+            succeed (ProofTree.Leaf (splits, lemmas, contradiction))
           )
         ]
       (* ) *)
 
-  (* Top-level decoder *)
+let proof_root_decoder (proof_size: int): ProofTree.t D.decoder =
+    let open D in
+    one_of [
+      ( "node",
+        let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
+        let* children = field "children" (list (proof_node_decoder proof_size)) in
+        succeed (ProofTree.Node ([], lemmas, List.hd children, List.hd (List.tl children)))
+      );
+      ( "leaf",
+        let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
+        let* contradiction = field "contradiction" (explanation_decoder proof_size) in
+        succeed (ProofTree.Leaf ([], lemmas, contradiction))
+      )
+    ]
 
+  (* Top-level decoder *)
   let proof_decoder : ('a D.decoder) =
     let open D in
     let* upper_bounds = field "upperBounds" @@ list (map Real.of_float float) in

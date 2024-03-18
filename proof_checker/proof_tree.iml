@@ -2,6 +2,8 @@ open Utils
 open Tightening
 open Bound_lemma
 
+module PT_old = Proof_tree_old.ProofTree
+
 module ProofTree = struct
   type t = 
     (* bounds lemmas, left child, right child, left tightening, right tightening*)
@@ -9,12 +11,14 @@ module ProofTree = struct
     (* tightening, bounds lemmas, contradiction vector *)
     | Leaf of BoundLemma.t list * real list
 
-  let non_empty_tightening n = match n with
-    | Node ([], _, _, _) | Leaf ([], _, _) -> false
-    | _ -> true
-
-  let get_tightening n = match n with
-    | Node (tightening, _, _, _)
-    | Leaf (tightening, _, _) -> tightening
-
+    let rec of_old_tree old_tree = 
+      match old_tree with
+      | PT_old.Node (tightenings, bound_lemmas, old_child_l, old_child_r) -> 
+        let child_l = of_old_tree old_child_l in
+        let child_r = of_old_tree old_child_r in
+        let tight_l = PT_old.get_tightening old_child_l in
+        let tight_r = PT_old.get_tightening old_child_r in
+        Node (bound_lemmas, child_l, child_r, tight_l, tight_r)
+      | PT_old.Leaf (tightenings, bound_lemmas, contradiction) ->
+        Leaf (bound_lemmas, contradiction)
 end

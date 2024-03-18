@@ -17,7 +17,7 @@ let check_contradiction (contradiction: Real.t list) (tableau: exp list) (upper_
     res
 
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
-let check_children_splits (l_t: Tightening.t list) (r_t: Tightening.t list) constraints =
+let check_children_splits (l_t: Tightening.t list) (r_t: Tightening.t list) (constraints: Constraint.t list) =
     let non_empty_children_splits = l_t <> [] && r_t <> [] in
     let valid_relu_split = check_relu_split l_t r_t constraints in
     let valid_single_var_split = check_single_var_split l_t r_t in
@@ -41,8 +41,8 @@ let rec check_node (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds
     | ProofTree.Node (bound_lemmas, left_child, right_child, left_tight, right_tight) ->
         let (valid_bounds, upper_bounds', lower_bounds') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints in
         let valid_children_splits = check_children_splits left_tight right_tight constraints in
-        let (lb_left, ub_left) = Tightenings.update_bounds left_tight upper_bounds' lower_bounds' in
-        let (lb_right, ub_right) = Tightenings.update_bounds right_tight upper_bounds' lower_bounds' in
+        let (lb_left, ub_left) = Tightening.update_bounds left_tight upper_bounds' lower_bounds' in
+        let (lb_right, ub_right) = Tightening.update_bounds right_tight upper_bounds' lower_bounds' in
         let valid_children = (check_node tableau ub_left lb_left constraints left_child) &&
             (check_node tableau ub_right lb_right constraints right_child) in
         if not valid_bounds then 
@@ -86,6 +86,5 @@ let sanity_checks tableau upper_bounds lower_bounds =
 let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_root: ProofTree.t) =
     let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
     let tableau_system = mk_eq_constraints tableau in
-    let check_tree = check_node tableau_system upper_bounds lower_bounds constraints proof_root
-    in
+    let check_tree = check_node tableau_system upper_bounds lower_bounds constraints proof_root in
     sanity_check_res && check_tree
