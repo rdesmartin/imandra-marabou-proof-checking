@@ -50,8 +50,7 @@ lemma contraposition a b =
     [@@rw]
 
 lemma soundness_node_cp tableau upper_bounds lower_bounds relu_constraints x tightenings bound_lemmas left_child right_child =
-    let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
-    let (valid_bounds, upper_bounds'', lower_bounds'') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds' lower_bounds' constraints in
+    let (valid_bounds, upper_bounds', lower_bounds') = BoundLemma.check_bound_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints in
     sat tableau upper_bounds lower_bounds relu_constraints x
     ==>
     sat tableau upper_bounds_left lower_bounds_left relu_constraints x ||
@@ -67,7 +66,7 @@ lemma soundness_node_cp tableau upper_bounds lower_bounds relu_constraints x tig
 axiom soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     match proof_tree with
     | Leaf _ -> true
-    | Node (tightenings, bound_lemmas, left_child, right_child) ->
+    | Node (bound_lemmas, left_child, right_child, left_tight, right_tight) ->
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
         ==>
         unsat tableau upper_bounds lower_bounds relu_constraints x
