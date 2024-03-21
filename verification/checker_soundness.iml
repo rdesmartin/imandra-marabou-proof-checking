@@ -65,6 +65,8 @@ axiom sat_child_implies_not_check_node tableau upper_bounds lower_bounds relu_co
         let (_, ub_left, lb_left) = Checker.update_child_bounds left (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints in
         let (_, ub_right, lb_right) = Checker.update_child_bounds right (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints in
         check_children_splits left.tightenings right.tightenings relu_constraints &&
+        (* From check_node, we have that check_node tableau ub_left lb_left constraints left.ptr) &&
+            (check_node tableau ub_right lb_right constraints right.ptr *)
         (sat tableau ub_left lb_left relu_constraints x ||
         sat tableau ub_right lb_right relu_constraints x)
         ==>

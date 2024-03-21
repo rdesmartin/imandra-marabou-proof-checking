@@ -83,5 +83,7 @@ let sanity_checks tableau upper_bounds lower_bounds =
 let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_root: ProofTree.t) =
     let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
     let tableau_system = mk_eq_constraints tableau in
+    (* we would need to apply the root's bound propagation lemmas here, then we prove that this 
+    bound update does not change satisfiability *)
     let check_tree = check_node tableau_system upper_bounds lower_bounds constraints proof_root in
     sanity_check_res && check_tree
