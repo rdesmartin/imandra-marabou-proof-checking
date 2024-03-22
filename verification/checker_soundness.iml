@@ -23,13 +23,18 @@ let unsat_rw tableau upper_bounds lower_bounds relu_constraints x =
     [@@rw]
 
 
-(* 
-    TODO: these might be assumptions we need:
+ (* 
+ 1.a. axiom Leaf case, proof_tree = Leaf contradiction: 
+ 
+ axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints (Leaf contradiction):
+        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints (Leaf contradiction)
+        ==> 
+        for all x, unsat tableau upper_bounds lower_bounds relu_constraints x
+
+   TODO: these might be assumptions we need:
         let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
         let tableau_system = mk_eq_constraints tableau in
-
-    | ProofTree.Node ([], bound_lemmas, _, _) | ProofTree.Leaf ([], bound_lemmas, _) ->
- *)
+*)
  axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
@@ -113,6 +118,25 @@ lemma soundness_node_contra tableau upper_bounds lower_bounds relu_constraints x
     [@@apply ]
     [@@fc]
 
+(* 
+1.b. lemma Node case, proof_tree = Node (left_child, right_child) 
+lemma soundness_node tableau upper_bounds lower_bounds relu_constraints (Node (left_child, right_child))
+    check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints (Node (left_child, right_child))
+    ==>
+    for all x, unsat tableau upper_bounds lower_bounds relu_constraints x
+
+
+Inductive Hypothesis:
+    check_node (mk_eq_constraints tableau) ub_left lb_left relu_constraints left_child.ptr
+    ==>
+    for all x, unsat tableau ub_left lb_left relu_constraints x
+
+    check_node (mk_eq_constraints tableau) ub_right lb_right relu_constraints left_child.ptr
+    ==>
+    for all x, unsat tableau ub_right lb_right relu_constraints x
+
+How do we make Imandra apply this inductive hypothesis?
+*)
 lemma soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
@@ -125,6 +149,18 @@ lemma soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_
     [@@disable sat, Checker.check_node, Certificate.mk_eq_constraints]
     [@@fc]
 
+
+(* 
+1. lemma check_node implies unsatisfiability
+    (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+    (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) =
+    check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+    ==>
+    for all x, unsat tableau upper_bounds lower_bounds relu_constraints x
+
+TODO: the root of the proof tree can have bound tightening, which will be applied in proof-tree pre-processing
+and should also be proved correct.
+*)
 lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
         (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) (x: real list) =
     check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
