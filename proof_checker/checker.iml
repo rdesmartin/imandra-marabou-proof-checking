@@ -8,12 +8,15 @@ open Constraint
 open Farkas_lemma
 open Certificate
 
+let mk_contradiction_certificate (contradiction: Real.t list) (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) = 
+    let lc = compute_combination contradiction tableau in
+    contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc))
+
 (* check contradiction with polynomials representation *)
 let check_contradiction (contradiction: Real.t list) (tableau: exp list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): bool = 
     let sys = mk_system_contradiction tableau upper_bounds lower_bounds in
-    let lc = compute_combination contradiction tableau in        
-    let contradiction' = contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc)) in
-    let res = (check_cert sys contradiction') in
+    let certificate = mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
+    let res = (check_cert sys certificate) in
     res
 
 (* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are hardcoded) *)
@@ -65,7 +68,7 @@ let well_formed_tableau tableau =
    the bounds is greater than the number of rows in the tableau
    todo: ask clarification about second condition
 *)
-let sanity_checks tableau upper_bounds lower_bounds =
+let well_formed_tableau_bounds tableau upper_bounds lower_bounds =
     let valid_bounds_sizes = List.length upper_bounds = List.length lower_bounds && List.length lower_bounds <> 0 in
     let tableau_bounds_match = List.length upper_bounds = List.length (List.hd tableau) in
     let tableau_well_formed = well_formed_tableau tableau in
@@ -81,7 +84,7 @@ let sanity_checks tableau upper_bounds lower_bounds =
    all the contradiction vectors correpond to a contradiction. 
 *)
 let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_root: ProofTree.t) =
-    let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
+    let sanity_check_res = well_formed_tableau_bounds tableau upper_bounds lower_bounds in
     let tableau_system = mk_eq_constraints tableau in
     (* we would need to apply the root's bound propagation lemmas here, then we prove that this 
     bound update does not change satisfiability *)

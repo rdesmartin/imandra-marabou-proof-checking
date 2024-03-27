@@ -37,3 +37,16 @@ theorem tableau_reduction_soundness tableau x =
     eval_system (mk_eq_constraints tableau) x
     [@@auto]
     [@@induct structural tableau]
+    [@@fc]
+
+theorem tableau_reduction_soundness_contra tableau x =
+    List.length x = List.length (List.hd tableau) &&
+    well_formed_tableau tableau &&
+    not (eval_system (mk_eq_constraints tableau) x)
+    ==>
+    not (is_in_kernel tableau x)
+    [@@simp]
+    [@@auto]
+    [@@apply tableau_reduction_soundness tableau x]
+    [@@disable List.length, Checker.well_formed_tableau, Arithmetic.is_in_kernel, Farkas_lemma.eval_system, Certificate.mk_eq_constraints]
+    [@@fc]
