@@ -19,20 +19,21 @@ let sat tableau upper_bounds lower_bounds relu_constraints x =
     check_relu_constraints relu_constraints x)
 
  (* 
- 1.a. axiom Leaf case, proof_tree = Leaf contradiction: 
-    TODO: these might be assumptions we need:
-        let sanity_check_res = sanity_checks tableau upper_bounds lower_bounds in
-        let tableau_system = mk_eq_constraints tableau in
+ 1.a. axiom Leaf case, proof_tree = Leaf contradiction:
+ TODO (RD): investigate: this is exactly the same theorem as proven in leaf_soundness, but for some reason, 
+ if I don't re-define it as an axiom here, Imandra wouldn't apply it to prove soudness_check_node
 *)
 axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
     | Node _ -> true
     | (Leaf contradiction) ->
+        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+        List.length x = List.length (List.hd tableau) &&
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
         ==> 
         unsat tableau upper_bounds lower_bounds relu_constraints x
-    [@@fc]
+[@@fc]
 
 axiom soundness_node_contra_expand tableau upper_bounds lower_bounds constraints x proof_tree =
     let open ProofTree in
@@ -50,7 +51,7 @@ axiom soundness_node_contra_expand tableau upper_bounds lower_bounds constraints
         not (check_node (mk_eq_constraints tableau) ub_right lb_right constraints right.ptr)
     [@@fc]
 
-lemma soundness_node_contra_helper tableau upper_bounds lower_bounds constraints x proof_tree =
+axiom soundness_node_contra_helper tableau upper_bounds lower_bounds constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
     | Leaf _ -> true
@@ -93,14 +94,16 @@ Inductive Hypothesis:
 
 How do we make Imandra apply this inductive hypothesis?
 *)
-lemma soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+axiom soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
     | Leaf _ -> true
     | Node (left, right) ->
+        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+        List.length x = List.length (List.hd tableau) &&
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
         ==>
-        not (sat tableau upper_bounds lower_bounds relu_constraints x)
+        unsat tableau upper_bounds lower_bounds relu_constraints x
     [@@auto]
     [@@disable sat, Checker.check_node, Certificate.mk_eq_constraints]
     [@@fc]
@@ -119,6 +122,8 @@ and should also be proved correct.
 *)
 lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
         (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) (x: real list) =
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
     check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
     ==>
     unsat tableau upper_bounds lower_bounds relu_constraints x
@@ -127,3 +132,4 @@ lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (
     [@@induct structural proof_tree]
     [@@apply soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree,
         soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree]
+    [@@disable unsat, Checker.well_formed_tableau_bounds, List.length, Checker.check_node]

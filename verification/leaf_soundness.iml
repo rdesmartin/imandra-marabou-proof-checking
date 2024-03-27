@@ -201,3 +201,4 @@ lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
     [@@disable Checker.well_formed_tableau_bounds, unsat, Farkas_lemma.check_cert, Certificate.mk_system_contradiction]
     [@@apply check_node_implies_check_cert (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree,
     not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x proof_tree]
+    [@@fc]
