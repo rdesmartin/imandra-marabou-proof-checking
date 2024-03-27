@@ -55,7 +55,10 @@ not (check_node tableau ub_right lb_right constraints right.ptr)
 
 
 by the IH this is equivalent to 
-<!-- Inductive hypothesis that sat child_left && sat child_right ==> sat Node(child_left, child_right)  -->
+<!-- Inductive hypothesis that 
+ check_node child_left ==> forall x, unsat(tableau, ub_left, lb_left) && 
+ check_node child_left ==> forall x, unsat(tableau, ub_left, lb_left)
+-->
 
 let valid_children_splits = check_children_splits left.tightenings right.tightenings constraints in
 let (valid_bounds_l, ub_left, lb_left) = update_child_bounds left tableau upper_bounds lower_bounds constraints in
@@ -78,6 +81,8 @@ let sat tableau upper_bounds lower_bounds relu_constraints x =
     check_relu_constraints relu_constraints x)
 
 
+We prove this in 2 steps. First we know that this holds when only updating the bounds for a tightening that represents a valid relu split:
+
 let valid_children_splits = check_children_splits left.tightenings right.tightenings constraints
 let (ub_left, lb_left) = Tightening.update_bounds left.tightening upper_bounds lower_bounds in
 let (ub_right, lb_right) = Tightening.update_bounds right.tightening upper_bounds lower_bounds in
@@ -87,9 +92,15 @@ valid_children_splits
 (there exists x s.t. sat tableau ub_left lb_left relu_constraints x) ||
 (there exists x s.t. sat tableau ub_right lb_right relu_constraints x)
 
+(axiom)
 let update_child_bounds (child_info: ProofTree.child_info) tableau upper_bounds lower_bounds constraints =
     let (ub', lb') = Tightening.update_bounds child_info.tightenings upper_bounds lower_bounds in
     let (valid_bounds, ub'', lb'') = BoundLemma.check_bound_lemmas child_info.bound_lemmas tableau ub' lb' constraints in
     (valid_bounds, ub'', lb'')
-<!-- sat tableau ub' lb' constraints x ==> sat tableau ub'' lb'' constraints x  -->
+
+(axiom)
+And applying bound propagation lemmas does not change the satisfiability:
+        for all bound_lemmas,
+        let (valid_bounds, ub'', lb'') = BoundLemma.check_bound_lemmas bound_lemmas tableau ub' lb' constraints in
+        sat tableau ub' lb' constraints x ==> sat tableau ub'' lb'' constraints x
 

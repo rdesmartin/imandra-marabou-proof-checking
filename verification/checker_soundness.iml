@@ -18,6 +18,14 @@ let sat tableau upper_bounds lower_bounds relu_constraints x =
     is_bounded upper_bounds lower_bounds x &&
     check_relu_constraints relu_constraints x)
 
+lemma sat_not_unsat tableau upper_bounds lower_bounds relu_constraints x =
+    sat tableau upper_bounds lower_bounds relu_constraints x = 
+    not (unsat tableau upper_bounds lower_bounds relu_constraints x)
+
+lemma unsat_not_sat tableau upper_bounds lower_bounds relu_constraints x =
+    unsat tableau upper_bounds lower_bounds relu_constraints x = 
+    not (sat tableau upper_bounds lower_bounds relu_constraints x)
+
  (* 
  1.a. axiom Leaf case, proof_tree = Leaf contradiction:
  TODO (RD): investigate: this is exactly the same theorem as proven in leaf_soundness, but for some reason, 
@@ -43,15 +51,15 @@ axiom soundness_node_contra_expand tableau upper_bounds lower_bounds constraints
         let valid_children_splits = check_children_splits left.tightenings right.tightenings constraints in
         let (valid_bounds_l, ub_left, lb_left) = update_child_bounds left (mk_eq_constraints tableau) upper_bounds lower_bounds constraints in
         let (valid_bounds_r, ub_right, lb_right) = update_child_bounds right (mk_eq_constraints tableau) upper_bounds lower_bounds constraints in
-        sat tableau upper_bounds lower_bounds constraints x &&
         valid_bounds_l && valid_bounds_r &&
+        sat tableau upper_bounds lower_bounds constraints x &&
         valid_children_splits
         ==>
         not (check_node (mk_eq_constraints tableau) ub_left lb_left constraints left.ptr) ||
         not (check_node (mk_eq_constraints tableau) ub_right lb_right constraints right.ptr)
     [@@fc]
 
-axiom soundness_node_contra_helper tableau upper_bounds lower_bounds constraints x proof_tree =
+lemma soundness_node_contra_helper tableau upper_bounds lower_bounds constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
     | Leaf _ -> true
@@ -68,6 +76,7 @@ axiom soundness_node_contra_helper tableau upper_bounds lower_bounds constraints
     [@@disable sat, Checker.update_child_bounds, Checker.check_node, Checker.check_children_splits, Checker.update_child_bounds]
     [@@fc]
 
+(* when Imandra tries to prove this automatically, it performs unnecessary simplifications that result in the proof goal becoming Is_a (Leaf) *)
 axiom soundness_node_contra tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
@@ -94,17 +103,16 @@ Inductive Hypothesis:
 
 How do we make Imandra apply this inductive hypothesis?
 *)
-axiom soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+lemma soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
     | Leaf _ -> true
     | Node (left, right) ->
-        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
-        List.length x = List.length (List.hd tableau) &&
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
         ==>
         unsat tableau upper_bounds lower_bounds relu_constraints x
     [@@auto]
+    [@@apply unsat_not_sat tableau upper_bounds lower_bounds relu_constraints x]
     [@@disable sat, Checker.check_node, Certificate.mk_eq_constraints]
     [@@fc]
 
@@ -122,7 +130,9 @@ and should also be proved correct.
 *)
 lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
         (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) (x: real list) =
+    (* this is a check performed in check_proof_tree, outside of check_node *)
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+    (* We only consider inputs with valid size; could this be moved to the sat/unsat definition instead? *)
     List.length x = List.length (List.hd tableau) &&
     check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
     ==>
