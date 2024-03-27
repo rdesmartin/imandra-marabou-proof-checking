@@ -71,6 +71,7 @@ valid_children_splits
 (there exists x s.t. sat tableau ub_left lb_left relu_constraints x) ||
 (there exists x s.t. sat tableau ub_right lb_right relu_constraints x)
 
+
 let sat tableau upper_bounds lower_bounds relu_constraints x =
     (is_in_kernel tableau x &&
     is_bounded upper_bounds lower_bounds x &&

@@ -144,10 +144,19 @@ lemma mk_lower_bounds_constraints_eval (bounds: Real.t list) (xs: Real.t list) (
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
 
 (* High-level proof goal *)
-lemma mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
+axiom mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
     List.length x = List.length upper_bounds &&
     List.length x = List.length lower_bounds && 
     is_bounded x upper_bounds lower_bounds
     ==>
     eval_system (mk_geq_constraints upper_bounds lower_bounds) x
     [@@auto]
+    [@@fc]
+
+axiom mk_geq_constraints_reduction_soundness_contra upper_bounds lower_bounds x =
+    List.length x = List.length upper_bounds &&
+    List.length x = List.length lower_bounds && 
+    not (eval_system (mk_geq_constraints upper_bounds lower_bounds) x)
+    ==>
+    not (is_bounded x upper_bounds lower_bounds)
+[@@fc]

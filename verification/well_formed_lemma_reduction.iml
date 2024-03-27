@@ -1,3 +1,14 @@
+open Utils
+open Arithmetic
+open Constraint
+open Proof_tree
+open Checker
+open Check_splits
+open Certificate
+open Farkas_lemma
+open Tightening
+open Bound_lemma
+
 (* ===================== mk_gt_constraint_well_formed ================= *)
 
 
