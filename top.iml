@@ -1,0 +1,16 @@
+(* 
+top.iml file that loads all the proof checker modules for working on 
+checker_soundness.iml proofs in interactive mode
+*)
+
+#use "proof_checker/imports.iml"
+
+open Utils
+open Constraint
+open Proof_tree
+open Check_splits
+open Certificate
+open Checker
+open Arithmetic
+
+
