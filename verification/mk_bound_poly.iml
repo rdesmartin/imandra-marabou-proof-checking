@@ -68,6 +68,14 @@ lemma mk_bound_poly_eval_i_null size i coeff bound xs =
     mk_bound_poly_eval_i_neg (size - 1) (i - 1) coeff bound (List.tl xs)]
     [@@rw][@@fc]
 
+lemma mk_bound_poly_eval_i_pos_helper size i coeff bound = 
+    size > 0 &&
+    i > 0
+    ==>
+    List.hd (mk_bound_poly size i coeff bound) = 0. 
+    [@@auto]
+    [@@rw][@@fc]
+
 lemma mk_bound_poly_eval_i_pos size i coeff bound xs = 
     xs <> [] &&
     size = List.length xs &&
@@ -76,6 +84,8 @@ lemma mk_bound_poly_eval_i_pos size i coeff bound xs =
     eval_poly (mk_bound_poly size i coeff bound) xs = 
         eval_poly (mk_bound_poly (size - 1) (i - 1) coeff bound) (List.tl xs)
     [@@auto]
+    [@@disable List.length]
+    [@@apply mk_bound_poly_eval_i_pos_helper size i coeff bound]
     [@@rw][@@fc]
 
 let rec induct_scheme'' size i coeff bound xs xi =
