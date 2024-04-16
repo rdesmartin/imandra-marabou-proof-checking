@@ -107,7 +107,6 @@ axiom mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
     eval_system (mk_geq_constraints upper_bounds lower_bounds) x
     [@@fc]
 
-
 lemma eval_system_unsat tableau upper_bounds lower_bounds x =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
     List.length x = List.length (List.hd tableau) &&
