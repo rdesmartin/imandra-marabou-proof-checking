@@ -2,7 +2,7 @@ open Farkas_lemma
 open Tightening
 open Utils
 open Certificate
-open Arithmetic.LinArith
+open Arithmetic
 
 lemma is_upper_bounded_tl x u = 
     is_upper_bounded x u
@@ -98,38 +98,50 @@ lemma eval_system_hd_tl s xs =
     eval_exp (List.hd s) xs && eval_system (List.tl s) xs
     [@@auto]
 
-lemma mk_lower_bounds_constraints_eval_hd (bounds: Real.t list) (xs: Real.t list) (size: int) (i: int) =
+(* lemma mk_lower_bounds_constraints_eval_hd (bounds: Real.t list) (xs: Real.t list) (size: int) (i: int) =
     is_upper_bounded bounds xs &&
     xs <> [] &&
     bounds <> [] &&
-    size = List.length xs &&
+    size = List.length xs
     ==>
     eval_system (mk_lower_bounds_constraints size i bounds) xs =
     eval_exp (Geq (mk_bound_poly size i 1. (-. (List.hd bounds)))) xs && 
         eval_system (mk_lower_bounds_constraints size (i + 1) (List.tl bounds)) xs
     [@@auto]
     [@@apply mk_lower_bounds_constraints_eval_hd_helper bounds size i]
-    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+    [@@disable Certificate.mk_bound_poly, List.nth, List.length] *)
 
-let rec induct_scheme bounds xs i =
-    if i >= 0 then induct_scheme bounds xs (i - 1)
-    else true
+lemma mk_upper_bounds_constraints_length size i upper_bounds = 
+    List.length (mk_upper_bounds_constraints' size i upper_bounds) = List.length upper_bounds
+    [@@auto][@@rw]
 
-axiom mk_lower_bounds_constraints_eval (bounds: Real.t list) (xs: Real.t list) (i: int) =
-    0 <= i && i <= size &&
-    is_upper_bounded bounds xs
+axiom check_down_from_i_eval_system ubs xs i = 
+    check_down_from i ubs xs
+    ==> 
+    eval_system (mk_upper_bounds_constraints' (List.length ubs) ((List.length xs) - i) ubs) xs
+
+lemma check_down_from_eval_system ubs xs = 
+    check_down_from (List.length ubs) ubs xs
+    ==> 
+    eval_system (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs
+
+    
+    (* check_down_from i ubs xs => eval_system (mk_upper_bounds_constraints size i ubs) xs *)
+
+lemma mk_upper_bounds_constraints_eval (ubs: Real.t list) (xs: Real.t list) =
+    is_upper_bounded xs ubs
     ==>
-    eval_system (mk_lower_bounds_constraints (List.length bounds) i bounds) xs
+    eval_system (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs
     [@@auto]
-    [@@induct functional induct_scheme]
-    [@@apply LinArith.is_upper_bounded_elem bounds xs ]
-    [@@disable Certificate.mk_bound_poly, List.nth, List.length]
+    [@@apply check_down_from_correct ubs xs (List.length xs)]
+    [@@apply check_down_from_eval_system ubs xs]
+    [@@disable Arithmetic.is_upper_bounded, Farkas_lemma.eval_system, List.nth, List.length]
 
 (* High-level proof goal *)
-lemma mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
+(* let mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
     List.length x = List.length upper_bounds &&
     List.length x = List.length lower_bounds && 
     is_bounded x upper_bounds lower_bounds
     ==>
     eval_system (mk_geq_constraints upper_bounds lower_bounds) x
-    [@@auto]
+    [@@auto] *)

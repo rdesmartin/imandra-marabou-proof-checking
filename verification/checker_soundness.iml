@@ -132,7 +132,16 @@ lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (
     (* this is a check performed in check_proof_tree, outside of check_node *)
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
     (* We only consider inputs with valid size; could this be moved to the sat/unsat definition instead? *)
-    List.length x = List.length (List.hd tableau) &&
+    List.length x = List.length lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+    (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) (x: real list) =
+(* this is a check performed in check_proof_tree, outside of check_node *)
+well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+(* We only consider inputs with valid size; could this be moved to the sat/unsat definition instead? *)
+List.length x = List.length (List.hd tableau) &&
+check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+==>
+unsat tableau upper_bounds lower_bounds relu_constraints x
+(List.hd tableau) &&
     check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
     ==>
     unsat tableau upper_bounds lower_bounds relu_constraints x
