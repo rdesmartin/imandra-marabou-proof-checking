@@ -41,7 +41,7 @@ let mk_ub_exp size i u =
 let ub_correct_at_i i ubs xs =
   match List.nth i ubs with
   | Some ub ->
-    eval_exp (Geq (mk_bound_poly (List.length xs) i (-1.) ub)) xs
+    eval_exp (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
   | None -> false
 
 lemma bounded_is_correct xs ubs i =
@@ -59,10 +59,10 @@ lemma bounded_is_correct xs ubs i =
  *)
 
 let rec check_down_from i ubs xs =
-  if i < 0 || i >= List.length xs then true
+  if i < 0 || i >= List.length ubs then true
   else ub_correct_at_i i ubs xs
        && check_down_from (i-1) ubs xs
-
+    
 let all_bounds_correct ubs xs =
   check_down_from (List.length xs - 1) ubs xs
   
