@@ -40,7 +40,7 @@ lemma eval_system_concat_invariant s1 s2 x =
     eval_system s1 x && eval_system s2 x 
     ==>
     eval_system (s1 @ s2) x
-    [@@auto]
+    [@@auto][@@rw]
 
 lemma relu_split_phases_eval_concat s b f aux b_var f_var aux_var x =
     well_formed s x &&

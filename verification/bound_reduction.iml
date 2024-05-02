@@ -11,6 +11,13 @@ lemma is_upper_bounded_tl x u =
     [@@auto]
     [@@fc]
 
+lemma is_upper_bounded_tl xs ubs x ub = 
+    is_upper_bounded xs ubs && x <=. ub
+    ==> 
+    is_upper_bounded (x::xs) (ub::ubs)
+    [@@auto]
+    [@@fc]
+
 lemma is_upper_bounded_hd x u = 
     is_upper_bounded x u 
     ==> 
@@ -26,6 +33,14 @@ lemma is_upper_bounded_nth x xn u un n =
     ==>   
     -. xn >=. -. un
     [@@auto]
+
+lemma is_upper_bounded_nth_matching xs ubs i = 
+    i >=0 && i < List.length xs && List.length xs = List.length ubs &&
+    is_upper_bounded xs ubs ==>
+    match List.nth i ubs, List.nth i xs with
+    | Some ub, Some x -> -. x >=. -. ub
+    | _ -> false
+[@@auto][@@fc]
 
 (* this lemma depends on mk_bound_poly_eval_gal, defined in verification/mk_bound_poly.iml *)
 lemma mk_bound_poly_eval var var_i value coeff x = 
@@ -83,6 +98,7 @@ lemma mk_bound_poly_eval_geq_true_conj var1 var1_i value1 coeff1 var2 var2_i val
     ]
     [@@disable Certificate.mk_bound_poly, List.nth, List.length]
 
+    
 lemma mk_lower_bounds_constraints_eval_hd_helper (bounds: Real.t list) (size: int) (i: int) =
     bounds <> []
     ==>
@@ -91,51 +107,174 @@ lemma mk_lower_bounds_constraints_eval_hd_helper (bounds: Real.t list) (size: in
     [@@auto]
     [@@rw][@@fc]
 
+
+lemma mk_upper_bounds_constraints'_eval_hd_helper (ubs: Real.t list) (i: int) =
+    ubs <> []
+    ==>
+    mk_upper_bounds_constraints' (List.length ubs) i ubs =
+    (Geq (mk_bound_poly (List.length ubs) i (-1.) (List.hd ubs))) :: mk_upper_bounds_constraints' (List.length ubs) (i + 1) (List.tl ubs)
+    [@@auto]
+    [@@rw][@@fc]
+
+
 lemma eval_system_hd_tl s xs =
     well_formed s xs &&
     eval_system s xs
     ==>
     eval_exp (List.hd s) xs && eval_system (List.tl s) xs
-    [@@auto]
+    [@@auto][@@rw][@@fc]
 
-(* lemma mk_lower_bounds_constraints_eval_hd (bounds: Real.t list) (xs: Real.t list) (size: int) (i: int) =
-    is_upper_bounded bounds xs &&
-    xs <> [] &&
-    bounds <> [] &&
-    size = List.length xs
+lemma eval_system_concat_invariant s1 s2 x = 
+    eval_system s1 x && eval_system s2 x 
     ==>
-    eval_system (mk_lower_bounds_constraints size i bounds) xs =
-    eval_exp (Geq (mk_bound_poly size i 1. (-. (List.hd bounds)))) xs && 
-        eval_system (mk_lower_bounds_constraints size (i + 1) (List.tl bounds)) xs
-    [@@auto]
-    [@@apply mk_lower_bounds_constraints_eval_hd_helper bounds size i]
-    [@@disable Certificate.mk_bound_poly, List.nth, List.length] *)
+    eval_system (s1 @ s2) x
+    [@@auto][@@rw][@@fc]
+
+lemma eval_system_exp_concat e s x = 
+    eval_exp e x && eval_system s x 
+    ==>
+    eval_system (e :: s) x
+    [@@auto][@@rw][@@fc]
+
+lemma eval_system_mem_exp e s x =
+    eval_system s x && List.mem e s
+    ==>
+    eval_exp e x
+    [@@auto][@@fc]
+
+let eval_exp' x e =
+    eval_exp e x
+
+lemma eval_system_mem_exp' e s x =
+    eval_system s x && List.mem e s
+    ==>
+    eval_exp' x e 
+    [@@auto][@@fc]
+
+lemma eval_system_forall_mem s x =
+    List.for_all (eval_exp' x) s
+    ==>
+    eval_system s x
+    [@@auto][@@disable Farkas_lemma.eval_system][@@fc]
 
 lemma mk_upper_bounds_constraints_length size i upper_bounds = 
-    List.length (mk_upper_bounds_constraints' size i upper_bounds) = List.length upper_bounds
+ List.length upper_bounds = List.length (mk_upper_bounds_constraints' size i upper_bounds) 
+    [@@auto][@@fc]
+
+lemma for_all_tl_hd_forall l f = 
+    f (List.hd l) && List.for_all f ( List.tl l  )
+    ==> 
+    List.for_all f l
+    [@@auto]
+
+lemma upper_bounded_eval_exp_hd ubs xs = 
+    is_upper_bounded xs ubs && xs <> []
+    ==>
+    eval_exp (List.hd (mk_upper_bounds_constraints' (List.length ubs) 0 ubs)) xs
+    [@@auto][@@fc]
+
+lemma upper_bounded_eval_exp ubs xs i ub = 
+    List.nth i ubs = Some ub
+    && is_upper_bounded xs ubs
+    ==>
+    eval_exp (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
+    [@@auto][@@apply bounded_is_correct xs ubs i][@@fc]
+
+
+lemma upper_bounded_eval_exp_matching' ubs xs i = 
+    is_upper_bounded xs ubs && i >=0 && i < List.length ubs ==>    
+    match List.nth i ubs with 
+    | Some ub -> eval_exp (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
+    | None -> false
+    [@@auto][@@apply bounded_is_correct xs ubs i][@@fc]
+
+lemma parallel_zero ubs ub = 
+    ubs <> [] && List.hd ubs = ub ==>
+    List.hd (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) = (Geq (mk_bound_poly (List.length ubs) 0 (-1.) ub))
+    [@@auto][@@fc]
+
+lemma parallel_zeroth ubs ub = 
+    List.nth 0 ubs = Some ub
+    ==>
+    List.nth 0 (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) = Some (Geq (mk_bound_poly (List.length ubs) 0 (-1.) ub))
+    [@@auto][@@fc]
+
+
+axiom parallel_nth ubs i ub size= 
+    size > List.length ubs && List.nth i ubs = Some ub
+    ==>
+    List.nth i (mk_upper_bounds_constraints' size 0 ubs) = Some (Geq (mk_bound_poly size i (-1.) ub))
+    [@@auto][@@disable Certificate.mk_bound_poly][@@fc]
+
+let rec eval_system_up_to s i xs = 
+    if i < 0 || i >= List.length s then true
+    else eval_exp (List.hd s) xs &&
+        eval_system_up_to (List.tl s) (i-1) xs
+
+lemma eval_system_up_to_forall s xs = 
+    eval_system_up_to s (List.length s - 1) xs
+    ==>
+    eval_system s xs
     [@@auto][@@rw]
 
-axiom check_down_from_i_eval_system ubs xs i = 
-    check_down_from i ubs xs
-    ==> 
-    eval_system (mk_upper_bounds_constraints' (List.length ubs) ((List.length xs) - i) ubs) xs
-
-lemma check_down_from_eval_system ubs xs = 
-    check_down_from (List.length ubs) ubs xs
-    ==> 
-    eval_system (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs
-
-    
-    (* check_down_from i ubs xs => eval_system (mk_upper_bounds_constraints size i ubs) xs *)
-
-lemma mk_upper_bounds_constraints_eval (ubs: Real.t list) (xs: Real.t list) =
-    is_upper_bounded xs ubs
+lemma eval_up_to_uses_nt s xs i p = 
+    List.nth i s = Some p && eval_exp p xs && 
+    eval_system_up_to s (i-1) xs 
     ==>
-    eval_system (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs
-    [@@auto]
-    [@@apply check_down_from_correct ubs xs (List.length xs)]
-    [@@apply check_down_from_eval_system ubs xs]
-    [@@disable Arithmetic.is_upper_bounded, Farkas_lemma.eval_system, List.nth, List.length]
+    eval_system_up_to s i xs 
+[@@auto][@@fc]
+
+lemma eval_up_to_uses_nt_matching' s xs i = 
+    eval_system_up_to s (i-1) xs && i >=0 && i < List.length s ==>
+    match List.nth i s with
+    | Some p -> eval_exp p xs ==> eval_system_up_to s i xs 
+    | None -> false
+[@@auto][@@fc]
+
+lemma eval_up_to_uses_nt s xs i e = 
+    eval_exp e xs && eval_system_up_to s (i-1) xs 
+    ==>
+    eval_system_up_to (e::s) i xs 
+[@@auto][@@rw]
+
+lemma eval_sys_hd_index_0 s xs = 
+    eval_exp (List.hd s) xs
+    ==>
+    eval_system_up_to s 0 xs 
+[@@auto]
+
+ (* uses parallel nth*)
+lemma upper_bounds_constraint_nth ubs xs i = 
+    is_upper_bounded xs ubs &&
+    List.length ubs = List.length xs && i >=0 && i < List.length (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) ==>
+    match List.nth i (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) with
+    | Some e -> eval_exp e xs
+    | None -> false
+    [@@auto][@@apply upper_bounded_eval_exp_matching' ubs xs i][@@disable Farkas_lemma.eval_exp][@@fc]
+
+lemma eval_up_tu_inductive_step ubs xs i = 
+    is_upper_bounded xs ubs && List.length ubs = List.length xs && i >= 0 && i < List.length (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) &&  eval_system_up_to (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) (i-1) xs ==>
+    eval_system_up_to (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) i xs
+    [@@auto][@@disable Farkas_lemma.eval_exp][@@apply  eval_up_to_uses_nt_matching'  (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs i,  upper_bounds_constraint_nth ubs xs i][@@rw] 
+
+
+let rec induct_scheme_i ubs xs i =
+    if i < 0 then true 
+    else  induct_scheme_i ubs xs (i-1)
+
+lemma upper_bounded_evals_up_to_length ubs xs i = 
+    is_upper_bounded xs ubs && List.length ubs = List.length xs && i >=0 && i < List.length (mk_upper_bounds_constraints' (List.length ubs) 0 ubs)  ==>
+    eval_system_up_to (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) i xs
+    [@@auto][@@disable Farkas_lemma.eval_exp][@@induct functional induct_scheme_i][@@rw]
+
+ 
+lemma mk_upper_bounds_constraints_eval ubs xs = 
+is_upper_bounded xs ubs
+==> 
+eval_system (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs
+[@@auto][@@disable Farkas_lemma.eval_exp]
+
+
 
 (* High-level proof goal *)
 (* let mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
