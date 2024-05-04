@@ -161,6 +161,10 @@ lemma mk_upper_bounds_constraints_length size i upper_bounds =
  List.length upper_bounds = List.length (mk_upper_bounds_constraints' size i upper_bounds) 
     [@@auto][@@fc]
 
+lemma mk_lower_bounds_constraints_length size i lower_bounds = 
+ List.length lower_bounds = List.length (mk_lower_bounds_constraints' size i lower_bounds) 
+    [@@auto][@@fc]
+
 lemma for_all_tl_hd_forall l f = 
     f (List.hd l) && List.for_all f ( List.tl l  )
     ==> 
@@ -173,20 +177,26 @@ lemma upper_bounded_eval_exp_hd ubs xs =
     eval_exp (List.hd (mk_upper_bounds_constraints' (List.length ubs) 0 ubs)) xs
     [@@auto][@@fc]
 
+lemma lower_bounded_eval_exp_hd xs lbs = 
+    is_upper_bounded lbs xs && xs <> []
+    ==>
+    eval_exp (List.hd (mk_lower_bounds_constraints' (List.length lbs) 0 lbs)) xs
+    [@@auto][@@fc]
+
 lemma upper_bounded_eval_exp ubs xs i ub = 
     List.nth i ubs = Some ub
     && is_upper_bounded xs ubs
     ==>
     eval_exp (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
-    [@@auto][@@apply bounded_is_correct xs ubs i][@@fc]
+    [@@auto][@@apply upper_bounded_is_correct xs ubs i][@@fc]
 
-
+(* upper bounds *)
 lemma upper_bounded_eval_exp_matching' ubs xs i = 
     is_upper_bounded xs ubs && i >=0 && i < List.length ubs ==>    
     match List.nth i ubs with 
     | Some ub -> eval_exp (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
     | None -> false
-    [@@auto][@@apply bounded_is_correct xs ubs i][@@fc]
+    [@@auto][@@apply upper_bounded_is_correct xs ubs i][@@fc]
 
 lemma parallel_zero ubs ub = 
     ubs <> [] && List.hd ubs = ub ==>
@@ -210,18 +220,18 @@ lemma connect_mk_upper_bounds_constraints ubs size =
      mk_upper_bounds_constraints' size (size-List.length ubs) ubs = (mk_upper_bounds_constraints size ubs) 
     [@@auto][@@rw]
 
-lemma parallel_nth ubs i ub size = 
+lemma parallel_nth_ubs ubs i ub size = 
     size = List.length ubs && List.nth i ubs = Some ub
     ==>
     List.nth i (mk_upper_bounds_constraints' size 0 ubs) = Some (Geq (mk_bound_poly size i (-1.) ub))
     [@@auto][@@apply connect_mk_upper_bounds_constraints ubs size, parallel_nth_generalized ubs i ub size] [@@fc]
 
-lemma parallel_nth_fixed_size ubs i ub = 
+lemma parallel_nth_fixed_size_ubs ubs i ub = 
     List.nth i ubs = Some ub
     ==>
     List.nth i (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) = Some (Geq (mk_bound_poly (List.length ubs) i (-1.) ub))
     [@@auto][@@fc]
-    [@@apply parallel_nth ubs i ub (List.length ubs)]
+    [@@apply parallel_nth_ubs ubs i ub (List.length ubs)]
 
 let rec eval_system_up_to s i xs = 
     if i < 0 || i >= List.length s then true
@@ -269,7 +279,7 @@ lemma upper_bounds_constraint_nth ubs xs i =
     | None -> false
     [@@auto][@@apply upper_bounded_eval_exp_matching' ubs xs i][@@disable Farkas_lemma.eval_exp][@@fc]
 
-lemma eval_up_tu_inductive_step ubs xs i = 
+lemma eval_up_to_inductive_step ubs xs i = 
     is_upper_bounded xs ubs && List.length ubs = List.length xs && i >= 0 && i < List.length (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) &&  eval_system_up_to (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) (i-1) xs ==>
     eval_system_up_to (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) i xs
     [@@auto][@@disable Farkas_lemma.eval_exp][@@apply  eval_up_to_uses_nt_matching'  (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs i,  upper_bounds_constraint_nth ubs xs i][@@rw] 
@@ -300,13 +310,89 @@ lemma mk_upper_bounds_constraints_eval ubs xs =
     [@@auto][@@disable Farkas_lemma.eval_exp][@@fc]
     [@@apply connect_mk_upper_bounds_constraints ubs (List.length ubs)]
 
+(* lower  bounds *)
+lemma lower_bounded_eval_exp_matching' lbs xs i = 
+    is_upper_bounded lbs xs  && i >=0 && i < List.length lbs ==>    
+    match List.nth i lbs with 
+    | Some lb -> eval_exp (Geq (mk_bound_poly (List.length lbs) i 1. (-. lb))) xs
+    | None -> false
+    [@@auto][@@apply lower_bounded_is_correct xs lbs i][@@fc]
 
-axiom mk_lower_bounds_constraints_eval lbs xs =  
+lemma parallel_zero_lbs lbs lb = 
+    lbs <> [] && List.hd lbs = lb ==>
+    List.hd (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) = (Geq (mk_bound_poly (List.length lbs) 0 1. (-. lb)))
+    [@@auto][@@fc]
+
+lemma parallel_zeroth_lbs lbs lb = 
+    List.nth 0 lbs = Some lb
+    ==>
+    List.nth 0  (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) = Some (Geq (mk_bound_poly (List.length lbs) 0 1. (-. lb)))
+    [@@auto][@@fc]
+
+
+lemma parallel_nth_generalized_lbs lbs i lb size = 
+    size >= List.length lbs && List.nth i lbs = Some lb
+    ==>
+    List.nth i (mk_lower_bounds_constraints size lbs) = Some (Geq (mk_bound_poly size (size - List.length lbs + i) 1. (-. lb)))
+[@@auto][@@fc]
+
+lemma connect_mk_lower_bounds_constraints lbs size = 
+     mk_lower_bounds_constraints' size (size-List.length lbs) lbs = (mk_lower_bounds_constraints size lbs) 
+    [@@auto][@@rw]
+
+lemma parallel_nth_lbs lbs i lb size = 
+    size = List.length lbs && List.nth i lbs = Some lb
+    ==>
+    List.nth i (mk_lower_bounds_constraints' size 0 lbs) = Some (Geq (mk_bound_poly size i 1. (-. lb)))
+    [@@auto][@@apply connect_mk_lower_bounds_constraints lbs size, parallel_nth_generalized_lbs lbs i lb size] [@@fc]
+
+lemma parallel_nth_fixed_size_lbs lbs i lb = 
+    List.nth i lbs = Some lb
+    ==>
+    List.nth i (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) = Some (Geq (mk_bound_poly (List.length lbs) i 1. (-. lb) ))
+    [@@auto][@@fc]
+    [@@apply parallel_nth_lbs lbs i lb (List.length lbs)]
+
+
+(* uses parallel nth*)
+axiom lower_bounds_constraint_nth lbs xs i = 
+    is_upper_bounded lbs xs  &&
+    List.length lbs = List.length xs && i >= 0 && i < List.length (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) ==>
+    match List.nth i (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) with
+    | Some e -> eval_exp e xs
+    | None -> false
+    [@@auto][@@apply lower_bounded_eval_exp_matching' lbs xs i][@@disable Farkas_lemma.eval_exp][@@fc]
+
+lemma eval_up_to_inductive_step_lower lbs xs i = 
+        is_upper_bounded lbs xs && List.length lbs = List.length xs && i >= 0 && i < List.length (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) &&  eval_system_up_to (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) (i-1) xs ==>
+        eval_system_up_to (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) i xs
+        [@@auto][@@disable Farkas_lemma.eval_exp][@@apply  eval_up_to_uses_nt_matching'  (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) xs i,  lower_bounds_constraint_nth lbs xs i][@@rw] 
+
+let rec induct_scheme_i' lbs xs i =
+        if i < 0 then true 
+        else  induct_scheme_i lbs xs (i-1)
+
+lemma lower_bounded_evals_up_to_length lbs xs i = 
+    is_upper_bounded lbs xs && List.length lbs = List.length xs && i >=0 && i < List.length (mk_lower_bounds_constraints' (List.length lbs) 0 lbs)  
+    ==>
+    eval_system_up_to (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) i xs
+    [@@auto][@@disable Farkas_lemma.eval_exp][@@induct functional induct_scheme_i'][@@rw]
+
+
+(* conclusion *)    
+lemma mk_upper_bounds_constraints'_eval lbs xs = 
+    is_upper_bounded lbs xs
+    ==> 
+    eval_system (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) xs
+    [@@auto][@@disable Farkas_lemma.eval_exp]
+    [@@apply eval_system_up_to_forall (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) xs]
+
+lemma mk_lower_bounds_constraints_eval lbs xs =  
     is_upper_bounded lbs xs
     ==> 
     eval_system (mk_lower_bounds_constraints (List.length lbs) lbs) xs
     [@@auto][@@disable Farkas_lemma.eval_exp][@@fc]
-    [@@apply connect_mk_upper_bounds_constraints lbs (List.length lbs)]
+    [@@apply connect_mk_lower_bounds_constraints lbs (List.length lbs)]
 
 (* High-level proof goal *)
 lemma mk_geq_constraints_reduction_soundness ubs lbs xs =
