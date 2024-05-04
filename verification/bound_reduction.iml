@@ -200,16 +200,21 @@ lemma parallel_zeroth ubs ub =
     [@@auto][@@fc]
 
 
-axiom parallel_nth_generalized ubs i ub size = 
+lemma parallel_nth_generalized ubs i ub size = 
     size >= List.length ubs && List.nth i ubs = Some ub
     ==>
-    List.nth i (mk_upper_bounds_constraints size ubs) = Some (Geq (mk_bound_poly size i (-1.) ub))
+    List.nth i (mk_upper_bounds_constraints size ubs) = Some (Geq (mk_bound_poly size (size - List.length ubs + i) (-1.) ub))
+[@@auto][@@fc]
 
-axiom parallel_nth ubs i ub size = 
-    size >= List.length ubs && List.nth i ubs = Some ub
+lemma connect_mk_upper_bounds_constraints ubs size = 
+     mk_upper_bounds_constraints' size (size-List.length ubs) ubs = (mk_upper_bounds_constraints size ubs) 
+    [@@auto][@@rw]
+
+lemma parallel_nth ubs i ub size = 
+    size = List.length ubs && List.nth i ubs = Some ub
     ==>
     List.nth i (mk_upper_bounds_constraints' size 0 ubs) = Some (Geq (mk_bound_poly size i (-1.) ub))
-    [@@auto][@@disable Certificate.mk_bound_poly][@@fc]
+    [@@auto][@@apply connect_mk_upper_bounds_constraints ubs size, parallel_nth_generalized ubs i ub size] [@@fc]
 
 lemma parallel_nth_fixed_size ubs i ub = 
     List.nth i ubs = Some ub
