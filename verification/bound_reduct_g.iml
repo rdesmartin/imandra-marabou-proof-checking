@@ -27,7 +27,7 @@ lemma is_upper_bounded_elem xs xi us ui n =
   xi <=. ui        
 [@@auto] [@@fc]
 
-lemma bound_eq_key i bound xs xi =
+lemma upper_bound_eq_key i bound xs xi =
   List.nth i xs = Some xi 
      ==>
   (xi <=. bound) = (((eval_poly (mk_bound_poly (List.length xs) i (-1.0) bound) xs)) >=. 0.0)
@@ -44,7 +44,7 @@ let ub_correct_at_i i ubs xs =
     eval_exp (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
   | None -> false
 
-lemma bounded_is_correct xs ubs i =
+lemma upper_bounded_is_correct xs ubs i =
   i >= 0
   && is_upper_bounded xs ubs
   && i < List.length xs
@@ -58,41 +58,74 @@ lemma bounded_is_correct xs ubs i =
    This way of phrasing the spec makes induction more natural.
  *)
 
-let rec check_down_from i ubs xs =
+let rec check_down_from_ubs i ubs xs =
   if i < 0 || i >= List.length ubs then true
   else ub_correct_at_i i ubs xs
-       && check_down_from (i-1) ubs xs
+       && check_down_from_ubs (i-1) ubs xs
     
-let all_bounds_correct ubs xs =
-  check_down_from (List.length xs - 1) ubs xs
+let all_ubs_correct ubs xs =
+  check_down_from_ubs (List.length xs - 1) ubs xs
   
-lemma check_down_from_correct ubs xs size =
+lemma check_down_from_correct_ubs ubs xs size =
    is_upper_bounded xs ubs
    && size <= List.length xs
    ==>
-   check_down_from size ubs xs
+   check_down_from_ubs size ubs xs
 [@@auto] [@@disable ub_correct_at_i] [@@rw]
 
-theorem final ubs xs =
+theorem final_ubs ubs xs =
   is_upper_bounded xs ubs
   ==>
-  all_bounds_correct ubs xs
+  all_ubs_correct ubs xs
 [@@auto]
 
-let rec induct_scheme ubs xs i size =
-  match ubs with
-  | [] -> true
-  | u :: ubs -> induct_scheme ubs xs (i + 1) size
+(* repeat for lower bounds *)
 
-(* lemma mk_upper_bounds_constraints_eval (ubs: Real.t list) (xs: Real.t list) (i: int) (size: int) =
-  size = List.length xs &&
-  xs <> [] &&
-  i = 0 &&
-  all_bounds_correct ubs xs
+lemma lower_bound_eq_key i bound xs xi =
+  List.nth i xs = Some xi 
+     ==>
+  (bound <=. xi) = (((eval_poly (mk_bound_poly (List.length xs) i 1. (-. bound) ) xs)) >=. 0.0)
+[@@auto] [@@fc]
+
+(* Key function: make an upper-bound expression! *)
+
+let lb_correct_at_i i lbs xs =
+  match List.nth i lbs with
+  | Some lb ->
+    eval_exp (Geq (mk_bound_poly (List.length lbs) i 1. (-. lb))) xs
+  | None -> false
+
+lemma lower_bounded_is_correct xs lbs i =
+  i >= 0
+  && is_upper_bounded lbs xs
+  && i < List.length xs
+     ==>
+  lb_correct_at_i i lbs xs
+[@@auto] [@@fc] [@@rw]
+
+(* Key function: for 0<=i<len(xs), the i-th bounds are correct!
+   Outside of these bounds, we don't care.
+
+   This way of phrasing the spec makes induction more natural.
+ *)
+
+let rec check_down_from_lbs i lbs xs =
+  if i < 0 || i >= List.length lbs then true
+  else lb_correct_at_i i lbs xs
+       && check_down_from_lbs (i-1) lbs xs
+    
+let all_lbs_correct lbs xs =
+  check_down_from_lbs (List.length xs - 1) lbs xs
+  
+lemma check_down_from_correct_lbs lbs xs size =
+   is_upper_bounded lbs xs 
+   && size <= List.length xs
+   ==>
+   check_down_from_lbs size lbs xs
+[@@auto] [@@disable lb_correct_at_i] [@@rw]
+
+theorem final_lbs lbs xs =
+  is_upper_bounded lbs xs
   ==>
-  eval_system (mk_upper_bounds_constraints size ubs) xs
-  [@@auto]
-  [@@induct functional induct_scheme]
-     *)
-
-
+  all_lbs_correct lbs xs
+[@@auto]
