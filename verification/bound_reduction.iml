@@ -157,7 +157,7 @@ lemma upper_bounded_eval_exp_hd ubs xs =
     [@@auto][@@fc]
 
 lemma lower_bounded_eval_exp_hd xs lbs = 
-    is_upper_bounded lbs xs && xs <> []
+    is_upper_bounded lbs xs && lbs <> []
     ==>
     eval_exp (List.hd (mk_lower_bounds_constraints' (List.length lbs) 0 lbs)) xs
     [@@auto][@@fc]
@@ -306,16 +306,16 @@ lemma parallel_zero_lbs lbs lb =
     [@@auto][@@fc]
 
 lemma parallel_zeroth_lbs lbs lb = 
-    List.nth 0 lbs = Some lb
+    List.nth 0 lbs = Some (-. lb)
     ==>
-    List.nth 0  (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) = Some (Geq (mk_bound_poly (List.length lbs) 0 1. (-. lb)))
+    List.nth 0 (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) = Some (Geq (mk_bound_poly (List.length lbs) 0 1. lb))
     [@@auto][@@fc]
 
 
 lemma parallel_nth_generalized_lbs lbs i lb size = 
-    size >= List.length lbs && List.nth i lbs = Some lb
+    size >= List.length lbs && List.nth i lbs = Some (-. lb)
     ==>
-    List.nth i (mk_lower_bounds_constraints size lbs) = Some (Geq (mk_bound_poly size (size - List.length lbs + i) 1. (-. lb)))
+    List.nth i (mk_lower_bounds_constraints size lbs) = Some (Geq (mk_bound_poly size (size - List.length lbs + i) 1. lb))
 [@@auto][@@fc]
 
 lemma connect_mk_lower_bounds_constraints lbs size = 
@@ -323,27 +323,25 @@ lemma connect_mk_lower_bounds_constraints lbs size =
     [@@auto][@@rw]
 
 lemma parallel_nth_lbs lbs i lb size = 
-    size = List.length lbs && List.nth i lbs = Some lb
+    size = List.length lbs && List.nth i lbs = Some (-. lb)
     ==>
-    List.nth i (mk_lower_bounds_constraints' size 0 lbs) = Some (Geq (mk_bound_poly size i 1. (-. lb)))
+    List.nth i (mk_lower_bounds_constraints' size 0 lbs) = Some (Geq (mk_bound_poly size i 1. lb))
     [@@auto][@@apply connect_mk_lower_bounds_constraints lbs size, parallel_nth_generalized_lbs lbs i lb size] [@@fc]
 
 lemma parallel_nth_fixed_size_lbs lbs i lb = 
-    List.nth i lbs = Some lb
+    List.nth i lbs = Some (-. lb)
     ==>
-    List.nth i (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) = Some (Geq (mk_bound_poly (List.length lbs) i 1. (-. lb) ))
-    [@@auto][@@fc]
-    [@@apply parallel_nth_lbs lbs i lb (List.length lbs)]
+    List.nth i (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) = Some (Geq (mk_bound_poly (List.length lbs) i 1. lb ))
+    [@@auto][@@apply parallel_nth_lbs lbs i lb (List.length lbs)][@@fc]
 
 lemma lower_bounded_eval_exp lbs xs i lb = 
-    List.nth i lbs = Some lb
+    List.nth i lbs = Some (-. lb)
     && is_upper_bounded lbs xs
     ==>
-    eval_exp (Geq (mk_bound_poly (List.length lbs) i 1. (-. lb))) xs
+    eval_exp (Geq (mk_bound_poly (List.length lbs) i 1. lb)) xs
     [@@auto][@@apply lower_bounded_is_correct xs lbs i][@@fc]
 
 (* uses parallel nth*)
-
 lemma lower_bounds_constraint_nth lbs xs i = 
     is_upper_bounded lbs xs  &&
     List.length lbs = List.length xs && i >= 0 && i < List.length (mk_lower_bounds_constraints' (List.length lbs) 0 lbs) ==>
