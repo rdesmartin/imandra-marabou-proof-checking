@@ -39,10 +39,10 @@ let rec mk_eq_constraints (tableau: Real.t list list): exp list =
 (** Creates a Geq constraint of the form `x_n - l_n >= 0` for each bound l_n in the lower_bound vector
     size = number of variables
 *)
-let rec mk_lower_bounds_constraints size i lower_bounds = 
+let rec mk_lower_bounds_constraints' size i lower_bounds = 
   match lower_bounds with
   | [] -> []
-  | l::bounds -> Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints size (i + 1) bounds
+  | l::bounds -> Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints' size (i + 1) bounds
 
 (** Idem for upper_bounds *)
 let rec mk_upper_bounds_constraints' size i upper_bounds = 
@@ -58,11 +58,19 @@ let rec mk_upper_bounds_constraints size upper_bounds =
       Geq (mk_bound_poly size i (-1.) u) :: mk_upper_bounds_constraints size bounds
 
 
+(* remove iterator to make it easier to prove *)
+let rec mk_lower_bounds_constraints size lower_bounds = 
+  match lower_bounds with
+  | [] -> []
+  | l::bounds -> let i = size - (List.length lower_bounds) in
+    Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints size bounds
+
+
 (** Create Geq constraints corresponding to the variable bounds.
 *)
 let mk_geq_constraints (upper_bounds: Real.t list) (lower_bounds: Real.t list): exp list =
   let size = List.length upper_bounds in
-  (mk_upper_bounds_constraints size upper_bounds) @ (mk_lower_bounds_constraints size 0 lower_bounds)
+  (mk_upper_bounds_constraints size upper_bounds) @ (mk_lower_bounds_constraints size lower_bounds)
  
 
 let mk_gt_constraint (size: int) ((var, value, bound_t): (int * Real.t * bound_type)): exp = 
