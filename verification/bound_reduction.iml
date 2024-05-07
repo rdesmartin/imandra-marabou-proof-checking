@@ -1,3 +1,13 @@
+(* 
+    Prove that if a vector xs is bounded by ls and us, 
+    then xs is a solution to the system constructed with 
+    `mk_geq_constraints ubs lbs`
+
+    depends on :
+    verification/mk_bound_poly.iml
+    verification/bound_reduct_g.iml
+*)
+
 open Farkas_lemma
 open Tightening
 open Utils
