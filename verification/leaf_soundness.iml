@@ -1,3 +1,11 @@
+(* 
+Check the soundness of the proof checker for the Leaf constructor of Proof Trees. 
+
+depends on 
+well_formed_reduction.iml for `contradiction_system_evaluation_false`
+verification/tableau_reduction.iml for `tableau_reduction_soundness_contra`
+*)
+
 open Utils
 open Constraint
 open Proof_tree
@@ -54,7 +62,6 @@ lemma check_cert_implies_not_eval_system tableau upper_bounds lower_bounds x pro
         check_cert sys certificate
         ==>
         eval_system sys x = false
-        (* contradiction_system_evaluation_false is in well_formed_reduction.iml *)
     [@@apply contradiction_system_evaluation_false tableau upper_bounds lower_bounds sys x certificate]
     [@@disable Checker.well_formed_tableau_bounds]
     [@@auto]
@@ -114,7 +121,6 @@ lemma eval_system_unsat tableau upper_bounds lower_bounds x =
     ==>
     not (is_in_kernel tableau x) || not (is_bounded x upper_bounds lower_bounds)
     [@@auto]
-    (* tableau_reduction_soundness_contra is in "verification/tableau_reduction.iml" *)
     [@@apply tableau_reduction_soundness_contra tableau x,
         mk_geq_constraints_reduction_soundness_contra upper_bounds lower_bounds x,
         mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x

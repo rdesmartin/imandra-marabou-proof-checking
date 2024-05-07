@@ -1,3 +1,9 @@
+(* Prove the soundness of the main proof-checking algorithm
+depends on :
+* verification/leaf_soundness.iml
+* verification/
+*)
+
 open Utils
 open Constraint
 open Proof_tree
@@ -5,6 +11,7 @@ open Check_splits
 open Certificate
 open Checker
 open Arithmetic
+open Bound_lemma
 
 let check_relu_constraints = Constraint.check_relu_constraints
 
@@ -43,7 +50,29 @@ axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
         unsat tableau upper_bounds lower_bounds relu_constraints x
 [@@fc]
 
-axiom soundness_node_contra_expand tableau upper_bounds lower_bounds constraints x proof_tree =
+axiom soundness_valid_relu_split tableau upper_bounds lower_bounds constraints x proof_tree =
+    let open ProofTree in
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (left, right) ->
+        let (ub_left, lb_left) = Tightening.update_bounds left.tightenings upper_bounds lower_bounds in
+        let (ub_right, lb_right) = Tightening.update_bounds right.tightenings upper_bounds lower_bounds in
+        check_children_splits left.tightenings right.tightenings constraints &&
+        sat tableau upper_bounds lower_bounds constraints x
+        ==>
+        sat tableau ub_left lb_left constraints x ||
+        sat tableau ub_right lb_right constraints x
+    [@@fc]
+
+axiom soundness_theory_lemma tableau upper_bounds lower_bounds constraints x (child_info: ProofTree.child_info) =
+    let (valid_bounds, ub', lb') = BoundLemma.check_bound_lemmas child_info.bound_lemmas (mk_eq_constraints tableau) upper_bounds lower_bounds constraints in
+    valid_bounds &&
+    sat tableau upper_bounds lower_bounds constraints x
+    ==>
+    not (check_node (mk_eq_constraints tableau) ub' lb' constraints child_info.ptr)
+    [@@fc]
+
+lemma soundness_node_contra_expand tableau upper_bounds lower_bounds constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
     | Leaf _ -> true
@@ -51,13 +80,20 @@ axiom soundness_node_contra_expand tableau upper_bounds lower_bounds constraints
         let valid_children_splits = check_children_splits left.tightenings right.tightenings constraints in
         let (valid_bounds_l, ub_left, lb_left) = update_child_bounds left (mk_eq_constraints tableau) upper_bounds lower_bounds constraints in
         let (valid_bounds_r, ub_right, lb_right) = update_child_bounds right (mk_eq_constraints tableau) upper_bounds lower_bounds constraints in
+        (* left = l && right = r && *)
         valid_bounds_l && valid_bounds_r &&
         valid_children_splits &&
         sat tableau upper_bounds lower_bounds constraints x
         ==>
         not (check_node (mk_eq_constraints tableau) ub_left lb_left constraints left.ptr) ||
         not (check_node (mk_eq_constraints tableau) ub_right lb_right constraints right.ptr)
+    [@@auto]
     [@@fc]
+    [@@apply soundness_leaf tableau upper_bounds lower_bounds constraints x proof_tree]
+    [@@apply soundness_valid_relu_split tableau upper_bounds lower_bounds constraints x proof_tree]
+    (* [@@apply soundness_theory_lemma tableau upper_bounds lower_bounds constraints x left]
+    [@@apply soundness_theory_lemma tableau upper_bounds lower_bounds constraints x right] *)
+    [@@disable sat, Bound_lemma.BoundLemma.check_bound_lemmas, Checker.check_node, Checker.check_children_splits]
 
 lemma soundness_node_contra_helper tableau upper_bounds lower_bounds constraints x proof_tree =
     let open ProofTree in
@@ -73,6 +109,7 @@ lemma soundness_node_contra_helper tableau upper_bounds lower_bounds constraints
         ==>
         not (check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_tree)
     [@@auto]
+    [@@apply soundness_leaf tableau upper_bounds lower_bounds constraints x proof_tree]
     [@@disable sat, Checker.update_child_bounds, Checker.check_node, Checker.check_children_splits, Checker.update_child_bounds]
 
 lemma soundness_node_contra tableau upper_bounds lower_bounds relu_constraints x proof_tree =
@@ -132,16 +169,7 @@ lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (
     (* this is a check performed in check_proof_tree, outside of check_node *)
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
     (* We only consider inputs with valid size; could this be moved to the sat/unsat definition instead? *)
-    List.length x = List.length lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
-    (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) (x: real list) =
-(* this is a check performed in check_proof_tree, outside of check_node *)
-well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
-(* We only consider inputs with valid size; could this be moved to the sat/unsat definition instead? *)
-List.length x = List.length (List.hd tableau) &&
-check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
-==>
-unsat tableau upper_bounds lower_bounds relu_constraints x
-(List.hd tableau) &&
+    List.length x = List.length (List.hd tableau) &&
     check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
     ==>
     unsat tableau upper_bounds lower_bounds relu_constraints x
