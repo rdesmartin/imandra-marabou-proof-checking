@@ -2,7 +2,7 @@
 Check the soundness of the proof checker for the Leaf constructor of Proof Trees. 
 
 depends on 
-well_formed_reduction.iml for `contradiction_system_evaluation_false`
+verification/well_formed_reduction.iml for `contradiction_system_evaluation_false`
 verification/tableau_reduction.iml for `tableau_reduction_soundness_contra`
 *)
 
