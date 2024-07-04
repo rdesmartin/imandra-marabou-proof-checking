@@ -9,6 +9,22 @@ open Bound_lemma
 open Tightening
 
 
+axiom relu_split_system tableau upper_bounds lower_bounds constraints x s 
+        (left: ProofTree.child_info) (right: ProofTree.child_info) =
+    let (ub_left, lb_left) = Tightening.update_bounds left.tightenings upper_bounds lower_bounds in
+    let (ub_right, lb_right) = Tightening.update_bounds right.tightenings upper_bounds lower_bounds in
+    check_relu_split left.tightenings right.tightenings constraints &&
+    ==>
+    eval_system_relus s (c::cs) x && (* x satisfies the system and all relu constraints in the parent node *)
+    is_inactive_relu s sl f b (List.length x) && (* the system of the left child corresponds to the inactive phase of a relu split *)
+    is_active_relu s sr b aux (List.length x) (* the system of the right child corresponds to the active phase of a relu split *)
+
+axiom sat_implies_eval_system tableau upper_bounds lower_bounds constraints x 
+        (left: ProofTree.child_info) (right: ProofTree.child_info) =
+    sat tableau upper_bounds lower_bounds constraints x
+    ==>
+    
+
 axiom soundness_valid_relu_var_split tableau upper_bounds lower_bounds constraints x 
         (left: ProofTree.child_info) (right: ProofTree.child_info) =
     let (ub_left, lb_left) = Tightening.update_bounds left.tightenings upper_bounds lower_bounds in
@@ -18,20 +34,4 @@ axiom soundness_valid_relu_var_split tableau upper_bounds lower_bounds constrain
     ==>
     sat tableau ub_left lb_left constraints x ||
     sat tableau ub_right lb_right constraints x
-    [@@fc]
-
-theorem soundness_valid_split tableau upper_bounds lower_bounds constraints x proof_tree =
-    let open ProofTree in
-    match proof_tree with
-    | Leaf _ -> true
-    | Node (left, right) ->
-        let (ub_left, lb_left) = Tightening.update_bounds left.tightenings upper_bounds lower_bounds in
-        let (ub_right, lb_right) = Tightening.update_bounds right.tightenings upper_bounds lower_bounds in
-        check_children_splits left.tightenings right.tightenings constraints &&
-        sat tableau upper_bounds lower_bounds constraints x
-        ==>
-        sat tableau ub_left lb_left constraints x ||
-        sat tableau ub_right lb_right constraints x
-    [@@auto]
-    [@@disable Tightening.Tightening.update_bounds, sat]
     [@@fc]
