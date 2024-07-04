@@ -396,4 +396,17 @@ lemma mk_geq_constraints_reduction_soundness ubs lbs xs =
     is_bounded xs ubs lbs
     ==>
     eval_system (mk_geq_constraints ubs lbs) xs
-    [@@auto][@@apply eval_system_concat_invariant (mk_upper_bounds_constraints (List.length ubs) ubs) (mk_lower_bounds_constraints (List.length lbs) lbs) xs, mk_upper_bounds_constraints_eval ubs xs, mk_lower_bounds_constraints_eval lbs xs ]
+    [@@auto]
+    [@@apply eval_system_concat_invariant (mk_upper_bounds_constraints (List.length ubs) ubs) (mk_lower_bounds_constraints (List.length lbs) lbs) xs, 
+        mk_upper_bounds_constraints_eval ubs xs, 
+        mk_lower_bounds_constraints_eval lbs xs ]
+
+lemma mk_geq_constraints_reduction_soundness_contra ubs lbs xs =
+    not (eval_system (mk_geq_constraints ubs lbs) xs)
+    ==>
+    not (is_bounded xs ubs lbs)
+    [@@auto]
+    [@@disable Farkas_lemma.eval_system, Arithmetic.is_bounded]
+    [@@apply mk_geq_constraints_reduction_soundness ubs lbs xs]
+    [@@fc]
+
