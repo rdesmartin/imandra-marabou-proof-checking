@@ -1,0 +1,84 @@
+(* The moral crux of our proof relating structural and index-based recursion.
+   Key idea: use a computable Skolem function witnessing failure!
+
+   G.Passmore, Imandra *)
+
+let holds_at_i p i x =
+  match List.nth i x with
+  | Some v -> p v
+  | None -> true
+
+let rec holds_all p x =
+  match x with
+  | [] -> true
+  | x::xs -> p x && holds_all p xs
+
+let rec holds_below p j x =
+  if j < 0 then true
+  else
+    holds_at_i p j x
+    && holds_below p (j-1) x
+
+(* Find a witness to the property *not* holding! *)
+(* This is our Skolem function that makes it all tick! *)
+
+let rec find_bad p xs k =
+  match xs with
+  | [] -> None
+  | x::xs ->
+    if not (p x) then Some k
+    else find_bad p xs (k+1)
+
+(* holds_all (structural) <==> no bad witnesses! *)
+
+lemma holds_all_no_bad p x k =
+  (find_bad p x k = None)
+  = holds_all p x
+[@@auto] [@@rw] [@@fc]
+
+(* holds_below (index-based) relationship to find_bad *)
+
+lemma find_bad_bound p xs k =
+  match find_bad p xs k with
+  | None -> true
+  | Some i -> i >= k && i <= List.length xs + k
+[@@auto] [@@fc] [@@rw]
+
+(* This connects find_bad with the List.nth world! *)
+
+lemma find_bad_nth p xs k =
+  match find_bad p xs k with
+  | None -> true
+  | Some i -> (match List.nth (i-k) xs with
+      | None -> false
+      | Some v -> not (p v))
+[@@auto] [@@fc]
+
+lemma holds_below_bad_above p j k x =
+  holds_below p j x
+  ==>
+  match find_bad p x k with
+  | None -> true
+  | Some i -> i >= j+k
+[@@auto]
+
+[@@@max_induct 2]
+
+lemma find_bad_holds_below_all p j k x =
+  find_bad p x k = None
+  ==>
+  holds_below p j x
+[@@induct functional find_bad]
+
+[@@@max_induct 1]
+
+(* Our main results! *)
+
+theorem main p x j =
+  j = List.length x
+  ==>
+  holds_all p x = holds_below p j x
+[@@apply holds_below_bad_above p j 0 x]
+[@@apply find_bad_holds_below_all p j j x]
+[@@apply holds_all_no_bad p x 0]
+[@@auto]
