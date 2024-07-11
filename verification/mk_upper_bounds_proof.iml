@@ -1,0 +1,49 @@
+(* 
+    Dependencies:
+    #use "./proof_checker/imports.iml"
+    #use "verification/imports.iml"
+*)
+
+(* ===== Useful definitions to have at hand: ======== *)
+(*
+(* returns true if x and u have the same length, and
+    for each x_i, u_i in x, u, x_i <= u_i *)
+
+let rec is_upper_bounded (x: Real.t list) (u: Real.t list) = 
+    match x, u with
+    | [], [] -> true
+    | [x], [u] -> x <=. u
+    | x :: xs, u :: us -> x <=. u && is_upper_bounded xs us
+    | _ -> false
+
+*)
+(* ===== Proof ====== *)
+
+open Utils
+open Constraint
+open Certificate
+open Arithmetic
+open Farkas_lemma
+
+let is_bounded_at i ubs xs = 
+    match (List.nth i xs), (List.nth i ubs) with
+    | Some x, Some u -> x <=. u
+    | _, _ -> false
+
+
+axiom eval_ub_system_implies_bounded_at x ubs i =
+    List.length x = List.length ubs &&
+    x <> [] &&
+    0 <= i && i < List.length x &&
+    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x 
+    ==>
+    is_bounded_at i ubs x
+    [@@fc][@@rw]
+
+(* Main verification goal *)
+lemma mk_ub_constraints_implies_is_upper_bounded ubs x =
+    List.length x = List.length ubs && x <> [] &&
+    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x
+    ==>
+    is_upper_bounded x ubs
+    [@@auto]

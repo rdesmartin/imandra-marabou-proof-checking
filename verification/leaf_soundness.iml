@@ -16,18 +16,6 @@ open Checker
 open Arithmetic
 open Farkas_lemma
 
-let check_relu_constraints = Constraint.check_relu_constraints
-
-let unsat tableau upper_bounds lower_bounds relu_constraints x =
-    (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
-    check_relu_constraints relu_constraints x) = false
-
-let sat tableau upper_bounds lower_bounds relu_constraints x =
-    (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
-    check_relu_constraints relu_constraints x)
-
 lemma check_node_implies_check_cert tableau upper_bounds lower_bounds relu_constraints proof_tree =
     let open ProofTree in
     match proof_tree with
@@ -153,6 +141,13 @@ lemma soundness_check_cert_composition tableau upper_bounds lower_bounds x =
         List.append]
     [@@fc]
 
+lemma unsat_decomp tableau upper_bounds lower_bounds relu_constraints x =
+    not (is_in_kernel tableau x) || not (is_bounded upper_bounds lower_bounds x)
+    ==> 
+    unsat tableau upper_bounds lower_bounds relu_constraints x
+    [@@auto][@@fc]
+
+
 lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
@@ -161,9 +156,9 @@ lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_const
     ==>
     unsat tableau upper_bounds lower_bounds relu_constraints x
     [@@fc]
-    [@@simp]
-    [@@apply soundness_check_cert_composition tableau upper_bounds lower_bounds x]
-    [@@disable Checker.well_formed_tableau_bounds, Certificate.mk_system_contradiction, Arithmetic.is_bounded]
+    [@@apply soundness_check_cert_composition tableau upper_bounds lower_bounds x,
+    unsat_decomp tableau upper_bounds lower_bounds relu_constraints x ]
+    [@@disable unsat, Checker.well_formed_tableau_bounds, Certificate.mk_system_contradiction, Arithmetic.is_bounded]
     [@@auto]
 
 lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints x =
@@ -174,7 +169,7 @@ lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints
     ==>
     eval_system sys x
     [@@auto]
-    [@@disable Checker.well_formed_tableau_bounds, sat, Farkas_lemma.check_cert, Certificate.mk_system_contradiction]
+    [@@disable Checker.well_formed_tableau_bounds, unsat, Farkas_lemma.check_cert, Certificate.mk_system_contradiction]
     [@@apply sat_not_unsat tableau upper_bounds lower_bounds relu_constraints x,
         not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x]
     
