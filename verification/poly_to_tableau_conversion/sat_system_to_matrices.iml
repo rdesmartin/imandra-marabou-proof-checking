@@ -14,6 +14,14 @@ open Farkas_lemma
 
 (* =============== Eq constraints ================================ *)
 
+let rec is_upper_bounded_total (x: Real.t list) (u: Real.t list) = 
+match x, u with
+| [], [] -> true
+| [x], [u] -> x <=. u
+| x :: xs, u :: us -> x <=. u && is_upper_bounded xs us
+| _ -> true
+
+
 lemma eval_tableau_row_poly row x = 
     eval_poly (row @ [0.]) x = dot_product row x
     [@@auto]
@@ -41,7 +49,7 @@ lemma eval_system_implies_is_in_kernel tableau upper_bounds lower_bounds x =
     [@@disable Certificate.mk_system_contradiction]
     [@@fc]
 
-(* ================ Geq constraints =============================== *)
+(* ================ Geq constraints lower bounds =============================== *)
 
 axiom mk_lb_constraints_implies_is_upper_bounded lower_bounds x =
     eval_system (mk_lower_bounds_constraints (List.length lower_bounds) lower_bounds) x
@@ -49,44 +57,16 @@ axiom mk_lb_constraints_implies_is_upper_bounded lower_bounds x =
     is_upper_bounded lower_bounds x
     [@@fc]
 
-let is_bounded_at i ubs xs = 
+(* ================ Geq constraints upper bounds =============================== *)
+
+let is_bounded_at i xs ubs = 
     match (List.nth i xs), (List.nth i ubs) with
     | Some x, Some u -> x <=. u
-    | _, _ -> false
+    | _, _ -> true
 
-lemma eval_mk_bound_poly_implies_bounded_at_i i x ubs u =
-    0 <= i && i < List.length x && x <> [] &&
-    List.nth i ubs = Some u &&
-    eval_exp (Geq (mk_bound_poly (List.length x) i (-1.) u)) x
-    ==>
-    is_bounded_at i ubs x
-    [@@auto]
-    [@@fc]
-
-lemma bounds_i_j j lu lx =
-    let i = lx - lu + j in
-    0 <= j && j < lu &&
-    0 < lu && lu <= lx
-    ==>
-    0 <= i && i < lx
-    [@@auto]
-    [@@fc]
-
-lemma eval_mk_bound_poly_implies_bounded_at x ubs u j =
-    let lx = List.length x in
-    let lu = List.length ubs in
-    let i = lx - lu + j in
-    0 <= j && j < lu &&
-    0 < lu && lu <= lx &&
-    List.nth i ubs = Some u &&
-    eval_exp (Geq (mk_bound_poly lx i (-1.) u)) x
-    ==>
-    is_bounded_at i ubs x
-    [@@auto]
-    [@@disable is_bounded_at]
-    [@@apply bounds_i_j j (List.length ubs) (List.length x),
-        eval_mk_bound_poly_implies_bounded_at_i ((List.length x) - (List.length ubs) + j) x ubs u]
-    [@@fc]
+lemma is_bounded_at_rw i xs ubs = 
+    is_bounded_at i xs ubs = is_bounded_at_i i (zip xs ubs)
+[@@auto]
 
 lemma eval_system_element s e i x =
     List.nth i s = Some e &&
@@ -95,15 +75,13 @@ lemma eval_system_element s e i x =
     eval_exp e x
     [@@auto]
     [@@fc]
-    
-(*
-lemma eval_system_up_to_element s e i x =
-    List.nth i s = Some e &&
-    eval_system_up_to s (List.length s - 1) x
+
+lemma parallel_nth_generalized ubs i ub size = 
+    size >= List.length ubs && List.nth i ubs = Some ub
     ==>
-    eval_exp e x
-    [@@auto]
-    [@@fc] *)
+    List.nth i (mk_upper_bounds_constraints size ubs) = 
+        Some (Geq (mk_bound_poly size (size - List.length ubs + i) (-1.) ub))
+[@@auto][@@fc]
 
 lemma eval_ub_system_implies_eval_exp_ith x ubs u i =
     List.length x = List.length ubs &&
@@ -117,17 +95,15 @@ lemma eval_ub_system_implies_eval_exp_ith x ubs u i =
     | None -> false
     [@@auto]
     [@@apply parallel_nth_generalized ubs i u (List.length x)]
-    [@@disable Farkas_lemma.eval_exp, is_bounded_at]
+    [@@disable Farkas_lemma.eval_exp]
     [@@fc]
-
 
 lemma eval_ub_system_implies_eval_exp_ith_destruct x ubs u i =
     let size = List.length x in
-    List.length x = List.length ubs &&
-    x <> [] &&
-    List.nth i ubs = Some u &&
+    List.length x = List.length ubs && x <> [] &&
     0 <= i && i < List.length x &&
-    eval_system (mk_upper_bounds_constraints size ubs) x 
+    (List.nth i ubs = Some u &&
+    eval_system (mk_upper_bounds_constraints size ubs) x) [@trigger]
     ==>
     eval_exp (Geq (mk_bound_poly size (size - List.length ubs + i) (-1.) u)) x
     [@@auto]
@@ -136,113 +112,76 @@ lemma eval_ub_system_implies_eval_exp_ith_destruct x ubs u i =
     [@@disable Farkas_lemma.eval_exp]
     [@@fc]
 
-lemma eval_ub_system_implies_bounded_at x ubs u i =
-    List.length x = List.length ubs &&
-    x <> [] &&
+lemma bounds_i_j j lu lx =
+    let i = lx - lu + j in
+    0 <= j && j < lu &&
+    0 < lu && lu <= lx
+    ==>
+    0 <= i && i < lx
+    [@@auto]
+    [@@fc]
+
+lemma eval_mk_bound_poly_implies_bounded_at_i i x ubs u =
+    0 <= i && i < List.length x && x <> [] &&
+    (List.nth i ubs = Some u &&
+    eval_exp (Geq (mk_bound_poly (List.length x) i (-1.) u)) x)[@trigger]
+    ==>
+    is_bounded_at_i i (zip x ubs)
+    [@@auto]
+    [@@fc]
+
+lemma eval_mk_bound_poly_implies_bounded_at x ubs u j =
+    let lx = List.length x in
+    let lu = List.length ubs in
+    let i = lx - lu + j in
+    0 <= j && j < lu &&
+    0 < lu && lu <= lx &&
     List.nth i ubs = Some u &&
-    0 <= i && i < List.length x &&
-    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x 
+    eval_exp (Geq (mk_bound_poly lx i (-1.) u)) x
     ==>
-    is_bounded_at i ubs x
+    is_bounded_at_i i (zip x ubs)
     [@@auto]
-    [@@apply eval_ub_system_implies_eval_exp_ith_destruct x ubs u i,
-        eval_mk_bound_poly_implies_bounded_at x ubs u i]
-    [@@disable Farkas_lemma.eval_exp]
+    [@@disable is_bounded_at]
+    [@@apply bounds_i_j j (List.length ubs) (List.length x),
+        eval_mk_bound_poly_implies_bounded_at_i ((List.length x) - (List.length ubs) + j) x ubs u]
     [@@fc]
 
-lemma eval_ub_system_implies_bounded_at_hd x ubs =
+lemma eval_ub_system_implies_bounded_at x ubs (u: Real.t) i =
+    let size = List.length x in 
     List.length x = List.length ubs &&
     x <> [] &&
-    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x 
-    ==>
-    (* List.hd ubs >=. List.hd x *)
-    match ubs, x with
-    | u :: ubs, x :: xs -> u >=. x
-    | _, _ -> false
-    [@@auto]
-    [@@apply eval_ub_system_implies_bounded_at x ubs (List.hd ubs) 0]
-    [@@disable Farkas_lemma.eval_exp]
-    [@@fc]
-
-lemma tail_length l = l <> [] ==> (1 + List.length (List.tl l)) = List.length l
-[@@rw]
-
-lemma length_tl_eq l1 l2 = 
-    l1 <> [] && l2 <> [] &&
-    List.length (List.tl l1) = List.length (List.tl l2)
-    ==> 
-    List.length l1 = List.length l2
-[@@auto]
-[@@fc]
-
-(* 
-lemma ad_hoc_helper_1_3 x ubs =
-    x <> [] && List.length x = List.length ubs &&
-    eval_exp (Geq (mk_bound_poly (List.length x) (List.length x - List.length ubs) (-1.) (List.hd ubs))) x
-    ==>
-    List.hd x <=. List.hd ubs
-    [@@auto]
-    [@@fc]
-
-lemma ad_hoc_helper_1_4 x ubs = 
-    List.length (List.tl x) = List.length ubs - 1 && x <> [] &&
-    eval_system (mk_upper_bounds_constraints (1 + List.length (List.tl x)) ubs) x 
-    ==> 
-    List.hd x <=. List.hd ubs
-    [@@auto]
-    [@@apply eval_ub_system_implies_bounded_at_hd x ubs, tail_length x]
-    [@@fc]
-
-lemma ad_hoc_helper_1_3' x ubs = 
-    List.length x = List.length ubs && x <> [] &&
-    eval_system (mk_upper_bounds_constraints (1 + List.length (List.tl x)) ubs) x 
-    ==> 
-    List.hd x <=. List.hd ubs
-    [@@auto]
-    [@@apply eval_ub_system_implies_bounded_at_hd x ubs, tail_length x]
-    [@@fc]
-
-lemma ad_hoc_helper_1_1 x ubs =
-    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x
-    ==>
-    eval_system (mk_upper_bounds_constraints (List.length (List.tl x)) (List.tl ubs)) (List.tl x)
-    [@@auto]
-     *)
-
-let rec bounded_down_from x ubs i = 
-    if i < 0 || i >= List.length x then true
-    else is_bounded_at i ubs x &&
-        bounded_down_from x ubs (i - 1)
-
-let all_bounds_correct x ubs =
-    bounded_down_from x ubs (List.length x - 1)
-
-lemma upper_bounded_correct x ubs =
-    is_upper_bounded x ubs
-    ==>
-    all_bounds_correct x ubs
-    [@@auto]
-    [@@induct functional Arithmetic.is_upper_bounded]
-
-lemma mk_ub_constraints_implies_bounded_up_to x ubs i =
     0 <= i && i < List.length x &&
-    List.length x = List.length ubs && x <> [] &&
-    eval_system_up_to (mk_upper_bounds_constraints (List.length x) ubs) i x
+    (List.nth i ubs = Some u &&
+    eval_system (mk_upper_bounds_constraints size ubs) x) [@trigger]
     ==>
-    bounded_up_to x ubs i
+    is_bounded_at_i i (zip x ubs)
     [@@auto]
-    [@@disable is_bounded_at, List.length]
-    [@@induct functional bounded_up_to]
+    [@@apply eval_ub_system_implies_eval_exp_ith_destruct x ubs u i]
+    [@@apply bounds_i_j i (List.length x) (List.length ubs)]
+    [@@apply eval_mk_bound_poly_implies_bounded_at_i i x ubs u]
+    [@@disable Farkas_lemma.eval_exp, Utils.zip, is_bounded_at_i]
     [@@fc]
 
-lemma bounded_up_to_implies_upper_bounded ubs x =
-    List.length x = List.length ubs && x <> [] &&
-    bounded_up_to x ubs (List.length x - 1) 
-    ==>
-    is_upper_bounded x ubs
+lemma list_length_fc l1 l2 i = 
+    List.length l1 = List.length l2 &&
+    i < List.length l1 
+    ==> 
+    i < List.length l2
     [@@auto]
+    [@@fc]
 
-(* current VG: *)
+lemma eval_ub_system_implies_bounded_at' x ubs i =
+    let size = List.length x in 
+    List.length x = List.length ubs &&
+    x <> [] &&
+    0 <= i && i < List.length x &&
+    eval_system (mk_upper_bounds_constraints size ubs) x 
+    ==>
+    is_bounded_at_i i (zip x ubs)
+    [@@auto]
+    [@@disable Farkas_lemma.eval_exp, Utils.zip, is_bounded_at_i]
+    [@@fc]
+
 lemma mk_ub_constraints_implies_is_upper_bounded ubs x =
     List.length x = List.length ubs && x <> [] &&
     eval_system (mk_upper_bounds_constraints (List.length x) ubs) x
@@ -250,7 +189,7 @@ lemma mk_ub_constraints_implies_is_upper_bounded ubs x =
     is_upper_bounded x ubs
     [@@auto]
     [@@induct functional Arithmetic.is_upper_bounded]
-    [@@disable Farkas_lemma.eval_exp, tail_length]
+    [@@disable Farkas_lemma.eval_exp]
     [@@fc]
 
 lemma eval_system_concat_destruct s1 s2 x =

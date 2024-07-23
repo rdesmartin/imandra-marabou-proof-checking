@@ -1,0 +1,92 @@
+(* 
+    Dependencies:
+    #use "./proof_checker/imports.iml"
+    #use "verification/imports.iml"
+*)
+
+
+(* ===== Proof ====== *)
+
+open Utils
+open Constraint
+open Certificate
+open Arithmetic
+open Farkas_lemma
+
+let geq_pair (x, y) = x <=. y
+
+let is_bounded_at_i = holds_at_i geq_pair
+
+let is_bounded_all = holds_all geq_pair 
+
+let is_bounded_below = holds_below geq_pair 
+
+lemma is_bounded_eq x_ubs k =
+    k = List.length x_ubs 
+    ==>
+    is_bounded_below k x_ubs = is_bounded_all x_ubs 
+[@@auto]
+[@@apply main geq_pair x_ubs k]
+[@@rw]
+
+let is_bounded_at i xs ubs = 
+    match (List.nth i xs), (List.nth i ubs) with
+    | Some x, Some u -> x <=. u
+    | _, _ -> true
+
+lemma is_bounded_at_rw i xs ubs = 
+    is_bounded_at i xs ubs = is_bounded_at_i i (zip xs ubs)
+[@@auto]
+
+lemma eval_ub_system_implies_bounded_at x ubs i =
+    List.length x = List.length ubs && x <> [] &&
+    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x 
+    ==>
+    (is_bounded_at_i i (zip x ubs) [@trigger])
+    [@@auto]
+    [@@disable is_bounded_at_i]
+    [@@fc][@@rw]
+
+lemma is_bounded_at_i_rw i l =
+    holds_at_i geq_pair i l = is_bounded_at_i i l 
+    [@@rw]
+
+lemma is_bounded_below_i ubs x i =
+    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x 
+    ==>
+    is_bounded_below i (zip x ubs) 
+[@@auto]
+[@@disable Utils.zip, is_bounded_at_i, holds_at_i]
+[@@apply eval_ub_system_implies_bounded_at x ubs i]
+[@@fc]
+
+lemma is_bounded_below_len ubs x i =
+    i = List.length (zip x ubs) &&
+    is_bounded_below i (zip x ubs)
+    ==>
+    is_bounded_all (zip x ubs)
+[@@auto]
+[@@disable is_bounded_below]
+
+lemma is_bounded_all_to_is_bounded ubs x =
+    is_bounded_all (zip x ubs) = is_upper_bounded x ubs
+[@@auto]
+[@@rw]
+
+lemma zip_len x y = 
+List.length x = List.length y ==>
+List.length (zip x y) = List.length x   
+[@@induct functional Utils.zip]
+[@@auto]
+[@@rw]
+
+(* Main verification goal *)
+lemma mk_ub_constraints_implies_is_upper_bounded ubs x =
+    List.length x = List.length ubs &&
+    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x
+    ==>
+    is_upper_bounded x ubs
+    [@@auto]
+    [@@disable is_bounded_all, is_bounded_below, Utils.zip]
+    [@@apply is_bounded_below_i ubs x (List.length x)]
+    [@@apply  is_bounded_below_len ubs x (List.length x)]

@@ -42,7 +42,7 @@ let ub_correct_at_i i ubs xs =
   match List.nth i ubs with
   | Some ub ->
     eval_exp (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
-  | None -> false
+  | None -> true
 
 lemma upper_bounded_is_correct xs ubs i =
   i >= 0
