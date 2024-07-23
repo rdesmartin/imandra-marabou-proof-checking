@@ -14,13 +14,6 @@ open Utils
 open Certificate
 open Arithmetic
 
-lemma is_upper_bounded_tl x u = 
-    is_upper_bounded x u
-    ==> 
-    is_upper_bounded (List.tl x) (List.tl u)
-    [@@auto]
-    [@@fc]
-
 lemma is_upper_bounded_tl xs ubs x ub = 
     is_upper_bounded xs ubs && x <=. ub
     ==> 
@@ -29,6 +22,7 @@ lemma is_upper_bounded_tl xs ubs x ub =
     [@@fc]
 
 lemma is_upper_bounded_hd x u = 
+    List.length x = List.length u &&
     is_upper_bounded x u 
     ==> 
     (List.hd u) -. (List.hd x)  >=. 0.
@@ -43,13 +37,14 @@ lemma is_upper_bounded_nth x xn u un n =
     ==>   
     -. xn >=. -. un
     [@@auto]
+    [@@fc]
 
 lemma is_upper_bounded_nth_matching xs ubs i = 
     i >=0 && i < List.length xs && List.length xs = List.length ubs &&
     is_upper_bounded xs ubs ==>
     match List.nth i ubs, List.nth i xs with
     | Some ub, Some x -> -. x >=. -. ub
-    | _ -> false
+    | _ -> true
 [@@auto][@@fc]
 
 (* this lemma depends on mk_bound_poly_eval_gal, defined in verification/mk_bound_poly.iml *)
@@ -161,12 +156,14 @@ lemma mk_lower_bounds_constraints_length size i lower_bounds =
     [@@auto][@@fc]
 
 lemma upper_bounded_eval_exp_hd ubs xs =
+    List.length xs = List.length ubs &&
     is_upper_bounded xs ubs && xs <> []
     ==>
     eval_exp (List.hd (mk_upper_bounds_constraints' (List.length ubs) 0 ubs)) xs
     [@@auto][@@fc]
 
 lemma lower_bounded_eval_exp_hd xs lbs = 
+    List.length xs = List.length lbs &&
     is_upper_bounded lbs xs && lbs <> []
     ==>
     eval_exp (List.hd (mk_lower_bounds_constraints' (List.length lbs) 0 lbs)) xs
@@ -181,6 +178,15 @@ lemma upper_bounded_eval_exp ubs xs i ub =
 
 
 (* =================== Upper bounds ========================================*)
+
+lemma nth_rw l i =
+    i >= 0 && i < List.length l
+    ==>
+    match List.nth i l with
+    | Some _ -> true
+    | None -> false
+[@@auto] 
+[@@fc]
 
 lemma upper_bounded_eval_exp_matching' ubs xs i = 
     is_upper_bounded xs ubs && 
@@ -213,7 +219,7 @@ lemma parallel_nth_generalized ubs i ub size =
     List.nth i (mk_upper_bounds_constraints size ubs) = 
         Some (Geq (mk_bound_poly size (size - List.length ubs + i) (-1.) ub))
 [@@auto][@@fc]
-
+(* ok up to here *)
 lemma connect_mk_upper_bounds_constraints ubs size = 
      mk_upper_bounds_constraints' size (size-List.length ubs) ubs = 
         (mk_upper_bounds_constraints size ubs) 

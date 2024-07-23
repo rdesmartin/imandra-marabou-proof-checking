@@ -1,6 +1,7 @@
-#use "verification/mk_bound_poly.iml";; (* ok *)
-#use "verification/bound_reduct_g.iml";; (* ok *)
-#use "verification/bound_reduction.iml";; (* ok *)
+#use "verification/tableau_to_poly_reduction/mk_bound_poly.iml";; 
+#use "verification/grant-struct-index.iml";;
+#use "verification/tableau_to_poly_reduction/bound_reduct_g.iml";; 
+(* #use "verification/tableau_to_poly_reduction/bound_reduction.iml";; *)
 (* #use "verification/farkas_lemma_correctness.iml";;*) 
 (* #use "verification/well_formed_reduction.iml";; (* ok *)
 #use "verification/well_formed_lemma_reduction.iml";; (* ok *)

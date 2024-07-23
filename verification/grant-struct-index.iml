@@ -81,4 +81,5 @@ theorem main p x j =
 [@@apply holds_below_bad_above p j 0 x]
 [@@apply find_bad_holds_below_all p j j x]
 [@@apply holds_all_no_bad p x 0]
+[@@fc]
 [@@auto]
