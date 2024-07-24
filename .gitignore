@@ -9,3 +9,4 @@ test_env/lib64
 json/
 experiments.log
 timing.csv
+.vscode
