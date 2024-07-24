@@ -2,7 +2,7 @@
   Proof that the satisfiability of the system representation implies the 
   satisfiability of the matrix representation of a linear query:
   If an assignment x satisfies the system representation of the 
-  query (tableau, upper_bounds, lower_bounds), then x also satisfies the
+  query (tableau, ubs, lbs), then x also satisfies the
   matrix representation.
 *)
 
@@ -13,14 +13,6 @@ open Arithmetic
 open Farkas_lemma
 
 (* =============== Eq constraints ================================ *)
-
-let rec is_upper_bounded_total (x: Real.t list) (u: Real.t list) = 
-match x, u with
-| [], [] -> true
-| [x], [u] -> x <=. u
-| x :: xs, u :: us -> x <=. u && is_upper_bounded xs us
-| _ -> true
-
 
 lemma eval_tableau_row_poly row x = 
     eval_poly (row @ [0.]) x = dot_product row x
@@ -34,204 +26,135 @@ lemma mk_eq_constraints_implies_is_in_kernel tableau x =
     [@@auto]
     [@@fc]
 
-lemma full_system_implies_eq_constraints tableau upper_bounds lower_bounds x =
-    eval_system (mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds) x
+lemma full_system_implies_eq_constraints tableau ubs lbs x =
+    eval_system (mk_system_contradiction (mk_eq_constraints tableau) ubs lbs) x
     ==>
     eval_system (mk_eq_constraints tableau) x
     [@@auto]
     [@@fc]
 
-lemma eval_system_implies_is_in_kernel tableau upper_bounds lower_bounds x =
-    eval_system (mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds) x
+lemma eval_system_implies_is_in_kernel tableau ubs lbs x =
+    eval_system (mk_system_contradiction (mk_eq_constraints tableau) ubs lbs) x
     ==>
     is_in_kernel tableau x
     [@@auto]
     [@@disable Certificate.mk_system_contradiction]
     [@@fc]
 
-(* ================ Geq constraints lower bounds =============================== *)
+(* ================ proved in mk_[upper|lower]_bounds_proof.iml =============================== *)
 
-axiom mk_lb_constraints_implies_is_upper_bounded lower_bounds x =
-    eval_system (mk_lower_bounds_constraints (List.length lower_bounds) lower_bounds) x
+axiom mk_lb_constraints_implies_is_upper_bounded lbs x =
+    eval_system (mk_lower_bounds_constraints (List.length lbs) lbs) x
     ==>
-    is_upper_bounded lower_bounds x
+    is_upper_bounded lbs x
     [@@fc]
 
-(* ================ Geq constraints upper bounds =============================== *)
-
-let is_bounded_at i xs ubs = 
-    match (List.nth i xs), (List.nth i ubs) with
-    | Some x, Some u -> x <=. u
-    | _, _ -> true
-
-lemma is_bounded_at_rw i xs ubs = 
-    is_bounded_at i xs ubs = is_bounded_at_i i (zip xs ubs)
-[@@auto]
-
-lemma eval_system_element s e i x =
-    List.nth i s = Some e &&
-    eval_system s x
-    ==>
-    eval_exp e x
-    [@@auto]
-    [@@fc]
-
-lemma parallel_nth_generalized ubs i ub size = 
-    size >= List.length ubs && List.nth i ubs = Some ub
-    ==>
-    List.nth i (mk_upper_bounds_constraints size ubs) = 
-        Some (Geq (mk_bound_poly size (size - List.length ubs + i) (-1.) ub))
-[@@auto][@@fc]
-
-lemma eval_ub_system_implies_eval_exp_ith x ubs u i =
+axiom mk_ub_constraints_implies_is_upper_bounded ubs x =
     List.length x = List.length ubs &&
-    x <> [] &&
-    List.nth i ubs = Some u &&
-    0 <= i && i < List.length x &&
-    eval_system (mk_upper_bounds_constraints (List.length x) ubs) x 
-    ==>
-    match List.nth i (mk_upper_bounds_constraints (List.length x) ubs) with
-    | Some e -> eval_exp e x
-    | None -> false
-    [@@auto]
-    [@@apply parallel_nth_generalized ubs i u (List.length x)]
-    [@@disable Farkas_lemma.eval_exp]
-    [@@fc]
-
-lemma eval_ub_system_implies_eval_exp_ith_destruct x ubs u i =
-    let size = List.length x in
-    List.length x = List.length ubs && x <> [] &&
-    0 <= i && i < List.length x &&
-    (List.nth i ubs = Some u &&
-    eval_system (mk_upper_bounds_constraints size ubs) x) [@trigger]
-    ==>
-    eval_exp (Geq (mk_bound_poly size (size - List.length ubs + i) (-1.) u)) x
-    [@@auto]
-    [@@apply parallel_nth_generalized ubs i u (List.length x), 
-        eval_ub_system_implies_eval_exp_ith x ubs u i]
-    [@@disable Farkas_lemma.eval_exp]
-    [@@fc]
-
-lemma bounds_i_j j lu lx =
-    let i = lx - lu + j in
-    0 <= j && j < lu &&
-    0 < lu && lu <= lx
-    ==>
-    0 <= i && i < lx
-    [@@auto]
-    [@@fc]
-
-lemma eval_mk_bound_poly_implies_bounded_at_i i x ubs u =
-    0 <= i && i < List.length x && x <> [] &&
-    (List.nth i ubs = Some u &&
-    eval_exp (Geq (mk_bound_poly (List.length x) i (-1.) u)) x)[@trigger]
-    ==>
-    is_bounded_at_i i (zip x ubs)
-    [@@auto]
-    [@@fc]
-
-lemma eval_mk_bound_poly_implies_bounded_at x ubs u j =
-    let lx = List.length x in
-    let lu = List.length ubs in
-    let i = lx - lu + j in
-    0 <= j && j < lu &&
-    0 < lu && lu <= lx &&
-    List.nth i ubs = Some u &&
-    eval_exp (Geq (mk_bound_poly lx i (-1.) u)) x
-    ==>
-    is_bounded_at_i i (zip x ubs)
-    [@@auto]
-    [@@disable is_bounded_at]
-    [@@apply bounds_i_j j (List.length ubs) (List.length x),
-        eval_mk_bound_poly_implies_bounded_at_i ((List.length x) - (List.length ubs) + j) x ubs u]
-    [@@fc]
-
-lemma eval_ub_system_implies_bounded_at x ubs (u: Real.t) i =
-    let size = List.length x in 
-    List.length x = List.length ubs &&
-    x <> [] &&
-    0 <= i && i < List.length x &&
-    (List.nth i ubs = Some u &&
-    eval_system (mk_upper_bounds_constraints size ubs) x) [@trigger]
-    ==>
-    is_bounded_at_i i (zip x ubs)
-    [@@auto]
-    [@@apply eval_ub_system_implies_eval_exp_ith_destruct x ubs u i]
-    [@@apply bounds_i_j i (List.length x) (List.length ubs)]
-    [@@apply eval_mk_bound_poly_implies_bounded_at_i i x ubs u]
-    [@@disable Farkas_lemma.eval_exp, Utils.zip, is_bounded_at_i]
-    [@@fc]
-
-lemma list_length_fc l1 l2 i = 
-    List.length l1 = List.length l2 &&
-    i < List.length l1 
-    ==> 
-    i < List.length l2
-    [@@auto]
-    [@@fc]
-
-lemma eval_ub_system_implies_bounded_at' x ubs i =
-    let size = List.length x in 
-    List.length x = List.length ubs &&
-    x <> [] &&
-    0 <= i && i < List.length x &&
-    eval_system (mk_upper_bounds_constraints size ubs) x 
-    ==>
-    is_bounded_at_i i (zip x ubs)
-    [@@auto]
-    [@@disable Farkas_lemma.eval_exp, Utils.zip, is_bounded_at_i]
-    [@@fc]
-
-lemma mk_ub_constraints_implies_is_upper_bounded ubs x =
-    List.length x = List.length ubs && x <> [] &&
     eval_system (mk_upper_bounds_constraints (List.length x) ubs) x
     ==>
     is_upper_bounded x ubs
-    [@@auto]
-    [@@induct functional Arithmetic.is_upper_bounded]
-    [@@disable Farkas_lemma.eval_exp]
-    [@@fc]
+[@@fc] 
+
+(* ================ Geq constraints =============================== *)
 
 lemma eval_system_concat_destruct s1 s2 x =
     eval_system (s1 @ s2) x
     ==>
     eval_system s1 x && eval_system s2 x
+    [@@disable Farkas_lemma.eval_exp]
     [@@auto]
     [@@fc]
 
-lemma mk_geq_constraints_implies_is_bounded upper_bounds lower_bounds x =
-    List.length x = List.length upper_bounds &&    
-    List.length lower_bounds = List.length upper_bounds &&
-    eval_system (mk_geq_constraints upper_bounds lower_bounds) x
-    ==>
-    is_upper_bounded x upper_bounds && is_upper_bounded lower_bounds x
-    [@@auto]
-    [@@disable Farkas_lemma.eval_system]
-    [@@fc]
+lemma mk_geq_constraints_rw ubs lbs = 
+      let size = List.length ubs in
+      mk_geq_constraints ubs lbs = 
+        (mk_upper_bounds_constraints size ubs) @ (mk_lower_bounds_constraints size lbs)
+[@@rw]
 
-lemma full_system_implies_geq_constraints tableau upper_bounds lower_bounds x =
-    eval_system (mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds) x
+lemma eval_mk_geq_constraint_destruct ubs lbs x = 
+    let size = List.length ubs in
+    eval_system (mk_geq_constraints ubs lbs) x
     ==>
-    eval_system (mk_geq_constraints upper_bounds lower_bounds) x
+    eval_system (mk_upper_bounds_constraints size ubs) x && 
+        eval_system (mk_lower_bounds_constraints size lbs) x
 [@@auto]
+[@@disable Farkas_lemma.eval_system]
 [@@fc]
 
-lemma eval_system_implies_is_bounded tableau upper_bounds lower_bounds x =
-    well_formed_tableau tableau &&
-    eval_system (mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds) x
+lemma mk_geq_constraints_implies_correct_ub ubs lbs x =
+    let size = List.length ubs in
+    List.length x = List.length ubs &&    
+    List.length lbs = List.length ubs &&
+    eval_system ((mk_upper_bounds_constraints size ubs) @ (mk_lower_bounds_constraints size lbs)) x
     ==>
-    is_bounded upper_bounds lower_bounds x
+    is_upper_bounded x ubs 
     [@@auto]
-    [@@disable Arithmetic.is_bounded]
+    [@@apply eval_mk_geq_constraint_destruct ubs lbs x]
+    [@@apply mk_ub_constraints_implies_is_upper_bounded ubs x]
+    [@@disable Farkas_lemma.eval_system, Certificate.mk_geq_constraints]
+    [@@fc]
+
+lemma mk_geq_constraints_implies_correct_lb ubs lbs x =
+    let size = List.length ubs in
+    List.length x = List.length ubs &&    
+    List.length lbs = List.length ubs &&
+    eval_system ((mk_upper_bounds_constraints size ubs) @ (mk_lower_bounds_constraints size lbs)) x
+    ==>
+    is_upper_bounded lbs x 
+    [@@auto]
+    [@@apply eval_mk_geq_constraint_destruct ubs lbs x]
+    [@@apply mk_lb_constraints_implies_is_upper_bounded ubs x]
+    [@@disable Farkas_lemma.eval_system, Certificate.mk_geq_constraints]
+    [@@fc]
+
+lemma mk_geq_constraints_implies_correct_ub_lb ubs lbs x =
+    List.length x = List.length ubs &&    
+    List.length lbs = List.length ubs &&
+    eval_system (mk_geq_constraints ubs lbs) x
+    ==>
+    is_upper_bounded x ubs && is_upper_bounded lbs x 
+    [@@auto]
+    [@@disable Farkas_lemma.eval_system, Certificate.mk_geq_constraints]
+    [@@fc]
+
+lemma full_system_implies_geq_constraints tableau ubs lbs x =
+    eval_system (mk_system_contradiction (mk_eq_constraints tableau) ubs lbs) x
+    ==>
+    eval_system (mk_geq_constraints ubs lbs) x
+[@@auto]
+[@@apply eval_system_concat_destruct (mk_eq_constraints tableau) (mk_geq_constraints ubs lbs) x]
+[@@disable Certificate.mk_geq_constraints]
+[@@fc]
+
+lemma is_bounded_rw ubs lbs x =
+    (is_upper_bounded x ubs && is_upper_bounded lbs x) 
+    =
+    is_bounded x ubs lbs
+
+lemma eval_system_implies_is_bounded tableau ubs lbs x =
+    List.length x = List.length ubs &&    
+    List.length lbs = List.length ubs &&
+    eval_system (mk_system_contradiction (mk_eq_constraints tableau) ubs lbs) x
+    ==>
+    is_bounded x ubs lbs
+    [@@auto]
+    [@@apply full_system_implies_geq_constraints tableau ubs lbs x]
+    [@@apply mk_geq_constraints_implies_correct_ub_lb ubs lbs x]
+    [@@apply is_bounded_rw ubs lbs x]
+    [@@disable Arithmetic.is_bounded, Certificate.mk_system_contradiction, Certificate.mk_geq_constraints]
     [@@fc]
 
 (* ================= Main theorem ===================== *)
-    
-theorem eval_system_implies_sat tableau upper_bounds lower_bounds relu_constraints x =
-    well_formed_tableau tableau &&
-    eval_system (mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds) x
+
+theorem eval_system_implies_sat_tableau tableau ubs lbs relu_constraints x =
+    List.length x = List.length ubs &&    
+    List.length lbs = List.length ubs &&
+    eval_system (mk_system_contradiction (mk_eq_constraints tableau) ubs lbs) x
     ==>
     is_in_kernel tableau x &&
-    is_bounded upper_bounds lower_bounds x
+    is_bounded x ubs lbs 
     [@@auto]
-    [@@disable Certificate.mk_system_contradiction]
+    [@@apply eval_system_implies_is_bounded tableau ubs lbs x]
+    [@@apply eval_system_implies_is_in_kernel tableau ubs lbs x]
+    [@@disable Farkas_lemma.eval_system, Certificate.mk_system_contradiction]

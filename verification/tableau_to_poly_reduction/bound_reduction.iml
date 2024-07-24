@@ -219,7 +219,7 @@ lemma parallel_nth_generalized ubs i ub size =
     List.nth i (mk_upper_bounds_constraints size ubs) = 
         Some (Geq (mk_bound_poly size (size - List.length ubs + i) (-1.) ub))
 [@@auto][@@fc]
-(* ok up to here *)
+
 lemma connect_mk_upper_bounds_constraints ubs size = 
      mk_upper_bounds_constraints' size (size-List.length ubs) ubs = 
         (mk_upper_bounds_constraints size ubs) 
