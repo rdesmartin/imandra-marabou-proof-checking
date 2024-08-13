@@ -1,0 +1,22 @@
+open Utils
+open Constraint
+open Proof_tree
+open Check_splits
+open Certificate
+open Checker
+open Arithmetic
+open Bound_lemma
+open Tightening
+
+
+
+axiom soundness_valid_single_var_split tableau upper_bounds lower_bounds constraints x 
+        (left: ProofTree.child_info) (right: ProofTree.child_info) =
+    let (ub_left, lb_left) = Tightening.update_bounds left.tightenings upper_bounds lower_bounds in
+    let (ub_right, lb_right) = Tightening.update_bounds right.tightenings upper_bounds lower_bounds in
+    check_single_var_split left.tightenings right.tightenings &&
+    sat tableau upper_bounds lower_bounds constraints x
+    ==>
+    sat tableau ub_left lb_left constraints x ||
+    sat tableau ub_right lb_right constraints x
+    [@@fc]

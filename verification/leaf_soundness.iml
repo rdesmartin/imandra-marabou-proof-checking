@@ -2,8 +2,9 @@
 Check the soundness of the proof checker for the Leaf constructor of Proof Trees. 
 
 depends on 
-well_formed_reduction.iml for `contradiction_system_evaluation_false`
+verification/well_formed_reduction.iml for `contradiction_system_evaluation_false`
 verification/tableau_reduction.iml for `tableau_reduction_soundness_contra`
+verification/bound_reduction.iml for `mk_geq_constraints_reduction_soundness` and `mk_geq_constraints_reduction_soundness_contra`
 *)
 
 open Utils
@@ -81,37 +82,17 @@ lemma eval_system_append l1 l2 x =
     [@@auto]
 
 
-lemma soundness_eval_sys_composition tableau upper_bounds lower_bounds x proof_tree =
-    let open ProofTree in
-    match proof_tree with
-    | Node _ -> true
-    | (Leaf contradiction) ->
-        let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
-        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
-        List.length x = List.length (List.hd tableau) &&
-        not (eval_system sys x)
-        ==>
-        not (eval_system (mk_eq_constraints tableau) x) || not (eval_system (mk_geq_constraints upper_bounds lower_bounds) x)
+lemma soundness_eval_sys_composition tableau upper_bounds lower_bounds x =
+    let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    not (eval_system sys x)
+    ==>
+    not (eval_system (mk_eq_constraints tableau) x) || not (eval_system (mk_geq_constraints upper_bounds lower_bounds) x)
     [@@auto]
     [@@apply destruct_mk_system (mk_eq_constraints tableau) upper_bounds lower_bounds,
     eval_system_append (mk_eq_constraints tableau) (mk_geq_constraints upper_bounds lower_bounds) x]
     [@@disable Farkas_lemma.eval_system, Certificate.mk_system_contradiction, Checker.well_formed_tableau_bounds]
-    [@@fc]
-
-axiom mk_geq_constraints_reduction_soundness_contra upper_bounds lower_bounds x =
-    List.length x = List.length upper_bounds &&
-    List.length x = List.length lower_bounds && 
-    not (eval_system (mk_geq_constraints upper_bounds lower_bounds) x)
-    ==>
-    not (is_bounded x upper_bounds lower_bounds)
-[@@fc]
-
-axiom mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x =
-    List.length x = List.length upper_bounds &&
-    List.length x = List.length lower_bounds && 
-    is_bounded x upper_bounds lower_bounds
-    ==>
-    eval_system (mk_geq_constraints upper_bounds lower_bounds) x
     [@@fc]
 
 lemma eval_system_unsat tableau upper_bounds lower_bounds x =
@@ -139,7 +120,7 @@ lemma eval_system_unsat_conjn tableau upper_bounds lower_bounds x =
     [@@simp]
     [@@auto]
     [@@apply eval_system_unsat tableau upper_bounds lower_bounds x]
-    [@@disable Checker.well_formed_tableau_bounds]
+    [@@disable Checker.well_formed_tableau_bounds, Arithmetic.is_bounded]
     [@@fc]
 
 lemma eval_system_unsat_contra tableau upper_bounds lower_bounds x =
@@ -154,44 +135,49 @@ lemma eval_system_unsat_contra tableau upper_bounds lower_bounds x =
     [@@fc]
 
 
-lemma soundness_check_cert_composition tableau upper_bounds lower_bounds x proof_tree =
-    let open ProofTree in
-    match proof_tree with
-    | Node _ -> true
-    | (Leaf contradiction) ->
-        let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
-        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
-        List.length x = List.length (List.hd tableau) &&
-        not (eval_system sys x)
-        ==>
-        not (is_in_kernel tableau x) || not (is_bounded x upper_bounds lower_bounds)
+lemma soundness_check_cert_composition tableau upper_bounds lower_bounds x =
+    let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    not (eval_system sys x)
+    ==>
+    not (is_in_kernel tableau x) || not (is_bounded x upper_bounds lower_bounds)
     [@@auto]
     [@@apply
-     soundness_eval_sys_composition tableau upper_bounds lower_bounds x proof_tree,
+     soundness_eval_sys_composition tableau upper_bounds lower_bounds x,
      eval_system_unsat_contra tableau upper_bounds lower_bounds x]
     [@@disable Certificate.mk_system_contradiction, Arithmetic.is_bounded,
         List.length, Checker.well_formed_tableau_bounds, Arithmetic.is_in_kernel, 
-        Farkas_lemma.eval_system, Certificate.mk_eq_constraints, Certificate.mk_lower_bounds_constraints,
+        Farkas_lemma.eval_system, Certificate.mk_geq_constraints, 
+        Certificate.mk_eq_constraints, Certificate.mk_lower_bounds_constraints,
         List.append]
     [@@fc]
 
-lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x proof_tree =
-    let open ProofTree in
-    match proof_tree with
-    | Node _ -> true
-    | (Leaf contradiction) ->
-        let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
-        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
-        List.length x = List.length (List.hd tableau) &&
-        not (eval_system sys x)
-        ==>
-        unsat tableau upper_bounds lower_bounds relu_constraints x
+lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x =
+    let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    not (eval_system sys x)
+    ==>
+    unsat tableau upper_bounds lower_bounds relu_constraints x
+    [@@fc]
     [@@simp]
-    [@@apply soundness_check_cert_composition tableau upper_bounds lower_bounds x proof_tree]
+    [@@apply soundness_check_cert_composition tableau upper_bounds lower_bounds x]
     [@@disable Checker.well_formed_tableau_bounds, Certificate.mk_system_contradiction, Arithmetic.is_bounded]
     [@@auto]
-    [@@fc]
 
+lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints x =
+    let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    sat tableau upper_bounds lower_bounds relu_constraints x
+    ==>
+    eval_system sys x
+    [@@auto]
+    [@@disable Checker.well_formed_tableau_bounds, sat, Farkas_lemma.check_cert, Certificate.mk_system_contradiction]
+    [@@apply sat_not_unsat tableau upper_bounds lower_bounds relu_constraints x,
+        not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x]
+    
 lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
@@ -205,5 +191,5 @@ lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
     [@@auto]
     [@@disable Checker.well_formed_tableau_bounds, unsat, Farkas_lemma.check_cert, Certificate.mk_system_contradiction]
     [@@apply check_node_implies_check_cert (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree,
-    not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x proof_tree]
+        not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x]
     [@@fc]

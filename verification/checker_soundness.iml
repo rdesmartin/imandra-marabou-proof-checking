@@ -1,7 +1,6 @@
 (* Prove the soundness of the main proof-checking algorithm
 depends on :
 * verification/leaf_soundness.iml
-* verification/
 *)
 
 open Utils
@@ -50,7 +49,8 @@ axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
         unsat tableau upper_bounds lower_bounds relu_constraints x
 [@@fc]
 
-axiom soundness_valid_relu_split tableau upper_bounds lower_bounds constraints x proof_tree =
+(* relies on `soundness_valid_single_var_split` and `soundness_valid_relu_var_split` *)
+lemma soundness_valid_relu_split tableau upper_bounds lower_bounds constraints x proof_tree =
     let open ProofTree in
     match proof_tree with
     | Leaf _ -> true
@@ -62,8 +62,10 @@ axiom soundness_valid_relu_split tableau upper_bounds lower_bounds constraints x
         ==>
         sat tableau ub_left lb_left constraints x ||
         sat tableau ub_right lb_right constraints x
+    [@@auto]
+    [@@disable Tightening.Tightening.update_bounds, sat]
     [@@fc]
-
+    
 axiom soundness_theory_lemma tableau upper_bounds lower_bounds constraints x (child_info: ProofTree.child_info) =
     let (valid_bounds, ub', lb') = BoundLemma.check_bound_lemmas child_info.bound_lemmas (mk_eq_constraints tableau) upper_bounds lower_bounds constraints in
     valid_bounds &&
@@ -137,8 +139,9 @@ Inductive Hypothesis:
     ==>
     for all x, unsat tableau ub_right lb_right relu_constraints x
 
-How do we make Imandra apply this inductive hypothesis?
-*)
+    Note 4/7/2024: proof of soundness_node didn't go through when using `#use checker_soundness.iml`
+    but it did when pasting lemmas one by one in CLI.
+    *)
 lemma soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     let open ProofTree in
     match proof_tree with

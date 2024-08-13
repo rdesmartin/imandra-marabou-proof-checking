@@ -151,73 +151,80 @@ lemma geq_mk_bound_poly_length_invariant size i coeff bound =
     [@@auto]
     [@@fc]
 
-lemma mk_upper_bounds_constraints_geq e i upper_bounds x = 
-    List.mem e (mk_upper_bounds_constraints (List.length x) i upper_bounds)
+lemma mk_upper_bounds_constraints_geq e upper_bounds x = 
+    List.mem e (mk_upper_bounds_constraints (List.length x) upper_bounds)
     ==>
     is_geq e
     [@@auto]
     [@@fc]
 
-lemma good_upper_bound_poly_length_mk_bound_poly i upper_bounds x = 
+lemma mk_bound_poly_length size i coeff bound =
+    size >= 0 
+    ==>
+    List.length (mk_bound_poly size i coeff bound) = size + 1
+[@@auto][@@fc]
+
+lemma good_poly_length_list_length x y = 
+    List.length x = List.length y + 1
+    ==> 
+    good_poly_length x y
+    [@@auto][@@fc]
+
+lemma non_empty_list_len x =
+    x <> [] ==> List.length x >= 0
+[@@auto][@@fc]
+
+lemma good_upper_bound_poly_length_mk_bound_poly upper_bounds x = 
     x <> [] && upper_bounds <> [] 
     ==> 
-    good_poly_length (mk_bound_poly (List.length x) i (-1.) (List.hd upper_bounds)) x
+    good_poly_length (mk_bound_poly (List.length x) ((List.length x) - (List.length upper_bounds)) (-1.) (List.hd upper_bounds)) x
     [@@auto]
     [@@fc]
 
-lemma mk_upper_bounds_constraints_length_invariant e sys size i upper_bounds =
+lemma mk_upper_bounds_constraints_length_invariant e sys size upper_bounds =
     e = List.hd sys &&
     size >= 0 && upper_bounds <> [] &&
-    sys = mk_upper_bounds_constraints size i upper_bounds
+    sys = mk_upper_bounds_constraints size upper_bounds
     ==> 
     List.length (extract_poly e) = size + 1
     [@@auto]
-    [@@apply geq_mk_bound_poly_length_invariant size i (-1.) (List.hd upper_bounds)]
+    [@@apply geq_mk_bound_poly_length_invariant size (size - (List.length upper_bounds)) (-1.) (List.hd upper_bounds)]
     [@@disable List.length]
     [@@fc]
 
-lemma mk_upper_bounds_constraints_good_poly_length e sys i upper_bounds x =
+lemma mk_upper_bounds_constraints_good_poly_length e sys upper_bounds x =
     e = List.hd sys &&
     x <> [] && upper_bounds <> [] &&
-    sys = mk_upper_bounds_constraints (List.length x) i upper_bounds
+    sys = mk_upper_bounds_constraints (List.length x) upper_bounds
     ==> 
     good_poly_length (extract_poly e) x
     [@@auto]
-    [@@apply mk_upper_bounds_constraints_length_invariant e sys (List.length x) i upper_bounds]
+    [@@apply mk_upper_bounds_constraints_length_invariant e sys (List.length x) upper_bounds]
     [@@disable List.length]
     [@@fc]
 
-lemma mk_upper_bounds_constraints_empty_invariant size i = 
-    mk_upper_bounds_constraints size i [] = []
+lemma mk_upper_bounds_constraints_empty_invariant size = 
+    mk_upper_bounds_constraints size [] = []
     [@@rw][@@fc]
 
-lemma mk_upper_bounds_constraints_empty_invariant_inverse size i upper_bounds = 
-    mk_upper_bounds_constraints size i upper_bounds = []
+lemma mk_upper_bounds_constraints_empty_invariant_inverse size upper_bounds = 
+    mk_upper_bounds_constraints size upper_bounds = []
     ==> 
     upper_bounds = []
     [@@fc]
 
-lemma mk_upper_bounds_constraints_nonempty_invariant size i upper_bounds = 
+lemma mk_upper_bounds_constraints_nonempty_invariant size upper_bounds = 
     upper_bounds <> []
     ==>
-    mk_upper_bounds_constraints size i upper_bounds <> []
+    mk_upper_bounds_constraints  size upper_bounds <> []
     [@@rw][@@fc]
 
-lemma mk_upper_bounds_constraints_disjunction sys i upper_bounds x =
+lemma mk_upper_bounds_constraints_well_formed sys upper_bounds x = 
     x <> [] && upper_bounds <> [] &&
-    sys = mk_upper_bounds_constraints (List.length x) i (List.tl upper_bounds)
+    sys = mk_upper_bounds_constraints (List.length x) upper_bounds
     ==>
-    sys = [] || well_formed sys x
-    [@@auto]
-    [@@fc]
-
-lemma mk_upper_bounds_constraints_well_formed sys i upper_bounds x = 
-    x <> [] && upper_bounds <> [] &&
-    sys = mk_upper_bounds_constraints (List.length x) i upper_bounds
-    ==>  
     well_formed sys x
     [@@auto]
-    [@@induct functional Certificate.mk_upper_bounds_constraints]
     [@@disable List.length, Farkas_lemma.extract_poly]
 
 
@@ -225,100 +232,67 @@ lemma mk_upper_bounds_constraints_well_formed sys i upper_bounds x =
 
 (* =============== mk_lower_bound_constraints_well_formed =============== *)
 
-lemma mk_lower_bounds_constraints_geq e i lower_bounds x = 
-    List.mem e (mk_lower_bounds_constraints (List.length x) i lower_bounds)
+lemma mk_lower_bounds_constraints_geq e lower_bounds x = 
+    List.mem e (mk_lower_bounds_constraints (List.length x) lower_bounds)
     ==>
     is_geq e
     [@@auto]
     [@@fc]
 
-lemma good_lower_bound_poly_length_mk_bound_poly i lower_bounds x = 
+lemma good_lower_bound_poly_length_mk_bound_poly lower_bounds x = 
     x <> [] && lower_bounds <> [] 
     ==> 
-    good_poly_length (mk_bound_poly (List.length x) i (1.) (-. (List.hd lower_bounds))) x
+    good_poly_length (mk_bound_poly (List.length x) ((List.length x) - (List.length lower_bounds)) (1.) (-. (List.hd lower_bounds))) x
     [@@auto]
     [@@fc]
 
-lemma mk_lower_bounds_constraints_length_invariant e sys size i lower_bounds =
+lemma mk_lower_bounds_constraints_length_invariant e sys size lower_bounds =
     e = List.hd sys &&
     size >= 0 && lower_bounds <> [] &&
-    sys = mk_lower_bounds_constraints size i lower_bounds
+    sys = mk_lower_bounds_constraints  size lower_bounds
     ==> 
     List.length (extract_poly e) = size + 1
     [@@auto]
-    [@@apply geq_mk_bound_poly_length_invariant size i (1.) (List.hd lower_bounds)]
+    [@@apply geq_mk_bound_poly_length_invariant size (size - (List.length lower_bounds)) (1.) (List.hd lower_bounds)]
     [@@disable List.length]
     [@@fc]
 
-lemma mk_lower_bounds_constraints_good_poly_length e sys i lower_bounds x =
+lemma mk_lower_bounds_constraints_good_poly_length e sys lower_bounds x =
     e = List.hd sys &&
     x <> [] && lower_bounds <> [] &&
-    sys = mk_lower_bounds_constraints (List.length x) i lower_bounds
+    sys = mk_lower_bounds_constraints (List.length x) lower_bounds
     ==> 
     good_poly_length (extract_poly e) x
     [@@auto]
-    [@@apply mk_lower_bounds_constraints_length_invariant e sys (List.length x) i lower_bounds]
+    [@@apply mk_lower_bounds_constraints_length_invariant e sys (List.length x) lower_bounds]
     [@@disable List.length]
     [@@fc]
 
-lemma mk_lower_bounds_constraints_empty_invariant size i = 
-    mk_lower_bounds_constraints size i [] = []
+lemma mk_lower_bounds_constraints_empty_invariant size = 
+    mk_lower_bounds_constraints  size [] = []
     [@@rw][@@fc]
 
-lemma mk_lower_bounds_constraints_empty_invariant_inverse size i lower_bounds = 
-    mk_lower_bounds_constraints size i lower_bounds = []
+lemma mk_lower_bounds_constraints_empty_invariant_inverse size lower_bounds = 
+    mk_lower_bounds_constraints size lower_bounds = []
     ==> 
     lower_bounds = []
     [@@fc]
 
-lemma mk_lower_bounds_constraints_nonempty_invariant size i lower_bounds = 
+lemma mk_lower_bounds_constraints_nonempty_invariant size lower_bounds = 
     lower_bounds <> []
     ==>
-    mk_lower_bounds_constraints size i lower_bounds <> []
+    mk_lower_bounds_constraints  size lower_bounds <> []
     [@@rw][@@fc]
 
-
-lemma mk_lower_bounds_constraints_disjunction sys i lower_bounds x =
+lemma mk_lower_bounds_constraints_well_formed sys lower_bounds x = 
     x <> [] && lower_bounds <> [] &&
-    sys = mk_lower_bounds_constraints (List.length x) i (List.tl lower_bounds)
-    ==>
-    sys = [] || well_formed sys x
-    [@@auto]
-    [@@fc]
-
-lemma mk_lower_bounds_constraints_disjunction_gpl sys i lower_bounds x =
-    x <> [] && lower_bounds <> [] &&
-    sys = mk_lower_bounds_constraints (List.length x) (i + 1) (List.tl lower_bounds)
-    ==>
-    sys = [] || good_poly_length (mk_bound_poly (List.length x) i 1. (-. (List.hd lower_bounds))) x
-    [@@auto]
-    [@@fc]
-
-lemma mk_lower_bounds_constraints_disjunction_gpl' i lower_bounds x =
-    x <> []
-    ==>
-    mk_lower_bounds_constraints (List.length x) (i + 1) (List.tl lower_bounds) = [] || 
-    good_poly_length (mk_bound_poly (List.length x) i 1. (-. (List.hd lower_bounds))) x
-    [@@auto]
-    [@@fc]
-
-lemma mk_lower_bounds_constraints_disjunction' i lower_bounds x =
-    x <> []
-    ==>
-    good_poly_length (mk_bound_poly (List.length x) i 1. (-. (List.hd lower_bounds))) x ||
-    List.tl lower_bounds <> []
-    [@@auto]
-    [@@fc]
-
-lemma mk_lower_bounds_constraints_well_formed sys i lower_bounds x = 
-    x <> [] && lower_bounds <> [] &&
-    sys = mk_lower_bounds_constraints (List.length x) i lower_bounds
+    sys = mk_lower_bounds_constraints  (List.length x) lower_bounds
     ==>  
     well_formed sys x
     [@@auto]
-    [@@apply mk_lower_bounds_constraints_disjunction_gpl' i lower_bounds x,
-    mk_lower_bounds_constraints_disjunction' i lower_bounds x]
-    [@@induct functional Certificate.mk_lower_bounds_constraints]
+    (* [@@apply mk_lower_bounds_constraints_disjunction_gpl' i lower_bounds x,
+    mk_lower_bounds_constraints_disjunction' i lower_bounds x] *)
+    (* [@@induct functional Certificate.mk_lower_bounds_constraints ] *)
     [@@disable List.length, Farkas_lemma.extract_poly]
 
 
@@ -334,31 +308,31 @@ lemma well_formed_concat_invariant s1 s2 x =
 
 
 lemma well_formed_mk_geq_constraints upper_bounds lower_bounds u_constraints l_constraints =
-    u_constraints = mk_upper_bounds_constraints (List.length upper_bounds) 0 upper_bounds &&
-    l_constraints = mk_lower_bounds_constraints (List.length upper_bounds) 0 lower_bounds &&
+    u_constraints = mk_upper_bounds_constraints (List.length upper_bounds) upper_bounds &&
+    l_constraints = mk_lower_bounds_constraints (List.length upper_bounds) lower_bounds &&
     upper_bounds <> [] && lower_bounds <> [] && 
     List.length upper_bounds = List.length lower_bounds
     ==>
     well_formed (u_constraints @ l_constraints) upper_bounds
 [@@auto]
-[@@apply mk_upper_bounds_constraints_well_formed u_constraints 0 upper_bounds upper_bounds,
-    mk_lower_bounds_constraints_well_formed l_constraints 0 lower_bounds upper_bounds,
+[@@apply mk_upper_bounds_constraints_well_formed u_constraints upper_bounds upper_bounds,
+    mk_lower_bounds_constraints_well_formed l_constraints lower_bounds upper_bounds,
     well_formed_concat_invariant u_constraints l_constraints upper_bounds
     ]
-[@@disable Certificate.mk_lower_bounds_constraints, Certificate.mk_upper_bounds_constraints]
+[@@disable Certificate.mk_lower_bounds_constraints, Certificate.mk_upper_bounds_constraints ]
 [@@fc]
 
 
 lemma well_formed_mk_geq_constraints' upper_bounds lower_bounds u_constraints l_constraints =
-    u_constraints = mk_upper_bounds_constraints (List.length upper_bounds) 0 upper_bounds &&
-    l_constraints = mk_lower_bounds_constraints (List.length upper_bounds) 0 lower_bounds &&
+    u_constraints = mk_upper_bounds_constraints (List.length upper_bounds) upper_bounds &&
+    l_constraints = mk_lower_bounds_constraints (List.length upper_bounds) lower_bounds &&
     upper_bounds <> [] && lower_bounds <> [] && 
     List.length upper_bounds = List.length lower_bounds
     ==>
     well_formed (mk_geq_constraints upper_bounds lower_bounds) upper_bounds
 [@@auto]
 [@@apply well_formed_mk_geq_constraints upper_bounds lower_bounds u_constraints l_constraints]
-[@@disable Certificate.mk_lower_bounds_constraints, Certificate.mk_upper_bounds_constraints]
+[@@disable Certificate.mk_lower_bounds_constraints , Certificate.mk_upper_bounds_constraints ]
 [@@fc]
 
 lemma well_formed_mk_geq_constraints'' upper_bounds lower_bounds sys =
@@ -369,11 +343,11 @@ lemma well_formed_mk_geq_constraints'' upper_bounds lower_bounds sys =
     well_formed sys upper_bounds
 [@@auto]
 [@@apply well_formed_mk_geq_constraints' upper_bounds lower_bounds 
-        (mk_upper_bounds_constraints (List.length upper_bounds) 0 upper_bounds) 
-        (mk_lower_bounds_constraints (List.length upper_bounds) 0 lower_bounds)
+        (mk_upper_bounds_constraints  (List.length upper_bounds) upper_bounds) 
+        (mk_lower_bounds_constraints  (List.length upper_bounds) lower_bounds)
         ]
 [@@disable Certificate.mk_lower_bounds_constraints, 
-Certificate.mk_upper_bounds_constraints, Certificate.mk_geq_constraints]
+Certificate.mk_upper_bounds_constraints , Certificate.mk_geq_constraints]
 [@@fc]
 
 
@@ -396,6 +370,14 @@ lemma well_formed_good_poly_length system e x =
     well_formed system x && List.mem e system
     ==> 
     good_poly_length (extract_poly e) x
+    [@@auto]
+    [@@fc]
+
+lemma good_poly_length_same_lengths p l1 l2 =
+    List.length l1 = List.length l2 &&
+    good_poly_length p l1
+    ==>
+    good_poly_length p l2
     [@@auto]
     [@@fc]
 
