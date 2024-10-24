@@ -1,8 +1,15 @@
+open Farkas_lemma
+
 module Relu = struct
     (* f  b aux *)
     type t = (int * int * int)
 
     let relu x = if x >=. 0. then x else 0. 
+
+    theorem relu_split x y = 
+        y = relu x 
+        ==>
+        (y <=. 0. && x = 0.) || (y >=. 0. && x = y)
 
     let eval_relu ((b_var, f_var, aux_var): t) x =
         let b = List.nth b_var x in
