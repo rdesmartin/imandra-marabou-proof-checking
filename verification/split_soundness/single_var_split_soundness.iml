@@ -15,7 +15,7 @@ axiom sat_tableau_to_poly_sys tableau ubs lbs constraints x =
     eval_system (mk_system_contradiction (mk_eq_constraints tableau) ubs lbs) x
     [@@fc]
 
-axiom sound_split_poly_system tableau ubs lbs x  
+lemma sound_split_poly_system tableau ubs lbs x  
         (left: Tightening.t list) (right: Tightening.t list) =
     let ub_left = Tightening.update_bounds' ubs left Utils.UPPER in
     let lb_left = Tightening.update_bounds' lbs left Utils.LOWER in
