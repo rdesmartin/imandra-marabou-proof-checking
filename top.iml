@@ -4,8 +4,8 @@ checker_soundness.iml proofs in interactive mode
 *)
 
 #use "proof_checker/imports.iml"
-#use "verification/mk_bound_poly.iml"
-#use "verification/bound_reduct_g.iml"
+#use "verification/tableau_to_poly_reduction/mk_bound_poly.iml"
+#use "verification/tableau_to_poly_reduction/bound_reduct_g.iml"
 
 open Utils
 open Constraint

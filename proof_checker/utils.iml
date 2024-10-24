@@ -43,7 +43,6 @@ let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =
     else
     match l with
     | [] -> []
-    (* | [_] when n=0 -> [x] *)
     | hd::tl ->
     if n = 0 then (
         x :: tl
@@ -51,6 +50,11 @@ let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =
         hd :: set_nth tl (n-1) x
     )
 ;;
+
+lemma set_nth_len_preservation l n x =
+    List.length (set_nth l n x) = List.length l
+    [@@auto]
+    [@@rw][@@fc]
 
 lemma get_set_nth l n a =
     n >= 0 && n < List.length l

@@ -27,6 +27,10 @@ module Tightening = struct
             | (var, value, _) :: tl -> let updated_bounds = set_nth bounds var value in
                     update_bounds_by_tightenings tl updated_bounds
 
+    let update_bounds' (bounds: Real.t list) (tightenings: t list) (bound_type: Utils.bound_type) =
+        let tightenings' = List.filter (fun (a, b, t) -> t = bound_type) tightenings in
+        update_bounds_by_tightenings tightenings' bounds 
+    
     (* update the bounds according to a list of tightenings *)
     let update_bounds (tightenings: t list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): (Real.t list * Real.t list) =
         let upper_tightenings = List.filter is_upper tightenings in
@@ -36,3 +40,14 @@ module Tightening = struct
         (updated_upper, updated_lower)
         
     end
+
+lemma update_bounds_by_tightening_len_preservation bounds tightenings = 
+    List.length (Tightening.update_bounds_by_tightenings tightenings bounds) = List.length bounds
+    [@@auto]
+    [@@rw]
+
+lemma update_bounds_len_preservation bounds tightenings bound_type = 
+    List.length (Tightening.update_bounds' bounds tightenings bound_type) = List.length bounds
+
+    [@@auto]
+    [@@rw]
