@@ -29,19 +29,21 @@ lemma different_at_index_matrix_to_system ubs ubs' i x =
     ==>
     eval_system (mk_bound_poly ubs)
 
+(* Assuming that the left side of the single variable constraint is the upper bound *)
 lemma single_var_tightenings_to_poly_system tableau ubs lbs x 
-        (left: Tightening.t list) (right: Tightening.t list) =
+        ((index_l, value_l, btype_l) as left: Tightening.t) 
+        ((index_r, value_r, btype_r) as right: Tightening.t) =
     let size = List.length ubs in
-    let ub_left = Tightening.update_bounds' ubs left Utils.UPPER in
-    let lb_left = Tightening.update_bounds' lbs left Utils.LOWER in
-    let ub_right = Tightening.update_bounds' ubs right Utils.UPPER in
-    let lb_right = Tightening.update_bounds' lbs right Utils.LOWER in
-    check_single_var_split left right
+    let ub_left = Tightening.update_bounds' ubs [left] Utils.UPPER in
+    let lb_left = Tightening.update_bounds' lbs [left] Utils.LOWER in
+    let ub_right = Tightening.update_bounds' ubs [right] Utils.UPPER in
+    let lb_right = Tightening.update_bounds' lbs [right] Utils.LOWER in
+    check_single_var_split [left] [right]
     ==>
     eval_system (mk_system_contradiction (mk_eq_constraints tableau) ub_left lb_left) x
     = (
         eval_system (mk_system_contradiction (mk_eq_constraints tableau) ubs lbs) x
-        && eval_exp (Geq (mk_bound_poly size left.value left.coeff))
+        && eval_exp (Geq (mk_bound_poly size index_l (-1.) value_l)) x
     )
 
 (* TODO: link (update_bounds/set_nth) with (ub_left lb_left)
