@@ -1,0 +1,208 @@
+(* GP Status: PROVED! *)
+
+[@@@import "farkas.iml"]
+[@@@import "certificate.iml"]
+[@@@import "arithmetic.iml"]
+[@@@import "constraint.iml"]
+[@@@import "proof_tree.iml"]
+[@@@import "checker.iml"]
+[@@@import "tightening.iml"]
+[@@@import "mk_bound_poly.iml"]
+[@@@import "bound_reduct_g.iml"]
+[@@@import "well_formed_reduction.iml"]
+[@@@import "util.iml"]
+
+open Util
+open Arithmetic
+open Constraint
+open Proof_tree
+open Checker
+open Check_splits
+open Certificate
+open Farkas
+open Tightening
+open Bound_lemma
+open Well_formed_reduction
+
+(* ===================== mk_gt_constraint_well_formed ================= *)
+
+
+lemma mk_gt_constraints_is_bound_poly gt_cons size var value bound_t = 
+    gt_cons = mk_gt_constraint size (var, value, bound_t) 
+    ==>
+    gt_cons = Gt (mk_bound_poly size var 1. (-. value)) ||
+    gt_cons = Gt (mk_bound_poly size var (-1.) value )
+[@@fc]
+
+let is_gt x = match x with 
+  | Gt _ -> true 
+  | Eq _ | Geq _ -> false
+
+lemma mk_gt_constraint_is_gt size var value bound_t = 
+    is_gt @@ mk_gt_constraint size (var, value, bound_t)
+[@@fc]
+
+lemma len_mk_bound_poly size i a b =
+  size >= 0
+  ==>
+  List.length (mk_bound_poly size i a b) = size + 1
+[@@by auto] [@@rw]
+
+lemma mk_gt_constraint_length_invariant gt_cons size var value bound_t x =
+    gt_cons = mk_gt_constraint size (var, value, bound_t) &&
+    List.length x = size
+    ==>
+    List.length (extract_poly gt_cons) = List.length x + 1
+[@@by auto]
+[@@fc] 
+
+lemma good_poly_x_sizes_len x y =
+  (good_poly_x_sizes x y) [@trigger]
+  =
+  (List.length x - 1 = List.length y)
+[@@by auto] [@@fc]
+
+lemma mk_gt_constraint_good_poly_length gt_cons size var value bound_t x =
+    gt_cons = mk_gt_constraint size (var, value, bound_t) &&
+    List.length x = size
+    ==>
+    good_poly_x_sizes (extract_poly gt_cons) x
+[@@by [%use mk_gt_constraint_length_invariant gt_cons size var value bound_t x]
+   @> auto]
+[@@disable extract_poly]
+[@@fc]
+
+lemma mk_gt_constraints_well_formed gt_cons size var value bound_t x =
+    List.length x = size &&
+    gt_cons = mk_gt_constraint size (var, value, bound_t)
+    ==>
+    well_formed [gt_cons] x
+[@@by [%use mk_gt_constraint_good_poly_length gt_cons size var value bound_t x]
+   @> auto]
+[@@fc]
+
+(* ================== mk_system_lemma_well_formed ========================= *)
+
+lemma well_formed_prepend_invariant exp sys x =
+    good_poly_x_sizes (extract_poly exp) x &&
+    well_formed sys x
+    ==> 
+    well_formed (exp :: sys) x
+[@@by auto]
+[@@fc]
+
+lemma well_formed_prepend_concat_invariant exp sys1 sys2 x = 
+    good_poly_x_sizes (extract_poly exp) x &&
+    well_formed sys1 x &&
+    well_formed sys2 x
+    ==> 
+    well_formed (exp :: (sys1 @ sys2)) x
+[@@by auto]
+[@@fc]
+
+(*  gt_constraint :: (eq_constraints @ geq_constraints) is well formed *)
+lemma mk_system_lemmas_gt_eq_geq_well_formed tableau upper_bounds lower_bounds eq_constraints geq_constraints gt_constraint caus_var lemma_bound caus_bound_t x =
+    well_formed_tableau tableau &&
+    upper_bounds <> [] && lower_bounds <> [] && 
+    List.length upper_bounds = List.length (List.hd tableau) &&
+    List.length upper_bounds = List.length lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    eq_constraints = mk_eq_constraints tableau &&
+    geq_constraints = mk_geq_constraints upper_bounds lower_bounds &&
+    gt_constraint = mk_gt_constraint (List.length upper_bounds) (caus_var, lemma_bound, caus_bound_t)
+    ==>
+    well_formed (gt_constraint :: (eq_constraints @ geq_constraints)) x
+[@@by [%use well_formed_mk_geq_constraints'' upper_bounds lower_bounds geq_constraints]
+   @> [%use well_formed_mk_eq_constraints tableau eq_constraints]
+   @> [%use mk_gt_constraint_good_poly_length gt_constraint (List.length upper_bounds) caus_var lemma_bound caus_bound_t x]
+   @> [%use well_formed_prepend_concat_invariant gt_constraint eq_constraints geq_constraints x]
+   @> auto]
+[@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.compute_combination, List.hd, Farkas.good_poly_x_sizes]
+[@@fc]
+
+(** we add equality conditions to the conclusion so that mk_system_lemma_well_formed' can be applied automatically when proving mk_system_lemma_well_formed'' *)
+lemma mk_system_lemma_equivalence tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system =
+    let geq_constraints = mk_geq_constraints upper_bounds lower_bounds in
+    let eq_constraints = mk_eq_constraints tableau in
+    let gt_constraint = mk_gt_constraint (List.length upper_bounds) (caus_var, lemma_bound, caus_bound_t) in
+    system = mk_system_lemma eq_constraints upper_bounds lower_bounds (caus_var, lemma_bound, caus_bound_t) 
+    ==>
+    system = gt_constraint :: (eq_constraints @ geq_constraints) &&
+    geq_constraints = mk_geq_constraints upper_bounds lower_bounds &&
+    eq_constraints = mk_eq_constraints tableau &&
+    gt_constraint = mk_gt_constraint (List.length upper_bounds) (caus_var, lemma_bound, caus_bound_t)
+[@@by auto]
+[@@fc]
+
+lemma mk_system_lemma_helper tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system x =
+    well_formed_tableau tableau &&
+    upper_bounds <> [] && lower_bounds <> [] && 
+    List.length upper_bounds = List.length (List.hd tableau) &&
+    List.length upper_bounds = List.length lower_bounds &&
+    List.length x = List.length (List.hd tableau)
+    ==>
+    well_formed ((mk_gt_constraint (List.length upper_bounds) (caus_var, lemma_bound, caus_bound_t)) :: ((mk_eq_constraints tableau) @ (mk_geq_constraints upper_bounds lower_bounds))) x
+[@@by [%use mk_system_lemmas_gt_eq_geq_well_formed 
+            tableau 
+            upper_bounds 
+            lower_bounds 
+            (mk_eq_constraints tableau) 
+            (mk_geq_constraints upper_bounds lower_bounds) 
+            (mk_gt_constraint (List.length upper_bounds) (caus_var, lemma_bound, caus_bound_t))
+            caus_var lemma_bound caus_bound_t x]
+    @> auto]
+[@@disable Certificate.mk_gt_constraint,
+    Certificate.mk_geq_constraints, 
+    Certificate.mk_eq_constraints,
+    Certificate.mk_gt_constraint,
+    Certificate.mk_system_lemma]
+
+lemma mk_system_lemma_well_formed tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system x =
+    well_formed_tableau tableau &&
+    upper_bounds <> [] && lower_bounds <> [] && 
+    List.length upper_bounds = List.length (List.hd tableau) &&
+    List.length upper_bounds = List.length lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    system = mk_system_lemma (mk_eq_constraints tableau) upper_bounds lower_bounds (caus_var, lemma_bound, caus_bound_t)
+    ==>
+    well_formed system x
+[@@by [%use mk_system_lemma_helper tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system x]
+   @> auto]
+[@@disable Certificate.mk_gt_constraint,
+           Certificate.mk_geq_constraints, 
+           Certificate.mk_eq_constraints,
+           Certificate.mk_system_lemma]
+[@@fc]
+
+(* =================== lemma_system_evaluation_false =========================== *)
+
+lemma lemma_system_evaluation_false_helper tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system x c =
+    well_formed_tableau tableau &&
+    upper_bounds <> [] && lower_bounds <> [] && 
+    List.length upper_bounds = List.length (List.hd tableau) &&
+    List.length upper_bounds = List.length lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    system = mk_system_lemma (mk_eq_constraints tableau) upper_bounds lower_bounds (caus_var, lemma_bound, caus_bound_t) &&
+    check_cert system c
+    ==>
+    well_formed system x
+[@@by [%use mk_system_lemma_well_formed tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system x]
+   @> auto]
+[@@disable Certificate.mk_system_lemma, Farkas.check_cert]
+[@@fc]
+
+lemma lemma_system_evaluation_false tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system x c =
+    well_formed_tableau tableau &&
+    upper_bounds <> [] && lower_bounds <> [] && 
+    List.length upper_bounds = List.length (List.hd tableau) &&
+    List.length upper_bounds = List.length lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    system = mk_system_lemma (mk_eq_constraints tableau) upper_bounds lower_bounds (caus_var, lemma_bound, caus_bound_t) &&
+    check_cert system c
+    ==>
+    eval_system system x = false
+[@@by [%use lemma_system_evaluation_false_helper tableau upper_bounds lower_bounds caus_var lemma_bound caus_bound_t system x c]
+   @> [%use Farkas.check_cert_correct system x c]
+   @> auto]
+[@@disable Certificate.mk_system_lemma, Farkas.check_cert]
+[@@fc]

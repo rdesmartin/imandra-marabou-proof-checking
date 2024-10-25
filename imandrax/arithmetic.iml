@@ -1,0 +1,89 @@
+(* GP Status: PROVED! *)
+
+[@@@import "util.iml"]
+[@@@import "farkas.iml"]
+
+open Util
+open Farkas
+
+(** is_bounded returns true is the vector xs is bounded by us and ls, i.e. for each corresponding
+    elements x_i, l_i, u_i, l_i <= x <= u_i *)
+let rec is_upper_bounded (x: Real.t list) (u: Real.t list) = 
+match x, u with
+| [], [] -> true
+| [x], [u] -> x <=. u
+| x :: xs, u :: us -> x <=. u && is_upper_bounded xs us
+| _ -> false
+
+(* lemma is_upper_bounded_elem xs xi us ui n =
+    List.nth n xs = Some xi &&
+    List.nth n us = Some ui &&
+    is_upper_bounded xs us
+    ==>
+    xi <=. ui        
+[@@auto]
+[@@fc] *)
+
+let is_bounded (x: Real.t list) (u: Real.t list) (l: Real.t list) = 
+    is_upper_bounded l x && is_upper_bounded x u
+
+(** Helper function for {!compute_combination} *)
+let rec update_combination (lc: Real.t list) (expl: Real.t list) (tableau: expr list): Real.t list = 
+    match expl, tableau with
+    | _, [] | [], _ -> lc
+    | coeff :: expl', row :: tableau' -> update_combination (list_add lc (list_scale (extract_poly row) coeff)) expl' tableau'
+
+(** Compute a linear combination of tableau rows with coefficients from the explanation vector `expl` 
+    (i.e. a bound-tightening lemma vector or a contradiction in a Leaf node) 
+    The initial zero vector accumulator has length (len p - 1) because the polynomials have a constant factor, 
+    and we want it to be the size of the variable vector
+    *)        
+let compute_combination (expl: Real.t list) (tableau: expr list): Real.t list =
+    match tableau with
+    | [] -> []
+    | (hd::tl as tableau) -> update_combination (repeat 0. (List.length (extract_poly hd) - 1)) expl tableau
+
+    (** Helper function for {!compute_row_upper_bound} *)
+let upper_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
+    if coeff <. 0. 
+    then 
+        bound +. (lower_bound *. coeff)
+    else
+        bound +. (upper_bound *. coeff)
+
+(** Compute the upper bound for a tableau row represented as list of reals *)
+let rec compute_row_upper_bound (row: Real.t list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): Real.t =
+    match row, upper_bounds, lower_bounds with
+    | row_h :: row_t, upp_h :: upp_t, low_h :: low_t -> 
+        if row_h >. 0. 
+        then row_h *. upp_h +. (compute_row_upper_bound row_t upp_t low_t)
+        else row_h *. low_h +. (compute_row_upper_bound row_t upp_t low_t)
+    | _ -> 0.
+
+let rec upper_bound_induct_scheme x row = 
+    match x, row with
+    | x_h :: x_t, row_h :: row_t -> upper_bound_induct_scheme x_t row_t
+    | _ -> true
+
+(** Helper function for {!compute_row_lower_bound}  *)
+let lower_bound_acc_fun bound (coeff, (upper_bound, lower_bound)) =
+    if coeff <. 0. 
+    then 
+        bound +. (upper_bound *. coeff)
+    else
+        bound +. (lower_bound *. coeff)
+
+(** Compute the upper bound for a tableau row represented as list of reals *)
+let compute_row_lower_bound (row: Real.t list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =
+    List.fold_left lower_bound_acc_fun 0. (zip row (zip upper_bounds lower_bounds))
+
+let rec dot_product x y =
+match x, y with
+    | [], [] -> 0.
+    | x_hd :: x_tl, y_hd :: y_tl -> x_hd *. y_hd +. (dot_product x_tl y_tl)
+    | _ -> 0.
+
+let rec is_in_kernel tableau x =
+    match tableau with
+    | [] -> true
+    | row :: rows -> dot_product row x = 0. && is_in_kernel rows x

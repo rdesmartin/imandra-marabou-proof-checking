@@ -1,0 +1,140 @@
+(* GP Status: PROVED! *)
+
+[@@@import "farkas.iml"]
+[@@@import "certificate.iml"]
+[@@@import "checker.iml"]
+[@@@import "tightening.iml"]
+[@@@import "mk_bound_poly.iml"]
+[@@@import "util.iml"]
+
+open Farkas
+open Tightening
+open Util
+open Certificate
+open Arithmetic
+ 
+ lemma is_upper_bounded_same_length xs bs =
+   is_upper_bounded xs bs
+   ==>
+   List.length xs = List.length bs
+ [@@by auto] [@@fc]
+ 
+ lemma is_upper_bounded_elem xs xi us ui n =
+   List.nth n xs = Some xi
+   && List.nth n us = Some ui
+   && is_upper_bounded xs us
+   ==>
+   xi <=. ui        
+ [@@by auto] [@@fc]
+
+lemma upper_bound_eq_key i bound xs xi =
+   List.nth i xs = Some xi 
+      ==>
+   ((xi <=. bound) = (((eval_poly (mk_bound_poly (List.length xs) i (-1.0) bound) xs)) >=. 0.0))
+[@@by auto] [@@fc]
+ 
+ (* Key function: make an upper-bound expression! *)
+ 
+ let mk_ub_exp size i u =
+   Geq (mk_bound_poly size i (-1.) u)
+ 
+ let ub_correct_at_i i ubs xs =
+   match List.nth i ubs with
+   | Some ub ->
+     eval_expr (Geq (mk_bound_poly (List.length ubs) i (-1.) ub)) xs
+   | None -> false
+
+  lemma nth_some_in_bounds i xs =
+   i >= 0 && i < List.length xs
+   ==>
+   List.nth i xs <> None
+  [@@by auto] [@@fc] [@@rw]
+  
+ lemma upper_bounded_is_correct xs ubs i =
+   i >= 0
+   && is_upper_bounded xs ubs
+   && i < List.length xs
+      ==>
+   ub_correct_at_i i ubs xs
+ [@@by auto] [@@fc] [@@rw]
+ [@@disable List.nth]
+
+ (* Key function: for 0<=i<len(xs), the i-th bounds are correct!
+    Outside of these bounds, we don't care.
+ 
+    This way of phrasing the spec makes induction more natural.
+  *)
+ 
+ let rec check_down_from_ubs i ubs xs =
+   if i < 0 || i >= List.length ubs then true
+   else ub_correct_at_i i ubs xs
+        && check_down_from_ubs (i-1) ubs xs
+     
+ let all_ubs_correct ubs xs =
+   check_down_from_ubs (List.length xs - 1) ubs xs
+   
+ lemma check_down_from_correct_ubs ubs xs size =
+    is_upper_bounded xs ubs
+    && size <= List.length xs
+    ==>
+    check_down_from_ubs size ubs xs
+ [@@by auto] [@@disable ub_correct_at_i] [@@rw]
+ 
+ theorem final_ubs ubs xs =
+   is_upper_bounded xs ubs
+   ==>
+   all_ubs_correct ubs xs
+ [@@by auto]
+ 
+ (* repeat for lower bounds *)
+ 
+ lemma lower_bound_eq_key i bound xs xi =
+   List.nth i xs = Some xi 
+      ==>
+   (bound <=. xi) = (((eval_poly (mk_bound_poly (List.length xs) i 1. (-. bound) ) xs)) >=. 0.0)
+ [@@by auto] [@@fc]
+ 
+ (* Key function: make an upper-bound expression! *)
+ 
+ let lb_correct_at_i i lbs xs =
+   match List.nth i lbs with
+   | Some lb ->
+     eval_expr (Geq (mk_bound_poly (List.length lbs) i 1. (-. lb))) xs
+   | None -> false
+ 
+ lemma lower_bounded_is_correct xs lbs i =
+   i >= 0
+   && is_upper_bounded lbs xs
+   && i < List.length xs
+      ==>
+   lb_correct_at_i i lbs xs
+ [@@by auto] [@@fc] [@@rw]
+ [@@disable List.nth]
+
+ (* Key function: for 0<=i<len(xs), the i-th bounds are correct!
+    Outside of these bounds, we don't care.
+ 
+    This way of phrasing the spec makes induction more natural.
+  *)
+ 
+ let rec check_down_from_lbs i lbs xs =
+   if i < 0 || i >= List.length lbs then true
+   else lb_correct_at_i i lbs xs
+        && check_down_from_lbs (i-1) lbs xs
+     
+ let all_lbs_correct lbs xs =
+   check_down_from_lbs (List.length xs - 1) lbs xs
+   
+ lemma check_down_from_correct_lbs lbs xs size =
+    is_upper_bounded lbs xs 
+    && size <= List.length xs
+    ==>
+    check_down_from_lbs size lbs xs
+ [@@by auto] [@@disable lb_correct_at_i] [@@rw]
+ 
+ theorem final_lbs lbs xs =
+   is_upper_bounded lbs xs
+   ==>
+   all_lbs_correct lbs xs
+ [@@by auto]
+ 

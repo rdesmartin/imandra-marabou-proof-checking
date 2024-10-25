@@ -1,0 +1,65 @@
+(* GP Status: PROVED! *)
+
+[@@@import "farkas.iml"]
+[@@@import "certificate.iml"]
+[@@@import "arithmetic.iml"]
+[@@@import "constraint.iml"]
+[@@@import "proof_tree.iml"]
+[@@@import "checker.iml"]
+[@@@import "tightening.iml"]
+[@@@import "mk_bound_poly.iml"]
+[@@@import "bound_reduct_g.iml"]
+[@@@import "well_formed_reduction.iml"]
+[@@@import "util.iml"]
+
+open Certificate
+open Checker
+open Util
+open Farkas
+open Arithmetic
+
+lemma kernel_row_eval_poly row x =
+    List.length x = List.length row
+    ==>
+    dot_product row x = eval_poly (row @ [0.]) x
+    [@@by auto]
+    [@@fc]
+
+lemma kernel_row_eval_system row x =
+    List.length x = List.length row &&
+    dot_product row x = 0.
+    ==>
+    eval_system [Eq (row @ [0.])] x
+    [@@by [%use kernel_row_eval_poly row x]
+       @> auto]
+    [@@fc]
+
+lemma kernel_head_zero_dot_product tableau x = 
+    List.length x = List.length (List.hd tableau) &&
+    well_formed_tableau tableau &&
+    is_in_kernel tableau x
+    ==>
+    dot_product (List.hd tableau) x = 0.
+    [@@by auto]
+    [@@fc]
+
+theorem tableau_reduction_soundness tableau x =
+    List.length x = List.length (List.hd tableau) &&
+    well_formed_tableau tableau &&
+    is_in_kernel tableau x
+    ==>
+    eval_system (mk_eq_constraints tableau) x
+    [@@by induct ~on_vars:["tableau"] ()]
+    [@@fc]
+
+theorem tableau_reduction_soundness_contra tableau x =
+    List.length x = List.length (List.hd tableau) &&
+    well_formed_tableau tableau &&
+    not (eval_system (mk_eq_constraints tableau) x)
+    ==>
+    not (is_in_kernel tableau x)
+    [@@by [%use tableau_reduction_soundness tableau x]
+       @> auto]
+    [@@disable List.length, Checker.well_formed_tableau, Arithmetic.is_in_kernel, 
+               Farkas.eval_system, Certificate.mk_eq_constraints]
+    [@@fc]

@@ -1,0 +1,136 @@
+(* GP Status: PROVED! *)
+
+type bound_type = UPPER | LOWER
+
+let bound_type_to_bool = function
+    | UPPER -> true
+    | LOWER -> false
+
+type constraint_type =
+    | RELU
+    | MAX
+    | SIGN
+    | DISJUNCTION
+    | ABSOLUTE_VALUE
+    | LEAKY_RELU
+    | UNDEFINED
+
+let all (l: bool list) = List.fold_left (fun x y -> x && y) true l
+
+let rec repeat x n =
+    if n <= 0
+    then
+        []
+    else
+        x::(repeat x (n - 1))
+
+lemma repeat_preserve_pos_length x n =
+    n >= 0 ==> List.length (repeat x n) = n
+[@@by auto]
+
+(* set list element at given index to x *)
+let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =    
+    if n < 0 then l
+    else
+    match l with
+    | [] -> []
+    (* | [_] when n=0 -> [x] *)
+    | hd::tl ->
+    if n = 0 then (
+        x :: tl
+    ) else (
+        hd :: set_nth tl (n-1) x
+    )
+
+lemma get_set_nth l n a =
+    n >= 0 && n < List.length l
+     ==>
+     (List.nth n (set_nth l n a) = Some a)
+[@@by auto] [@@rw]
+
+lemma set_nth_unchanged l n m a =
+  n <> m
+  ==>
+  List.nth m (set_nth l n a) = List.nth m l
+[@@by auto] [@@rw]
+
+(* increment list element at given index by 1 *)
+let increment_elem (l: Real.t list) (n: int): Real.t list =
+    match List.nth n l with
+    | None -> l
+    | Some value -> set_nth l n (value +. 1.)
+
+(* decrement list element at given index by 1 *)
+let decrement_elem (l: Real.t list) (n: int): Real.t list =
+    match List.nth n l with
+    | None -> l
+    | Some value -> set_nth l n (value -. 1.)
+
+let rec zip (x: 'a list) (y: 'b list): ('a * 'b) list =
+    match x, y with
+    | [], _ | _, [] -> []
+    | hx::tx, hy::ty -> (hx, hy) :: (zip tx ty)
+
+let zip_map_compare (x: 'a list) (y: 'b list) (f: 'a -> 'b -> 'c) (n: int) =
+    let open Option in
+    let* xn = List.nth n x in
+    let* yn = List.nth n y in
+    let* b = List.nth n @@ List.map (fun (a, b) -> f a b) (zip x y) in
+    Some (f xn yn = b)
+
+(* Add 2 lists of Real.ts element-wise *)
+let rec list_add (x: Real.t list) (y: Real.t list): Real.t list = 
+    match x, y with
+    | [], [] -> []
+    | x :: xs, y :: ys -> x +. y :: list_add xs ys
+    | x::xs, [] | [], x :: xs -> []
+
+lemma list_add_length_invariant l1 l2 = 
+    List.length l1 = List.length l2 
+    ==>
+    List.length (list_add l1 l2) = List.length l1
+    [@@by induct ~on_fun:[%id list_add] ()
+       @> auto]
+
+(* Multiply all elements in a list of Real.ts by a constant *)
+let rec list_scale (x: Real.t list) (c: Real.t): Real.t list = 
+    match x with
+    | [] -> []
+    | x :: xs -> x *. c :: list_scale xs c
+
+lemma list_scale_length_preservation l c = 
+    List.length (list_scale l c) = List.length l
+    [@@by auto]
+    [@@rw][@@fc]
+
+lemma repeat_length x n =
+    n >= 0 
+    ==>
+    List.length (repeat x n) = n
+[@@by auto]
+
+lemma zip_size1 (x: int list) (y: int list) =
+    List.length x <= List.length y 
+    ==>
+    List.length (zip x y) = List.length x
+[@@by induct ~on_fun:[%id zip] ()]
+
+lemma zip_size2 (x: 'a list) (y: 'b list) =
+    List.length y <= List.length x 
+    ==>
+    List.length (zip x y) = List.length y
+[@@by induct ~on_fun:[%id zip] ()]
+
+lemma zip_cons x1 x2 y1 y2 =
+    zip (x1 :: x2) (y1 :: y2) = (x1, y1) :: (zip x2 y2)
+[@@by auto]
+
+lemma zip_cat x1 x2 y1 y2 =
+    List.length x1 = List.length y1
+    ==> 
+    zip (x1 @ x2) (y1 @ y2) = (zip x1 y1) @ (zip x2 y2)
+[@@by induct ~on_fun:[%id zip] ()]
+
+(** returns true if all elements of l1 are gte to corresponding elements of l2  *)
+let list_geq (l1: Real.t list) (l2: Real.t list): bool =
+    all (List.map (fun (a, b) -> a >=. b) (zip l1 l2))

@@ -1,0 +1,37 @@
+(* GP Status: PROVED! *)
+
+let lift f r = match r with
+| Ok r' -> Ok (f r')
+| Error e -> Error e
+
+let rec extract_list (l: ('a, 'b) result list) = match l with   (* return: ('a list, 'b) result *)
+| [] -> Ok []
+| (Ok x)::tail -> lift (List.cons x) (extract_list tail)
+| (Error msg)::tail -> Error msg
+
+let bind2 (f: 'a -> 'b -> ('c, 'e) result) (x: ('a, 'e) result) (y: ('b, 'e) result) =
+    match (x, y) with
+    | (Ok x', Ok y') -> f x' y'
+    | (Error e, _) | (_, Error e) -> Error e
+
+let bind3 (f: 'a -> 'b -> 'c -> ('d, 'e) result) (x: ('a, 'e) result) (y: ('b, 'e) result) (z: ('c, 'e) result) =
+    match x, y, z with
+    | Ok x', Ok y', Ok z' -> f x' y' z'
+    | Error e, _, _ | _, Error e, _ | _, _, Error e -> Error e
+
+let bind5 func a b c d e =
+    let res1 = bind3 (fun p q r -> Ok (p, q, r)) a b c in
+    let res2 = bind2 (fun p q -> Ok (p, q)) d e in
+    let res3 = bind2 (fun (p, q, r) (s, t) -> Ok (p, q, r, s, t)) res1 res2 in
+    match res3 with 
+    | Ok (p, q, r, s, t) -> func p q r s t
+    | Error e -> Error e
+
+let bind7 func a b c d e f g =
+    let res1 = bind3 (fun p q r -> Ok (p, q, r)) a b c in
+    let res2 = bind3 (fun p q r -> Ok (p, q, r)) d e f in
+    let res3 = bind3 (fun (p, q, r) (s, t, u) v -> Ok (p, q, r, s, t, u, v)) res1 res2 g in
+    match res3 with 
+    | Ok (p, q, r, s, t, u, v) -> func p q r s t u v
+    | Error e -> Error e
+        
