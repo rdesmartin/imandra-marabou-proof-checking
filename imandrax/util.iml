@@ -54,6 +54,10 @@ lemma set_nth_unchanged l n m a =
   List.nth m (set_nth l n a) = List.nth m l
 [@@by auto] [@@rw]
 
+lemma len_set_nth x key value = 
+  List.length (set_nth x key value) = List.length x
+[@@by auto] [@@rw]
+
 (* increment list element at given index by 1 *)
 let increment_elem (l: Real.t list) (n: int): Real.t list =
     match List.nth n l with
