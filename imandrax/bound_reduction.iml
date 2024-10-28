@@ -250,7 +250,9 @@ lemma eval_up_to_uses_nt_matching' s xs i =
     match List.nth i s with
     | Some p -> eval_expr p xs ==> eval_system_up_to s i xs 
     | None -> false
-[@@by auto] [@@fc]
+[@@by auto] 
+[@@timeout 120]
+[@@fc]
 
 lemma eval_up_to_uses_nt s xs i e = 
     eval_expr e xs && eval_system_up_to s (i-1) xs 
