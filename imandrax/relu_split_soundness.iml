@@ -1,0 +1,20 @@
+[@@@import "tightening.iml"]
+[@@@import "split.iml"]
+[@@@import "leaf_soundness.iml"]
+
+open Tightening
+open Split
+open Leaf_soundness
+
+
+axiom soundness_relu_split_matching tableau ubs lbs constraints x 
+        (left: Tightening.t list) (right: Tightening.t list) =
+    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lbs ubs (match_split left right constraints) in
+    match match_split left right constraints with
+    | Relu (b, f, aux) -> 
+        sat tableau ubs lbs constraints x
+        ==>
+        sat tableau ub_left lb_left constraints x 
+        || sat tableau ub_right lb_right constraints x
+    | _ -> true
+[@@by auto]

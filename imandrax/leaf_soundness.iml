@@ -7,7 +7,7 @@
 [@@@import "arithmetic.iml"]
 [@@@import "constraint.iml"]
 [@@@import "proof_tree.iml"]
-[@@@import "check_splits.iml"]
+[@@@import "split.iml"]
 [@@@import "checker.iml"]
 [@@@import "tightening.iml"]
 [@@@import "mk_bound_poly.iml"]
@@ -20,7 +20,7 @@
 open Util
 open Constraint
 open Proof_tree
-open Check_splits
+open Split
 open Certificate
 open Checker
 open Arithmetic

@@ -20,7 +20,7 @@ open Arithmetic
 open Constraint
 open Proof_tree
 open Checker
-open Check_splits
+(* open Check_splits *)
 open Certificate
 open Farkas
 open Tightening

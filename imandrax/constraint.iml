@@ -17,7 +17,7 @@ type t = constraint_type * int list
     
 let relu x = if x >=. 0. then x else 0. 
 
-let eval_relu ((b_var, f_var, aux_var): (int * int * int)) x =
+let eval_relu (b_var: int) (f_var: int) (aux_var: int) (x: real list) =
     let b = List.nth b_var x in
     let f = List.nth f_var x in
     let aux = List.nth aux_var x in
@@ -29,5 +29,5 @@ let eval_relu ((b_var, f_var, aux_var): (int * int * int)) x =
 let rec check_relu_constraints (cs: t list) (x: real list) =
     match cs with
     | [] -> true
-    | (RELU, [a; b; f]) :: cs -> eval_relu (a, b, f) x && check_relu_constraints cs x
+    | (RELU, [a; b; f]) :: cs -> eval_relu b f a x && check_relu_constraints cs x
     | _ -> false

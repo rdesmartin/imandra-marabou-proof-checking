@@ -15,17 +15,17 @@ match x, u with
 | x :: xs, u :: us -> x <=. u && is_upper_bounded xs us
 | _ -> false
 
-(* lemma is_upper_bounded_elem xs xi us ui n =
-    List.nth n xs = Some xi &&
-    List.nth n us = Some ui &&
-    is_upper_bounded xs us
-    ==>
-    xi <=. ui        
-[@@auto]
-[@@fc] *)
-
-let is_bounded (x: Real.t list) (u: Real.t list) (l: Real.t list) = 
+let is_bounded_old (x: Real.t list) (u: Real.t list) (l: Real.t list) = 
     is_upper_bounded l x && is_upper_bounded x u
+
+let rec is_bounded xs us ls = 
+    match xs, us, ls with
+    | [], [], [] -> true
+    | x::xs, u::us, l::ls -> l <=. x && x <=. u && is_bounded xs us ls
+    | x::xs, [], l::ls -> l <=. x && is_bounded xs us ls
+    | x::xs, u::us, [] -> x <=. u && is_bounded xs us ls
+    | _, _, _ -> true
+
 
 (** Helper function for {!compute_combination} *)
 let rec update_combination (lc: Real.t list) (expl: Real.t list) (tableau: expr list): Real.t list = 

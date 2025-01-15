@@ -54,6 +54,10 @@ lemma set_nth_unchanged l n m a =
   List.nth m (set_nth l n a) = List.nth m l
 [@@by auto] [@@rw]
 
+lemma set_nth_length_preservation l n x = 
+    List.length (set_nth l n x) = List.length l
+[@@by auto] [@@rw]
+
 (* increment list element at given index by 1 *)
 let increment_elem (l: Real.t list) (n: int): Real.t list =
     match List.nth n l with
@@ -130,6 +134,17 @@ lemma zip_cat x1 x2 y1 y2 =
     ==> 
     zip (x1 @ x2) (y1 @ y2) = (zip x1 y1) @ (zip x2 y2)
 [@@by induct ~on_fun:[%id zip] ()]
+
+let rec zip3 l1 l2 l3 = 
+    match l1, l2, l3 with
+    | [], _, _ | _, [], _ | _, _, [] -> []
+    | h1::t1, h2::t2, h3::t3 -> (h1, h2, h3) :: zip3 t1 t2 t3
+
+(* lemma zip3_length_preservation l1 l2 l3 =
+    List.length l1 <= List.length l2 && List.length l1 <= List.length l3
+    ==> 
+    List.length (zip3 l1 l2 l3) = List.length l1
+    [@@by auto] *)
 
 (** returns true if all elements of l1 are gte to corresponding elements of l2  *)
 let list_geq (l1: Real.t list) (l2: Real.t list): bool =

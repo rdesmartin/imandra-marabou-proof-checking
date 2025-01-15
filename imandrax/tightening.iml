@@ -19,14 +19,17 @@ let is_lower = function
   | (_, _, LOWER) -> true
   | _ -> false
 
-(* update a single bound according to a list of tightenings *)
+(* update a single bound vector according to a list of tightenings *)
 let rec update_bounds_by_tightenings (tightenings: t list) (bounds: Real.t list): Real.t list =
    match tightenings with
    | []                    -> bounds
    | (var, value, _) :: tl -> let updated_bounds = set_nth bounds var value in
                               update_bounds_by_tightenings tl updated_bounds
 
-
+let update_bounds' (bounds: Real.t list) (tightenings: t list) (bound: bound_type) =
+        let tightenings' = List.filter (fun (a, b, t) -> t = bound) tightenings in
+        update_bounds_by_tightenings tightenings' bounds 
+    
 (* update the bounds according to a list of tightenings *)
 let update_bounds_lr upper_tightenings lower_tightenings (upper_bounds: Real.t list) (lower_bounds: Real.t list): (Real.t list * Real.t list) =
   let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in

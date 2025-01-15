@@ -4,13 +4,13 @@
 [@@@import "farkas.iml"]
 [@@@import "arithmetic.iml"]
 [@@@import "tightening.iml"]
-[@@@import "check_splits.iml"]
+[@@@import "split.iml"]
 [@@@import "certificate.iml"]
 [@@@import "constraint.iml"]
 
 open Util
 open Arithmetic
-open Check_splits
+open Split
 open Tightening
 open Farkas
 open Certificate

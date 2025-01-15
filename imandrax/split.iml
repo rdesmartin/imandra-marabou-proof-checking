@@ -1,0 +1,147 @@
+(* GP Status: PROVED! *)
+
+[@@@import "util.iml"]
+[@@@import "tightening.iml"]
+[@@@import "constraint.iml"]
+
+open Util
+open Tightening
+open Constraint
+
+type t = 
+    Single of int * real (* variable, value *)
+    | Relu of int * int * int (* participating relu variables: b, f, aux *) 
+    | Invalid
+
+let is_single_var (split: t): bool =
+    match split with
+    | Single _ -> true
+    | _ -> false
+
+let is_relu (split: t): bool =
+    match split with
+    | Relu _ -> true
+    | _ -> false
+
+let is_invalid (split: t): bool =
+    match split with
+    | Invalid -> true
+    | _ -> false
+
+(* check that some split corresponds to a single variable split *)
+let match_single_var_split (l_t: Tightening.t list) (r_t: Tightening.t list): t =
+    match l_t, r_t with
+    | [(var, value, UPPER)], [(var, value, LOWER)] -> Single (var, value)
+    | [(var, value, LOWER)], [(var, value, UPPER)] -> Single (var, value) 
+    | _, _ -> Invalid
+
+let check_single_var_split (l_t: Tightening.t list) (r_t: Tightening.t list): bool = 
+    match match_single_var_split l_t r_t with 
+    | Single _ -> true
+    | _ -> false 
+
+let is_single_var (split: t): bool =
+    match split with
+    | Single _ -> true
+    | _ -> false
+
+let is_relu (split: t): bool =
+    match split with
+    | Relu _ -> true
+    | _ -> false
+
+let is_invalid (split: t): bool =
+    match split with
+    | Invalid -> true
+    | _ -> false
+
+let update_bounds_from_split (lbs: real list) (ubs: real list) (split: t): 
+        ((real list * real list) * (real list * real list)) =
+    match split with
+    | Single (i, k) -> ((set_nth lbs i k, ubs), (lbs, set_nth ubs i k))
+    | Relu (b, f, aux) ->
+        let lbs' = set_nth lbs f 0. in
+        let ubs' = set_nth (set_nth ubs b 0.) f 0. in
+        let lbs'' = set_nth (set_nth ubs b 0.) aux 0. in
+        let ubs'' = set_nth lbs aux 0. in
+        (lbs', ubs'), (lbs'', ubs'')
+    | _ -> (lbs, ubs), (lbs, ubs)
+
+let match_relu_split_measure constraints =
+    Ordinal.of_int (List.length constraints)
+
+let rec match_relu_split (l_t: Tightening.t list) (r_t: Tightening.t list) (constraints: Constraint.t list): t = 
+    match constraints with
+    | [] -> Invalid 
+    | (RELU, [b; f; aux])::tl-> (
+        match r_t, l_t with
+        (* inactive phase, active phase *)
+        | [(b, 0., UPPER); (f, 0., UPPER)], [(b, 0., LOWER); (aux, 0., UPPER)] -> Relu (b, f, aux)
+        | [(f, 0., UPPER); (b, 0., UPPER)], [(b, 0., LOWER); (aux, 0., UPPER)]-> Relu (b, f, aux)
+        | [(b, 0., UPPER); (f, 0., UPPER)], [(aux, 0., UPPER); (b, 0., LOWER)]-> Relu (b, f, aux)
+        | [(f, 0., UPPER); (b, 0., UPPER)], [(aux, 0., UPPER); (b, 0., LOWER)]-> Relu (b, f, aux)
+        (* active phase, inactive phase *)
+        | [(b, 0., LOWER); (aux, 0., UPPER)], [(b, 0., UPPER); (f, 0., UPPER)]-> Relu (b, f, aux)
+        | [(b, 0., LOWER); (aux, 0., UPPER)], [(f, 0., UPPER); (b, 0., UPPER)]-> Relu (b, f, aux)
+        | [(aux, 0., UPPER); (b, 0., LOWER)], [(b, 0., UPPER); (f, 0., UPPER)]-> Relu (b, f, aux)
+        | [(aux, 0., UPPER); (b, 0., LOWER)], [(f, 0., UPPER); (b, 0., UPPER)]-> Relu (b, f, aux)
+        | _ -> match_relu_split r_t l_t tl
+    )
+    | (_::tl) -> match_relu_split r_t l_t tl
+[@@measure match_relu_split_measure constraints]
+
+let match_split (l_t: Tightening.t list) (r_t: Tightening.t list) (constraints: Constraint.t list): t =
+    match (match_single_var_split l_t r_t) with 
+    | Single (var, value) -> Single (var, value)  
+    | _ -> (
+        match (match_relu_split l_t r_t constraints) with
+        | Relu (b, f, aux) -> Relu (b, f, aux)
+        | _ -> Invalid
+    )
+
+(** Match a given split with a constraint from a list of known ReLU constraints*)
+let rec match_relu_constraint r_tightening l_tightening constraints =
+    match constraints with
+    | [] -> []
+    | (RELU, l)::tl-> (
+        match r_tightening, l_tightening with
+        | [(var1, _, _); (var2, _, _)], [(var3, _, _); (var4, _, _)] ->
+            if
+                List.exists (fun x -> x = var1) l &&
+                List.exists (fun x -> x = var2) l &&
+                List.exists (fun x -> x = var3) l &&
+                List.exists (fun x -> x = var4) l
+            then
+                l
+            else
+                match_relu_constraint r_tightening l_tightening tl
+        | _ -> match_relu_constraint r_tightening l_tightening tl
+    )
+    | (_::tl) -> match_relu_constraint r_tightening l_tightening tl
+
+(* find a constraint given two participating variables *)
+let rec match_constraint (var1: int) (var2: int) constraints =
+    match constraints with
+    | [] -> (UNDEFINED, [])
+    | (c, l)::tl->
+            if List.exists (fun x -> x = var1) l && List.exists (fun x -> x = var2) l
+            then (c, l)
+            else match_constraint var1 var2 tl
+
+(* check that the split corresponds to the active phase of a ReLU constraint *)
+let is_active split b aux = match split with
+    | [(var1, 0., UPPER); (var2, 0., LOWER)] -> var1 = aux && var2 = b
+    | [(var1, 0., LOWER); (var2, 0., UPPER)] -> var1 = b && var2 = aux
+    | _ -> false
+
+(* check that the split corresponds to the inactive phase of a ReLU constraint *)
+let is_inactive split f b = match split with
+    | [(var1, 0., UPPER); (var2, 0., UPPER)] -> (var1 = f && var2 = b) || (var1 = b && var2 = f)
+    | _ -> false
+
+(* Check whether a proof tree node's split correspond to a known ReLU constraint *)
+let check_relu_split (l_tightening : Tightening.t list) (r_tightening : Tightening.t list) constraints =
+    let matched_constraint = match_relu_constraint l_tightening r_tightening constraints in
+    match matched_constraint with
+        | [b; f; aux; _] -> (is_active l_tightening b aux && is_inactive r_tightening f b) || (is_active r_tightening b aux && is_inactive l_tightening f b)
+        | _ -> false
