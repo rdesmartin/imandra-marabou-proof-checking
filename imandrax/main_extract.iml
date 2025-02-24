@@ -1,0 +1,34 @@
+[@@@import "util.iml"]
+[@@@import "json_decoder.iml"]
+[@@@import "proof_tree.iml"]
+[@@@import "checker.iml"]
+[@@@import "certificate.iml"]
+[@@@import "tightening.iml"]
+
+open Util
+open Json_decoder
+open Proof_tree
+open Checker
+open Certificate
+open Tightening
+
+let load_proof = JSON_decoder.decode_proof_file [@@program]
+
+let check_proof_file file_name =
+    let proof_res = load_proof file_name in
+    match proof_res with
+    | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
+        (* load_proof returns a Marabou proof tree, with tightening informations stored in parent nodes. We convert it
+        to our formalisation with tightenings in the corresponding node *)
+      let proof_tree' = Proof_tree.of_marabou_tree proof_tree in
+      check_proof_tree tableau upper_bounds lower_bounds constraints proof_tree' 
+      (*check_proof_tree = true means that the (tableau, bounds) is unsatisfiable *)
+    | Error e -> let () = Printf.printf "Error parsing proof file %s\n%s" file_name (Decoders_yojson.Basic.Decode. string_of_error e) in
+                 false
+    [@@program]
+
+let proof_file = Sys.argv.(1)
+[@@program]
+
+let () = Printf.printf "Result for %s: %b\n" proof_file (check_proof_file proof_file) 
+[@@program]

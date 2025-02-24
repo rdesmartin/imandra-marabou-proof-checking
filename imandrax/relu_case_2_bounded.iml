@@ -1,0 +1,393 @@
+[@@@import "relu.iml"]
+
+open Relu
+
+(* Auxilliary lemmas and definitions *)
+
+(* set list element at given index to x *)
+let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =    
+    if n < 0 then l
+    else
+    match l with
+    | [] -> []
+    | hd::tl ->
+    if n = 0 then (
+        x :: tl
+    ) else (
+        hd :: set_nth tl (n-1) x
+    )
+
+let rec bounded xs ls us = 
+    match xs, ls, us with
+    | x::xs, l::ls, u::us -> l <=. x && x <=. u && bounded xs ls us
+    | _, _, _ -> true
+
+let bounded_at_i i xs ls us =
+    match List.nth i xs, List.nth i ls, List.nth i us with 
+    | Some x, Some l, Some u -> l <=. x && x <=. u
+    | _, _, _ -> true
+
+lemma none_nth_oob l i =
+    (i < 0 || (i >= List.length l))
+    =
+    (List.nth i l = None)
+    [@@by auto] [@@rw] [@@fc]
+
+lemma get_set_nth l n a =
+    0 <= n && n < List.length l
+    ==>
+    List.nth n (set_nth l n a) = Some a
+[@@by auto] [@@rw]
+
+lemma set_nth_unchanged l n m a =
+    n <> m
+    ==>
+    List.nth m (set_nth l n a) = List.nth m l
+[@@by auto] [@@rw]
+
+lemma bounded_implies_bounded_at_i_helper i xs ls us =
+    bounded xs ls us
+    ==>
+    match List.nth i xs, List.nth i ls, List.nth i us with 
+    | Some x, Some l, Some u -> l <=. x && x <=. u
+    | _, _, _ -> true
+    [@@by auto][@@fc]
+
+lemma bounded_implies_bounded_at_i i xs ls us =
+    bounded xs ls us
+    ==>
+    bounded_at_i i xs ls us 
+    [@@by auto][@@fc]
+
+lemma set_nth_unchanged_2vars (ls: real list) (i: int) (j: int) (k: int) (a: real) (b: real) =
+    let ls' = set_nth (set_nth ls i a) j b in
+    k <> i && k <> j
+    ==>
+    List.nth k ls' = List.nth k ls
+[@@by auto]
+[@@rw]
+
+lemma set_nth_length_preservation l n x = 
+    List.length (set_nth l n x) = List.length l
+[@@by auto] [@@rw][@@fc]
+
+lemma eval_relu_different_var xs f_var b_var a_var =
+    eval_relu f_var b_var a_var xs
+    ==> 
+    (b_var <> f_var) && (b_var <> a_var) && (f_var <> a_var) 
+[@@fc]
+
+(* Proof case_2_bounded_at_i *)
+
+lemma case_2_bounded_at_i_i1 xs ls us b_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i <> a_var && i <> b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && bounded xs ls us
+    ==>
+    List.nth i ls' = List.nth i ls
+    && List.nth i us' = List.nth i us
+[@@by [%use set_nth_unchanged us i a_var 0.]
+    @> [%use set_nth_unchanged_2vars ls b_var a_var i 0. 0.]
+    @> auto]
+[@@fc]
+
+lemma case_2_bounded_at_i_i xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i <> a_var && i <> b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && bounded xs ls us
+    ==>
+    bounded_at_i i xs ls' us'
+[@@by [%use bounded_implies_bounded_at_i i xs ls us]
+    @> [%use case_2_bounded_at_i_i1 xs ls us b_var f_var i]
+    @> auto]
+
+let g i l = match List.nth i l with Some v -> v | None -> 0.0
+
+lemma case_2_bounded_at_i_a1 xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i = a_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && bounded xs ls us
+    ==>
+    List.nth i ls' = Some 0.
+    && List.nth i us' = Some 0.
+[@@by [%use get_set_nth us a_var  0.]
+    @> [%use get_set_nth (set_nth ls b_var  0.) a_var 0.]
+    @> auto]
+
+lemma case_2_bounded_at_i_a2 xs b_var f_var a_var =
+    active_relu b_var f_var a_var xs
+    ==>
+    List.nth a_var xs = Some 0.
+[@@by auto]
+
+lemma case_2_bounded_at_i_a xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i = a_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && active_relu b_var f_var a_var xs
+    && bounded xs ls us
+    ==>
+    bounded_at_i i xs ls' us'
+[@@by [%use case_2_bounded_at_i_a1 xs ls us b_var f_var a_var i]
+    @> [%use case_2_bounded_at_i_a2 xs b_var f_var a_var]
+    @> auto]
+
+lemma case_2_bounded_at_i_b1 xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i = b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && bounded xs ls us
+    && eval_relu b_var f_var a_var xs
+    ==>
+    g i ls' = 0. 
+    && g i us = g i us'  
+[@@by [%use eval_relu_different_var xs b_var f_var a_var]
+    @> [%use set_nth_unchanged ls b_var a_var 0.]
+    @> [%use get_set_nth (set_nth ls b_var  0.) a_var 0.]
+    @> auto]
+[@@timeout 100]
+
+lemma case_2_bounded_at_i_b2 xs b_var f_var a_var =
+    active_relu b_var f_var a_var xs
+    && 0 <= b_var && b_var < List.length xs 
+    ==>
+    g b_var xs >=. 0.
+[@@by auto]
+
+lemma g_nth_bounded xs ls us i =
+    0 <= i && (i < List.length xs)
+    && g i ls <=. g i xs 
+    && g i xs <=. g i us
+    ==> 
+    bounded_at_i i xs ls us
+[@@by auto]
+
+lemma nth_g_bounded_us xs ls us i =
+    0 <= i && (i < List.length xs)
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && bounded_at_i i xs ls us
+    ==> 
+    g i xs <=. g i us
+    (* match List.nth i xs, List.nth i us with 
+    | Some x_i, Some u_i -> x_i <=. u_i
+    | _ -> false *)
+[@@by auto]
+
+lemma nth_g_bounded_ls xs ls us i =
+    0 <= i && (i < List.length xs)
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && bounded_at_i i xs ls us
+    ==> 
+    g i ls <=. g i xs
+    (* match List.nth i xs, List.nth i ls with 
+    | Some x_i, Some l_i -> l_i <=. x_i
+    | _ -> false *)
+[@@by auto]
+
+lemma case_2_bounded_at_i_b3 xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i = b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && active_relu b_var f_var a_var xs
+    && bounded xs ls us
+    ==>
+    g i ls <=. g i xs
+[@@by [%use case_2_bounded_at_i_b1 xs ls us b_var f_var a_var i]
+    @> [%use case_2_bounded_at_i_b2 xs b_var f_var a_var]
+    @> [%use nth_g_bounded_us xs (set_nth us a_var  0.) (set_nth (set_nth ls b_var  0.) a_var 0.) i]
+    @> auto]
+
+lemma case_2_bounded_at_i_b4 xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i = b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && active_relu b_var f_var a_var xs
+    && bounded xs ls us
+    ==>
+    g i xs <=. g i us
+[@@by [%use bounded_implies_bounded_at_i i xs ls us]
+    @> [%use nth_g_bounded_us xs ls us i]
+    @> auto]
+
+lemma case_2_bounded_at_i_b5 xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i = b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && active_relu b_var f_var a_var xs
+    && bounded xs ls us
+    ==>
+    g i ls <=. g i xs
+[@@by [%use case_2_bounded_at_i_b4 xs ls us b_var f_var a_var i]
+    @> [%use case_2_bounded_at_i_b1 xs ls us b_var f_var a_var i]
+    @> auto]
+
+lemma case_2_bounded_at_i_b xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && i = b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && active_relu b_var f_var a_var xs
+    && bounded xs ls us
+    ==>
+    bounded_at_i i xs ls' us'
+[@@by [%use case_2_bounded_at_i_b3 xs ls us b_var f_var a_var i]
+    @> [%use case_2_bounded_at_i_b5 xs ls us b_var f_var a_var i]
+    @> [%use g_nth_bounded xs (set_nth (set_nth ls b_var  0.) a_var 0.) (set_nth us a_var  0.) i]
+    @> auto]
+[@@disable bounded_at_i, List.length, bounded, active_relu]
+
+lemma case_2_bounded_at_i xs ls us b_var f_var a_var i =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    0 <= i && (i < List.length xs) 
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && active_relu b_var f_var a_var xs
+    ==>
+    bounded_at_i i xs ls' us'
+[@@by [%use case_2_bounded_at_i_i xs ls us b_var f_var a_var i]
+    @> [%use case_2_bounded_at_i_a xs ls us b_var f_var a_var i]
+    @> [%use case_2_bounded_at_i_b xs ls us b_var f_var a_var i]
+    @> auto]
+[@@fc]
+
+(* Proof case_2_bounded_preservation *)
+
+(* skolem function *)
+let rec find_bad_bound xs ls us k =
+    match xs, ls, us with
+    | [], _, _ | _, [], _ | _, _, [] -> None
+    | x :: xs, l :: ls, u :: us -> 
+        if not (l <=. x && x <=. u) then Some k
+        else find_bad_bound xs ls us (k + 1) 
+
+(* relationship between find_bad and bounded *)
+lemma no_witness_bounded xs ls us k =
+    (find_bad_bound xs ls us k = None)
+    = (bounded xs ls us)
+    [@@by auto][@@fc]
+
+lemma witness_index_bounded xs ls us k =
+    match find_bad_bound xs ls us k with
+    | None -> true
+    | Some i -> i >= k && (i < List.length xs + k)
+[@@by auto]
+
+lemma witness_not_bounded_at_i xs ls us k =
+  match find_bad_bound xs ls us k with
+  | None -> true
+  | Some i -> not (bounded_at_i (i-k) xs ls us)
+[@@by auto][@@fc]
+
+lemma case_2_witness_not_bounded xs ls us b_var f_var a_var =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && active_relu b_var f_var a_var xs
+    ==>
+    match find_bad_bound xs ls' us' 0 with
+    | None -> true
+    | Some j -> not (bounded_at_i j xs ls' us')
+    [@@by [%use witness_not_bounded_at_i xs (set_nth us a_var  0.) (set_nth (set_nth ls b_var  0.) a_var 0.) 0]
+        @> auto]
+    [@@disable set_nth, bounded]
+
+lemma case_2_find_witness_helper xs ls us b_var f_var a_var j =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && active_relu b_var f_var a_var xs
+    && find_bad_bound xs ls' us' 0 = Some j
+    ==>
+    bounded_at_i j xs ls' us'
+    [@@by [%use case_2_bounded_at_i xs ls us b_var f_var a_var j]
+        @> auto]
+    [@@disable set_nth, bounded]
+    [@@fc]
+
+(* to prove the lemma above the helper lemma above is automatically applied *)
+lemma case_2_witness_bounded xs ls us b_var f_var a_var =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && active_relu b_var f_var a_var xs
+    ==>
+    match find_bad_bound xs ls' us' 0 with
+    | None -> true
+    | Some j -> bounded_at_i j xs ls' us'
+    [@@by auto]
+    [@@disable set_nth, bounded]
+
+(* we prove that there cannot be witnesses by contradiction *)
+lemma case_2_no_witness xs ls us b_var f_var a_var =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && active_relu b_var f_var a_var xs
+    ==>
+    find_bad_bound xs ls' us' 0 = None
+    [@@by [%use case_2_witness_not_bounded xs ls us b_var f_var a_var]
+    @> [%use case_2_witness_bounded xs ls us b_var f_var a_var]
+    @> auto]
+    [@@disable set_nth, bounded]
+
+lemma case_2_updating_bounds_preserves_bounded xs ls us b_var f_var a_var =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in 
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && active_relu b_var f_var a_var xs
+    ==>
+    bounded xs ls' us'
+[@@by [%use case_2_no_witness xs ls us b_var f_var a_var] 
+@> [%use no_witness_bounded xs (set_nth (set_nth ls b_var  0.) a_var 0.) (set_nth us a_var  0.) 0]
+@> auto]
+[@@disable set_nth, bounded]
+[@@fc]

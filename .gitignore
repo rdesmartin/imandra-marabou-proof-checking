@@ -6,7 +6,7 @@ test_env/bin/python
 test_env/bin/python3
 test_env/bin/python3.9
 test_env/lib64
-json/
+examples/
 experiments.log
 timing.csv
 .vscode

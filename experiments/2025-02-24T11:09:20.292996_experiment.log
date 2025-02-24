@@ -1,0 +1,56 @@
+
+2025-02-24 11:09:21.601210: Proof ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.24204993248s.json finished; status: OK
+
+
+2025-02-24 11:09:21.601383: Result for ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.24204993248s.json: true
+
+
+2025-02-24 11:09:21.601467: ==========
+
+2025-02-24 11:09:21.969990: Proof ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.24551987648s.json finished; status: OK
+
+
+2025-02-24 11:09:21.970086: Result for ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.24551987648s.json: true
+
+
+2025-02-24 11:09:21.970163: ==========
+
+2025-02-24 11:09:24.000585: Proof ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.479170084s.json finished; status: OK
+
+
+2025-02-24 11:09:24.000611: Result for ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.479170084s.json: true
+
+
+2025-02-24 11:09:24.000629: ==========
+
+2025-02-24 11:09:24.591146: Proof ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.359375s.json finished; status: OK
+
+
+2025-02-24 11:09:24.591198: Result for ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.359375s.json: true
+
+
+2025-02-24 11:09:24.591243: ==========
+
+2025-02-24 11:09:24.946653: Proof ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.15145778656s.json finished; status: OK
+
+
+2025-02-24 11:09:24.946706: Result for ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.15145778656s.json: true
+
+
+2025-02-24 11:09:24.946744: ==========
+
+2025-02-24 11:09:25.669010: Proof ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.19238615036s.json finished; status: OK
+
+
+2025-02-24 11:09:25.669054: Result for ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.19238615036s.json: true
+
+
+2025-02-24 11:09:25.669079: ==========
+
+2025-02-24 11:09:26.078086: Proof ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.05650806427s.json finished; status: OK
+
+
+2025-02-24 11:09:26.078204: Result for ./examples/relu_benchmark/no_lemmas/proof_reluBenchmark0.05650806427s.json: true
+
+
+2025-02-24 11:09:26.078256: ==========

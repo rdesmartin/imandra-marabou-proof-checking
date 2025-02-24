@@ -1,0 +1,7 @@
+./examples/relu_benchmark/lemmas/proof_reluBenchmark0.19238615036s_lemmas.json;OK;false;0:00:11.493751
+./examples/relu_benchmark/lemmas/proof_reluBenchmark0.05650806427s_lemmas.json;OK;true;0:00:00.417763
+./examples/relu_benchmark/lemmas/proof_reluBenchmark0.359375s_lemmas.json;OK;true;0:00:03.939419
+./examples/relu_benchmark/lemmas/proof_reluBenchmark0.479170084s_lemmas.json;OK;false;0:00:07.979944
+./examples/relu_benchmark/lemmas/proof_reluBenchmark0.15145778656s_lemmas.json;OK;true;0:00:00.407188
+./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24204993248s_lemmas.json;OK;false;0:00:14.153014
+./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24551987648s_lemmas.json;OK;true;0:00:00.318563

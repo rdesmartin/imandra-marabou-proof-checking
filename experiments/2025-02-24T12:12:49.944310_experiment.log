@@ -1,0 +1,56 @@
+
+2025-02-24 12:13:01.442077: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:13:01.442135: invalid contradiction in leafinvalid check childreninvalid check childrenResult for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.19238615036s_lemmas.json: false
+
+
+2025-02-24 12:13:01.442157: ==========
+
+2025-02-24 12:13:01.860081: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:13:01.860139: Result for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.05650806427s_lemmas.json: true
+
+
+2025-02-24 12:13:01.860178: ==========
+
+2025-02-24 12:13:05.799763: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:13:05.799927: Result for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.359375s_lemmas.json: true
+
+
+2025-02-24 12:13:05.799979: ==========
+
+2025-02-24 12:13:13.780231: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:13:13.780315: invalid contradiction in leafinvalid check childreninvalid check childreninvalid check childreninvalid check childreninvalid check childrenResult for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.479170084s_lemmas.json: false
+
+
+2025-02-24 12:13:13.780382: ==========
+
+2025-02-24 12:13:14.187758: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:13:14.187826: Result for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.15145778656s_lemmas.json: true
+
+
+2025-02-24 12:13:14.187866: ==========
+
+2025-02-24 12:13:28.341048: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:13:28.341076: invalid contradiction in leafinvalid check childreninvalid check childreninvalid check childrenResult for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24204993248s_lemmas.json: false
+
+
+2025-02-24 12:13:28.341095: ==========
+
+2025-02-24 12:13:28.659803: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:13:28.659894: Result for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24551987648s_lemmas.json: true
+
+
+2025-02-24 12:13:28.659949: ==========

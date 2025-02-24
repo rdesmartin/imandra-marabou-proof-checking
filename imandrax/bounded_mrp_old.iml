@@ -1,0 +1,280 @@
+[@@@import "relu.iml"]
+[@@@import "struct_index.iml"]
+
+open Relu
+open Struct_index
+
+
+let rec zip3 l1 l2 l3 = 
+    match l1, l2, l3 with
+    | [], _, _ | _, [], _ | _, _, [] -> []
+    | h1::t1, h2::t2, h3::t3 -> (h1, h2, h3) :: zip3 t1 t2 t3
+
+lemma zip3_length l1 l2 l3 = 
+    List.length l1 = List.length l2
+    && List.length l1 = List.length l3
+    ==>
+    List.length (zip3 l1 l2 l3) = List.length l1
+    [@@by induct ~on_fun:[%id zip3] ()
+    @> auto]
+    [@@rw]
+
+(* set list element at given index to x *)
+let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =    
+    if n < 0 then l
+    else
+    match l with
+    | [] -> []
+    | hd::tl ->
+    if n = 0 then (
+        x :: tl
+    ) else (
+        hd :: set_nth tl (n-1) x
+    )
+
+let rec bounded xs ls us = 
+    match xs, ls, us with
+    | [], [], [] -> true
+    | x::xs, l::ls, u::us -> l <=. x && x <=. u && bounded xs ls us
+    | _, _, _ -> true
+
+let bounded_elem (x, l, u) =
+    l <=. x && x <=. u
+
+let bounded_at_i = holds_at_i bounded_elem
+
+let bounded_below = holds_below bounded_elem
+
+let bounded_all = holds_all bounded_elem
+
+lemma bounded_all_eq_bounded xs ls us = 
+    bounded xs ls us = bounded_all (zip3 xs ls us)
+    [@@by auto]
+
+lemma bounded_all_eq_bounded_below xs ls us =
+    bounded_all (zip3 xs ls us) 
+    = bounded_below (List.length (zip3 xs ls us) - 1) (zip3 xs ls us) 
+[@@by [%use main bounded_elem (zip3 xs ls us) (List.length (zip3 xs ls us))]
+@> auto]
+
+lemma bounded_below_eq_bounded xs ls us =
+    let i = List.length (zip3 xs ls us) - 1 in
+    bounded_below i (zip3 xs ls us) = bounded xs ls us
+[@@by [%use bounded_all_eq_bounded xs ls us]
+    @> [%use bounded_all_eq_bounded_below xs ls us]
+    @> auto]
+
+lemma get_set_nth l n a =
+    0 <= n && n < List.length l
+    ==>
+    List.nth n (set_nth l n a) = Some a
+[@@by auto] [@@rw]
+
+lemma set_nth_unchanged l n m a =
+    n <> m
+    ==>
+    List.nth m (set_nth l n a) = List.nth m l
+[@@by auto] [@@rw]
+
+lemma set_nth_length_preservation l n x = 
+    List.length (set_nth l n x) = List.length l
+[@@by auto] [@@rw][@@fc]
+
+lemma changed_bounds_length_preservation xs ls us b_var f_var =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    ==>
+    List.length (zip3 xs ls' us') = List.length xs
+    [@@by auto]
+    [@@rw]
+
+axiom case_1_bounded_at_i xs ls us b_var f_var a_var i =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    0 <= i && (i < List.length xs) 
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    bounded_at_i i (zip3 xs ls' us')
+
+lemma none_nth_oob l i =
+    (i < 0 || (i >= List.length l))
+    =
+    (List.nth i l = None)
+    [@@by auto] [@@rw] [@@fc]
+
+lemma bounded_at_i_oob i x =
+    List.nth i x = None
+    ==>
+    bounded_at_i i x
+    [@@by auto]
+    [@@fc]
+
+lemma case_1_bounded_at_i_oob xs ls us b_var f_var a_var i =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    (i < 0 || (i >= List.length xs)) 
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    bounded_at_i i (zip3 xs ls' us')
+[@@by [%use none_nth_oob (zip3 xs (set_nth ls f_var 0.) (set_nth (set_nth us b_var 0.) f_var 0.)) i]
+    @> [%use bounded_at_i_oob i (zip3 xs (set_nth ls f_var 0.) (set_nth (set_nth us b_var 0.) f_var 0.))]
+    @> auto]
+[@@fc]
+
+lemma case_1_bounded_at_i' xs ls us b_var f_var a_var i =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    bounded_at_i i (zip3 xs ls' us')
+[@@by [%use case_1_bounded_at_i xs ls us b_var f_var a_var i]
+    @> [%use case_1_bounded_at_i_oob xs ls us b_var f_var a_var i]
+    @> auto]
+[@@fc]
+
+let rec find_bad_bounds_below i xs = 
+     if i < 0 then None
+     else match List.nth i xs with
+     | None -> find_bad_bounds_below (i - 1) xs
+     | Some k -> if bounded_at_i i xs = false then Some i
+        else find_bad_bounds_below (i - 1) xs
+
+lemma no_witness_bounded_below i xs =
+    match find_bad_bounds_below i xs with
+    | None -> bounded_below i xs
+    | Some k -> true
+[@@by auto]
+
+lemma bounded_below_no_witnesses i xs =
+    bounded_below i xs = (find_bad_bounds_below i xs = None)
+[@@by auto]
+
+lemma bad_bounds_witness i xs =
+    match find_bad_bounds_below i xs with
+    | None -> true
+    | Some k -> bounded_at_i k xs = false
+[@@by auto]
+
+lemma find_bad_bounds_below_rw i xs =
+    find_bad_bounds_below (i - 1) xs = None
+    && bounded_at_i i xs
+    ==> 
+    find_bad_bounds_below i xs = None
+[@@by auto]
+
+let rec induct_i xs ls us b_var f_var a_var i =
+    if i < 0 then true
+    else induct_i xs ls us b_var f_var a_var (i - 1) 
+
+lemma no_bad_witnesses xs ls us b_var f_var a_var i =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    find_bad_bounds_below i (zip3 xs ls' us') = None
+[@@by induct ~on_fun:[%id induct_i] ()
+    @> auto]
+[@@fc]
+
+
+(* lemma case_1_crux xs ls us b_var f_var a_var =
+    let ls' = set_nth ls f_var 0. in 
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    f_var <> b_var && f_var <> a_var && a_var <> b_var
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    bounded xs ls' us' *)
+ 
+lemma bounded_below_rw xul i =
+    (bounded_below i xul) = (bounded_below (i - 1) xul && bounded_at_i i xul)
+[@@by auto][@@rw]
+ 
+lemma holds_below_empty_list p i =
+    holds_below p i [] = true
+[@@by auto] [@@rw]
+
+lemma case_1_bounded_at_n xs ls us b_var f_var a_var i =
+    let ls' = set_nth ls f_var 0. in 
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    i >= 0 && (i < List.length xs) 
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    match List.nth i (zip3 xs ls' us') with
+    | Some (x, l, u) -> l <=. x && x <=. u
+    | None -> false
+[@@by [%use case_1_bounded_at_i xs ls us b_var f_var a_var i]
+    @> [%use changed_bounds_length_preservation xs ls us b_var f_var]
+    @> [%use none_nth_oob (zip3 xs (set_nth ls f_var 0.) (set_nth (set_nth us b_var 0.) f_var 0.)) i]
+    @> auto]
+
+(* 
+(* induction on the length of xs, ls, us *)
+let rec induction_scheme (xs: real list) (ls: real list) (us: real list)
+        (b_var: int) (f_var: int) (a_var: int) (i: int) =
+     match xs, ls, us with
+    | [], _, _ | _, [], _ | _, _, [] -> true
+    | xh :: xt, lh :: lt, uh :: ut -> induction_scheme xt lt ut b_var f_var a_var
+ *)
+ 
+lemma case_1_inductive_step xs ls us b_var f_var a_var i =
+    let ls' = set_nth ls f_var 0. in 
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    i >= 0 && (i < List.length xs) 
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    && bounded_below (i-1)  (zip3 xs ls' us')
+    ==>
+    bounded_below i (zip3 xs ls' us')
+[@@by [%use bounded_below_rw (zip3 xs (set_nth ls f_var 0.) (set_nth (set_nth us b_var 0.) f_var 0.)) i]
+    @> [%use case_1_bounded_at_i xs ls us b_var f_var a_var i]
+    @> auto]
+
+let rec induction_scheme (xs: real list) (ls: real list) (us: real list)
+        (b_var: int) (f_var: int) (a_var: int) (i: int) =
+    if i < 0 then true 
+    else induction_scheme xs ls us b_var f_var a_var (i - 1)
+
+lemma case_1_bounded_below xs ls us b_var f_var a_var i =
+    let ls' = set_nth ls f_var 0. in 
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    i >= 0 && (i < List.length xs) 
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs ls us
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    bounded_below i (zip3 xs ls' us')
+[@@by 
+    [%use case_1_inductive_step xs ls us b_var f_var a_var i]
+    @> [%use bounded_below_rw (zip3 xs (set_nth ls f_var 0.) (set_nth (set_nth us b_var 0.) f_var 0.)) i]
+    @> induct ~on_fun:[%id induction_scheme] ()
+    @> auto]
+[@@disable set_nth, zip3, bounded, main]
+[@@fc]

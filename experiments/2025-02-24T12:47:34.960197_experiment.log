@@ -1,0 +1,71 @@
+
+2025-02-24 12:47:36.926452: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.19238615036s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:47:36.926589: check_lemma failed
+check_lemma failed
+check_lemma failed
+invalid contradiction in leafinvalid bound tighteninginvalid check childrenResult for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.19238615036s_lemmas.json: false
+
+
+2025-02-24 12:47:36.926749: ==========
+
+2025-02-24 12:47:37.523348: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.05650806427s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:47:37.523395: Result for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.05650806427s_lemmas.json: true
+
+
+2025-02-24 12:47:37.523429: ==========
+
+2025-02-24 12:47:38.633246: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.359375s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:47:38.633277: check_lemma failed
+check_lemma failed
+invalid check childrenResult for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.359375s_lemmas.json: false
+
+
+2025-02-24 12:47:38.633300: ==========
+
+2025-02-24 12:47:39.917418: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.479170084s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:47:39.917463: check_lemma failed
+check_lemma failed
+check_lemma failed
+check_lemma failed
+check_lemma failed
+invalid contradiction in leafinvalid check childreninvalid check childreninvalid check childreninvalid check childreninvalid bound tighteningResult for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.479170084s_lemmas.json: false
+
+
+2025-02-24 12:47:39.917546: ==========
+
+2025-02-24 12:47:40.313338: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.15145778656s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:47:40.313397: Result for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.15145778656s_lemmas.json: true
+
+
+2025-02-24 12:47:40.313472: ==========
+
+2025-02-24 12:47:41.474004: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24204993248s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:47:41.474058: check_lemma failed
+check_lemma failed
+check_lemma failed
+check_lemma failed
+check_lemma failed
+invalid contradiction in leafinvalid bound tighteninginvalid bound tighteninginvalid check childrenResult for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24204993248s_lemmas.json: false
+
+
+2025-02-24 12:47:41.474106: ==========
+
+2025-02-24 12:47:41.784371: Proof ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24551987648s_lemmas.json finished; status: OK
+
+
+2025-02-24 12:47:41.784427: Result for ./examples/relu_benchmark/lemmas/proof_reluBenchmark0.24551987648s_lemmas.json: true
+
+
+2025-02-24 12:47:41.784466: ==========

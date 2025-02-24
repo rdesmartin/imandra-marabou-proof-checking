@@ -116,11 +116,18 @@ module BoundLemma = struct
                             check_full_lemmas tl tableau upper_bounds' lower_bounds' constraints
                         else
                             (* if the lemmas aren't valid, we just continue without updating the bounds *)
-                            check_full_lemmas tl tableau upper_bounds lower_bounds constraints
-                    | _ ->  check_full_lemmas tl tableau upper_bounds lower_bounds constraints
+                            let () = Printf.printf "invalid lemma found\n" in
+                            (false, upper_bounds, lower_bounds)
+                            (* check_full_lemmas tl tableau upper_bounds lower_bounds constraints *)
+                    | _ ->  
+                    let () = Printf.printf "no matching relu constraint found\n" in
+                        (false, upper_bounds, lower_bounds)
+                        (* check_full_lemmas tl tableau upper_bounds lower_bounds constraints *)
                 )
             ) else (
-                check_full_lemmas tl tableau upper_bounds lower_bounds constraints
+                let () = Printf.printf "invalid lemma found\n" in
+                (false, upper_bounds, lower_bounds)
+                (* check_full_lemmas tl tableau upper_bounds lower_bounds constraints *)
             )
         | (Short _)::_ -> (false, upper_bounds, lower_bounds)
 

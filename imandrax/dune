@@ -1,0 +1,7 @@
+(executable
+ (name main_extract)
+ (modes byte exe)
+ (public_name imandra-marabou.main_extract)
+ (flags :standard -open Imandrax_api_prelude -warn-error -A+8+39 -w -27-33-58)
+ (ocamlc_flags -g)
+ (libraries decoders-yojson decoders yojson imandrax-api-prelude))

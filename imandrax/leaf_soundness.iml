@@ -15,6 +15,7 @@
 [@@@import "bound_reduction.iml"]
 [@@@import "well_formed_reduction.iml"]
 [@@@import "tableau_reduction.iml"]
+[@@@import "sat.iml"]
 [@@@import "util.iml"]
 
 open Util
@@ -28,18 +29,9 @@ open Farkas
 open Well_formed_reduction
 open Tableau_reduction
 open Bound_reduction
+open Sat
 
 let check_relu_constraints = Constraint.check_relu_constraints
-
-let unsat tableau upper_bounds lower_bounds relu_constraints x =
-    (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
-    check_relu_constraints relu_constraints x) = false
-
-let sat tableau upper_bounds lower_bounds relu_constraints x =
-    (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
-    check_relu_constraints relu_constraints x)
 
 lemma check_node_implies_check_cert tableau upper_bounds lower_bounds relu_constraints proof_tree =
     match proof_tree with
@@ -174,24 +166,6 @@ lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_const
 [@@fc]
 
 let check_relu_constraints = Constraint.check_relu_constraints
-
-let unsat tableau upper_bounds lower_bounds relu_constraints x =
-    (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
-    check_relu_constraints relu_constraints x) = false
-    
-let sat tableau upper_bounds lower_bounds relu_constraints x =
-    (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
-    check_relu_constraints relu_constraints x)
-    
-lemma sat_not_unsat tableau upper_bounds lower_bounds relu_constraints x =
-    sat tableau upper_bounds lower_bounds relu_constraints x 
-    = not (unsat tableau upper_bounds lower_bounds relu_constraints x)
-    
-lemma unsat_not_sat tableau upper_bounds lower_bounds relu_constraints x =
-    unsat tableau upper_bounds lower_bounds relu_constraints x
-    = not (sat tableau upper_bounds lower_bounds relu_constraints x)
 
 lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in

@@ -97,7 +97,7 @@ module BoundLemma = struct
         The bounds are updated between two lemma checkings 
         If (1) or (2) is not verified, we continue the lemma checking without updating the bound.
         *)
-    let rec check_full_lemmas (bound_lemmas: t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) =
+    let rec check_full_lemmas (bound_lemmas: t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t_old list) =
     match bound_lemmas with
         | [] -> (true, upper_bounds, lower_bounds)
         | ((Full (aff_var, aff_bound_t, value, caus_var, caus_bound_t, constr_t, _)) as bound_lemma)::tl ->
@@ -112,11 +112,19 @@ module BoundLemma = struct
                             check_full_lemmas tl tableau upper_bounds' lower_bounds' constraints
                         else
                             (* if the lemmas aren't valid, we just continue without updating the bounds *)
-                            check_full_lemmas tl tableau upper_bounds lower_bounds constraints
-                    | _ ->  check_full_lemmas tl tableau upper_bounds lower_bounds constraints
+                            let () = Printf.printf "no matching RELLU lemma found\n" in
+                            (false, upper_bounds, lower_bounds)
+                            (* check_full_lemmas tl tableau upper_bounds lower_bounds constraints *)
+                    | _ ->  
+                        let () = Printf.printf "matching lemma is not RELU\n" in
+                        (false, upper_bounds, lower_bounds)
+                        (* check_full_lemmas tl tableau upper_bounds lower_bounds constraints *)
                 )
             ) else (
-                check_full_lemmas tl tableau upper_bounds lower_bounds constraints
+            (* if the lemmas aren't valid, we just continue without updating the bounds *)
+            let () = Printf.printf "check_lemma failed\n" in
+            (false, upper_bounds, lower_bounds)
+                (* check_full_lemmas tl tableau upper_bounds lower_bounds constraints *)
             )
         | (Short _)::_ -> (false, upper_bounds, lower_bounds)
 
@@ -127,7 +135,7 @@ module BoundLemma = struct
         (true, upper_bounds', lower_bounds')
 
     (** Apply complete lemma checking for full lemmas and simply updates the bounds in case of simple lemmas *)
-    let check_bound_lemmas (bound_lemmas: 'b list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list): (bool * Real.t list * Real.t list) =
+    let check_bound_lemmas (bound_lemmas: 'b list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t_old list): (bool * Real.t list * Real.t list) =
         match bound_lemmas with
         | (Short _)::tl -> update_bound_lemmas bound_lemmas upper_bounds lower_bounds constraints
         | (Full _)::tl -> check_full_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints

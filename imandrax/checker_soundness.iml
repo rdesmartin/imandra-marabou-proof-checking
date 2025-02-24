@@ -22,6 +22,7 @@
 [@@@import "leaf_soundness.iml"]
 [@@@import "single_var_split_soundness.iml"]
 [@@@import "relu_split_soundness.iml"]
+[@@@import "sat.iml"]
 
 open Util
 open Constraint
@@ -35,6 +36,7 @@ open Tightening
 open Leaf_soundness
 open Single_var_split_soundness
 open Relu_split_soundness
+open Sat
 
 lemma not_invalid_split_matching tableau upper_bounds lower_bounds constraints x left right =
     let split = match_split left.tightenings right.tightenings constraints in
@@ -115,7 +117,7 @@ lemma soundness_node_contra_invalid_split tableau upper_bounds lower_bounds cons
     [@@fc]
 
 (* 
-Proof outline - soundness_node_contra_valid_split
+Proof outline - soundness_nodrelu_split_soundnesse_contra_valid_split
 Induction on proof_tree
 Base case: Leaf -> true
 

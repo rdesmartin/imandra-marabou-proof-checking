@@ -1,0 +1,43 @@
+let rec bounded xs ls us = match xs, ls, us with
+    | [], [], [] -> true
+    | x::xs, l::ls, u::us -> l <=. x && x <=. u && bounded xs ls us
+    | _,_,_ -> true
+
+let rec set_nth (l: 'a list) (n: int) (x: 'a): 'a list =    
+    if n < 0 then l
+    else
+    match l with
+    | [] -> []
+    | hd::tl ->
+    if n = 0 then (
+        x :: tl
+    ) else (
+        hd :: set_nth tl (n-1) x
+    )
+
+lemma is_bounded_elem xs ls us n = 
+    bounded xs ls us
+    ==>
+    match (List.nth n xs), (List.nth n ls), (List.nth n us) with
+        | Some x, Some l, Some u -> l <=. x && x <=. u
+        | _, _, _ -> true
+    [@@auto]
+
+lemma get_set_nth l n a =
+    n >= 0 && n < List.length l
+     ==>
+     (List.nth n (set_nth l n a) = Some a)
+[@@auto] [@@rw]
+
+lemma set_nth_unchanged l n m a =
+  n <> m
+  ==>
+  List.nth m (set_nth l n a) = List.nth m l
+[@@auto] [@@rw]
+
+lemma bounded_set_nth xs ls us k i =
+    bounded xs ls us
+    ==> 
+    bounded xs (set_nth ls i k) us ||
+    bounded xs ls (set_nth us i k)
+[@@auto]

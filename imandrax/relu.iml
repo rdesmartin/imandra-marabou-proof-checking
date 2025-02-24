@@ -1,9 +1,5 @@
 (* GP Status: PROVED! *)
 
-(* [@@@import "farkas.iml"] *)
-
-(* open Farkas *)
-
 (* backwards variable, forward variable, auxilliary variable *)
 type t = (int * int * int)
 
@@ -24,7 +20,7 @@ let active_relu b_var f_var aux_var x =
 let inactive_relu b_var f_var aux_var x =
     match List.nth b_var x, List.nth f_var x, List.nth aux_var x with
     | Some b, Some f, Some aux -> 
-        b <=. 0. && f = 0.
+        b <. 0. && f = 0.
     | _ -> false 
 
 let rec eval_relus (cs: t list) (x: real list): bool = 

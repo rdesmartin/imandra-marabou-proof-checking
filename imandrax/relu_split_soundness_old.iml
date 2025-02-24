@@ -4,11 +4,6 @@
 open Relu
 open Struct_index
 
-let rec len ls =
-    match ls with
-    | [] -> 0
-    | l::ls -> 1 + len ls
-
 let rec zip3 l1 l2 l3 = 
     match l1, l2, l3 with
     | [], _, _ | _, [], _ | _, _, [] -> []
@@ -183,7 +178,7 @@ lemma case_1_a xs ls us b_var f_var a_var x_b x_f x_a l_i u_i l_i' u_i' =
     && List.nth b_var ls' = Some l_i'
     && List.nth b_var us' = Some u_i'
     && (b_var <> f_var) && (b_var <> a_var) && (f_var <> a_var)
-    && x_b = relu x_f && x_a = x_f -. x_b
+    && x_f = relu x_b && x_a = x_f -. x_b
     && bounded xs ls us
     && x_b <=. 0. && x_f = 0.
     ==>
@@ -207,7 +202,7 @@ lemma case_1_b xs ls us b_var f_var a_var x_b x_f x_a l_i u_i l_i' u_i' =
     && List.nth f_var us' = Some u_i'
     && (b_var <> f_var) 
     && (b_var <> a_var) && (f_var <> a_var)
-    && x_b = relu x_f && x_a = x_f -. x_b
+    && x_f = relu x_b && x_a = x_f -. x_b
     && bounded xs ls us
     && x_b <=. 0. && x_f = 0.
     ==>
@@ -230,7 +225,7 @@ lemma case_1_c xs ls us b_var f_var a_var x_b x_f x_a l_i u_i l_i' u_i' i x_i =
     && List.nth i us' = Some u_i'
     && List.nth i xs = Some x_i
     && (b_var <> f_var) && (b_var <> a_var) && (f_var <> a_var)
-    && x_b = relu x_f && x_a = x_f -. x_b
+    && x_f = relu x_b && x_a = x_f -. x_b
     && bounded xs ls us
     && x_b <=. 0. && x_f = 0.
     && i <> b_var && i <> f_var
@@ -262,7 +257,7 @@ lemma case_1 xs ls us b_var f_var a_var x_b x_f x_a l_i u_i l_i' u_i' i x_i =
     && List.nth i us' = Some u_i'
     && List.nth i xs = Some x_i
     && (b_var <> f_var) && (b_var <> a_var) && (f_var <> a_var)
-    && x_b = relu x_f && x_a = x_f -. x_b
+    && x_f = relu x_b && x_a = x_f -. x_b
     && bounded xs ls us
     && x_b <=. 0. && x_f = 0.
     ==>
@@ -296,7 +291,7 @@ lemma case_1' xs ls us b_var f_var a_var x_b x_f x_a l_i u_i l_i' u_i' i x_i =
     && List.nth i us' = Some u_i'
     && List.nth i xs = Some x_i
     && ((b_var <> f_var) && (b_var <> a_var) && (f_var <> a_var)
-    && x_b = relu x_f && x_a = x_f -. x_b
+    && x_f = relu x_b && x_a = x_f -. x_b
     && bounded xs ls us
     && x_b <=. 0. && x_f = 0. [@trigger])
     ==>
@@ -379,7 +374,7 @@ lemma case_2_a xs ls us b_var f_var a_var x_b x_f x_a l_i u_i l_i' u_i' =
     && List.nth b_var ls' = Some l_i'
     && List.nth b_var us' = Some u_i'
     && (b_var <> f_var) && (b_var <> a_var) && (f_var <> a_var)
-    && x_b = relu x_f && x_a = x_f -. x_b
+    && x_f = relu x_b && x_a = x_f -. x_b
     && bounded xs ls us
     && x_b >=. 0. && x_a = 0.
     ==>

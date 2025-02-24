@@ -1,20 +1,130 @@
+[@@@import "util.iml"]
+[@@@import "relu.iml"]
+(* [@@@import "relu_case_1_bounded.iml"]
+[@@@import "relu_case_2_bounded.iml"] *)
 [@@@import "tightening.iml"]
 [@@@import "split.iml"]
-[@@@import "leaf_soundness.iml"]
+[@@@import "sat.iml"]
+[@@@import "arithmetic.iml"]
+[@@@import "constraint.iml"]
 
+open Util
+open Relu
 open Tightening
 open Split
-open Leaf_soundness
+open Sat
+open Arithmetic
+open Constraint
 
+(* admitting main results from relu_case_1_bounded and relu_case_2_bounded to reduce overhead from imports *)
+axiom case_1_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
+    let ls' = set_nth ls f_var 0. in 
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && is_bounded xs us ls
+    && inactive_relu b_var f_var a_var xs
+    ==>
+    is_bounded xs us' ls'
 
-axiom soundness_relu_split_matching tableau ubs lbs constraints x 
-        (left: Tightening.t list) (right: Tightening.t list) =
-    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lbs ubs (match_split left right constraints) in
-    match match_split left right constraints with
-    | Relu (b, f, aux) -> 
-        sat tableau ubs lbs constraints x
-        ==>
-        sat tableau ub_left lb_left constraints x 
-        || sat tableau ub_right lb_right constraints x
-    | _ -> true
+axiom case_2_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
+    let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
+    let us' = set_nth us a_var  0. in 
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && is_bounded xs us ls
+    && active_relu b_var f_var a_var xs
+    ==>
+    is_bounded xs us' ls'
+
+lemma eval_relu_split b f a xs =
+    eval_relu b f a xs
+    ==> 
+    (active_relu b f a xs) || (inactive_relu b f a xs)
 [@@by auto]
+
+lemma relu_split x_b x_f x_a = 
+    (x_f = relu x_b) && (x_a = x_f -. x_b)
+    ==> 
+    (x_b >=. 0. && x_a = 0.) || (x_b <=. 0. && x_f = 0.)
+
+lemma relu_split_soundness_bounds (xs: real list) (ls: real list) (us: real list) (b_var: int) (f_var: int) (a_var: int) =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && is_bounded xs us ls
+    ==>
+    (is_bounded xs us' ls')
+    || (is_bounded xs us'' ls'')
+[@@by [%use eval_relu_split b_var f_var a_var xs]
+    @> [%use case_2_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var]
+    @> [%use case_1_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var]
+    @> auto]
+
+lemma sat_new_bounds tableau us ls constraints xs us' ls' =
+    sat tableau us ls constraints xs 
+    && is_bounded xs us' ls'
+    ==>
+    sat tableau us' ls' constraints xs
+[@@by auto]
+
+lemma relu_split_soundness_sat (xs: real list) tableau (ls: real list) (us: real list) constraints (b_var: int) (f_var: int) (a_var: int) =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && sat tableau us ls constraints xs
+    ==>
+    sat tableau us' ls' constraints xs
+    || sat tableau us'' ls'' constraints xs
+[@@by [%use relu_split_soundness_bounds xs ls us b_var f_var a_var]
+    @> auto]
+
+lemma match_split_relu xs ls us constraints b f aux
+        (left: Tightening.t list) (right: Tightening.t list) =
+    match_split left right constraints = ReluSplit (b, f, aux)
+    ==>
+    update_bounds_from_split ls us (match_split left right constraints) =
+    ((set_nth ls f 0.,  set_nth (set_nth us b 0.) f 0.),
+    (set_nth (set_nth ls b 0.) aux 0., set_nth us aux 0.))
+[@@by auto]
+[@@disable set_nth, update_bounds_from_split]
+
+lemma sat_check_constraints tableau us ls constraints xs =
+    sat tableau us ls constraints xs 
+    ==>
+    check_relu_constraints constraints xs
+[@@fc]
+
+
+axiom check_constraints_eval_relu constraints left right xs b f aux =
+    check_relu_constraints constraints xs
+    && match_split left right constraints = ReluSplit (b, f, aux) 
+    ==> 
+    eval_relu b f aux xs
+[@@by auto]
+
+theorem soundness_relu_split_matching tableau us ls constraints xs b f aux
+        (left: Tightening.t list) (right: Tightening.t list) =
+    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split ls us (match_split left right constraints) in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && match_split left right constraints = ReluSplit (b, f, aux)
+    && sat tableau us ls constraints xs
+    ==>
+    sat tableau ub_left lb_left constraints xs 
+    || sat tableau ub_right lb_right constraints xs
+[@@by [%use match_split_relu xs ls us constraints b f aux left right]
+    @> [%use check_constraints_eval_relu constraints left right xs b f aux]
+    @> [%use relu_split_soundness_sat xs tableau ls us constraints b f aux] 
+    @> auto]
+[@@disable sat, match_split, update_bounds_from_split]

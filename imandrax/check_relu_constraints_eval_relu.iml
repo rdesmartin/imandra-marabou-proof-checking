@@ -1,0 +1,140 @@
+[@@@import "constraint.iml"]
+[@@@import "split.iml"]
+[@@@import "util.iml"]
+
+
+open Constraint
+open Split
+open Util
+
+let rec find_constraint constraints k b f a =
+    match constraints with
+    | [] -> None
+    | Relu (b', f', a') :: cs -> if (b',f',a') = (b,f,a) then Some k
+        else find_constraint cs (k + 1) b f a
+    | _ :: cs -> find_constraint cs (k + 1) b f a
+
+lemma find_constraint_bounded constraints k b f a =
+    match find_constraint constraints k b f a with
+    | Some i -> 0 <= (i-k) && (i-k) < List.length constraints 
+    | None -> true
+[@@by auto][@@fc]
+
+lemma find_constraint_ith constraints k b f a = 
+    match find_constraint constraints k b f a with
+    | Some i -> List.nth (i-k) constraints = Some (Relu (b,f,a))
+    | None -> true
+[@@by auto][@@fc]
+
+lemma find_constraint_ith' constraints k b f a i = 
+    find_constraint constraints k b f a = Some i
+    ==>
+    List.nth (i-k) constraints = Some (Relu (b,f,a))
+[@@by auto][@@fc]
+
+let rec all_different c cs =
+    match cs with 
+    | [] -> true
+    | ch :: ct -> if c=ch then false else all_different c ct
+
+lemma all_different_not_find_constraint k b f a cs =
+    (all_different (Relu (b,f,a)) cs)
+    =
+    (find_constraint cs k b f a = None)
+    [@@by auto]
+
+(* 
+structure of the proof:
+- L1: if match_split left right constraints = Relu (b,f,aux) 
+    then \exists i. List.nth i constraints = Some RELU [a,b,f]
+    <==> not (\forall i. (not List.nth constriants = Some Relu (b, f, a))
+*)
+
+lemma match_relu_split_not_single_var constraints left right = 
+    match match_relu_split left right constraints with 
+    | SingleSplit _ -> false
+    | _ -> true
+[@@by auto]
+[@@disable is_relu_split]
+
+lemma match_relu_split_rw b f a left right constraints = 
+    match_relu_split constraints 
+
+lemma all_different_not_match_relu_split constraints left right b f a =
+    all_different (Relu (b,f,a)) constraints
+    ==> 
+    not (match_relu_split left right constraints = ReluSplit (b, f, a))
+[@@by induct ~on_vars:["constraints"] ()
+    @> auto]
+[@@fc]
+
+lemma match_relu_split_not_all_different constraints left right b f a =
+    match_relu_split left right constraints = ReluSplit (b, f, a)
+    ==> 
+    not (all_different (Relu (b,f,a)) constraints)
+[@@by auto]
+[@@disable all_different, match_relu_split]
+
+
+lemma match_relu_split_find_constraint constraints left right k b f a =
+    match_relu_split left right constraints = ReluSplit (b, f, a)
+    ==>
+    not (find_constraint constraints k b f a = None) 
+[@@by [%use match_relu_split_not_all_different constraints left right b f a]
+    @> [%use all_different_not_find_constraint k b f a constraints]
+    @> auto]
+[@@fc]
+[@@disable match_relu_split]
+
+lemma match_split_ith_constraint constraints left right b f a =
+    (match_split left right constraints [@trigger 0i]) = (ReluSplit (b, f, a) [@trigger 0i])
+    ==>
+    match find_constraint constraints 0 b f a with 
+    | Some i -> List.nth i constraints = Some (Relu (b,f,a))
+    | None -> false
+[@@by auto][@@fc]
+[@@timeout 50]
+
+(* - L2: if check_relu_constraints constraints xs 
+    then \forall i s.t. xsList.nth i constraints = Some RLU [a,b,f],
+        eval_relu b f a  *)
+lemma check_relu_eval_relu_ith constraints xs i b f a =
+    check_relu_constraints constraints xs
+    && List.nth i constraints = Some (Relu (b, f, a))
+    ==>
+    eval_relu b f a xs
+[@@by auto][@@fc]
+[@@timeout 50]
+[@@disable check_relu_constraints]
+
+(* bridge L1 and L2 *)
+(* lemma check_constraints_eval_relu_bridge constraints left right xs i b f a =
+    check_relu_constraints constraints xs
+    && match_split left right constraints = ReluSplit (b, f, a)
+    && find_constraint constraints 0 b f a = Some i
+    ==>
+    eval_relu b f a xs
+[@@by auto]
+[@@fc]
+[@@timeout 50] *)
+
+(* bridge L1 and L2 *)
+lemma check_constraints_eval_relu_bridge_2 constraints left right xs b f a =
+    check_relu_constraints constraints xs
+    && match_split left right constraints = ReluSplit (b, f, a)
+    ==>
+    match find_constraint constraints 0 b f a with
+    | Some i -> eval_relu b f a xs
+    | None -> false
+[@@by [%use match_split_ith_constraint constraints left right b f a] 
+    @> auto]
+    [@@fc]
+
+(* Our main theorem *)
+lemma check_constraints_eval_relu constraints left right xs b f aux =
+    check_relu_constraints constraints xs
+    && match_split left right constraints = ReluSplit (b, f, aux) 
+    ==> 
+    eval_relu b f aux xs
+[@@by [%use check_constraints_eval_relu_bridge_2 constraints left right xs b f aux]
+    @> auto]
