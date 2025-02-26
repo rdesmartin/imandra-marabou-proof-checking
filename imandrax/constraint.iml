@@ -25,7 +25,7 @@ type t_old = constraint_type * int list
 
 let parse_constraint (i: int) (vars: int list) =
   match i, vars with
-  | 0, [a; b; f] -> Relu (b, f, a)
+  | 0, [b; f; a] -> Relu (b, f, a)
   | _ -> Undefined
 
 let relu x = if x >=. 0. then x else 0. 

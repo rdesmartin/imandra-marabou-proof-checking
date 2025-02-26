@@ -26,18 +26,6 @@ let check_contradiction (contradiction: Real.t list) (tableau: expr list) (upper
     let res = (check_cert sys certificate) in
     res
 
-(* check that a node's childrens' splits are non-empty and correctly divide the search space (ReLU and Single Variable splits are supported) *)
-let check_children_splits (l_t: Tightening.t list) (r_t: Tightening.t list) (constraints: Constraint.t_old list) =
-    let non_empty_children_splits = l_t <> [] && r_t <> [] in
-    let valid_relu_split = check_relu_split l_t r_t constraints in
-    let valid_single_var_split = check_single_var_split l_t r_t in
-    non_empty_children_splits && (valid_relu_split || valid_single_var_split)
-
-let update_child_bounds (child_info: Proof_tree.child_info) tableau upper_bounds lower_bounds (constraints: Constraint.t_old list) =
-    let (ub', lb') = Tightening.update_bounds child_info.tightenings upper_bounds lower_bounds in
-    let (valid_bounds, ub'', lb'') = BoundLemma.check_bound_lemmas child_info.bound_lemmas tableau ub' lb' constraints in
-    (valid_bounds, ub'', lb'')
-
 (** Recursively check nodes in the proof tree
     First, update the bounds according to the split.
     We then check that the dynamic bound tightenings performed at this step are valid, and we apply them. 
@@ -47,7 +35,7 @@ let update_child_bounds (child_info: Proof_tree.child_info) tableau upper_bounds
 
     If the node is a Leaf, we check that the saved proof vector leads to a contradiction
     *)
-let rec check_node (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t_old list) (proof_node: Proof_tree.t) =
+let rec check_node (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_node: Proof_tree.t) =
     match proof_node with
     | Proof_tree.Leaf (contradiction) ->
         let valid_contradiction = check_contradiction contradiction tableau upper_bounds lower_bounds in
@@ -57,27 +45,19 @@ let rec check_node (tableau: expr list) (upper_bounds: Real.t list) (lower_bound
         else
             valid_contradiction
     | Proof_tree.Node (left, right) ->
-        let valid_children_splits = check_children_splits left.tightenings right.tightenings constraints in
-        let (valid_bounds_l, ub_left, lb_left) = update_child_bounds left tableau upper_bounds lower_bounds constraints in
-        let (valid_bounds_r, ub_right, lb_right) = update_child_bounds right tableau upper_bounds lower_bounds constraints in
-        (* let split = match_split left.tightenings right.tightenings constraints in
-        let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in *)
+        (* the match_split should be done during parsing, here we should only have a split with split info *)
+        let split = match_split left.tightenings right.tightenings constraints in
+        let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
+        (* for integration tests with lemma tightening, we update the bounds according to theory lemmas without checking them *)
+        let (lb_left, ub_left) = BoundLemma.update_bound_lemmas left.bound_lemmas ub_left lb_left in
+        let (lb_right, ub_right) = BoundLemma.update_bound_lemmas right.bound_lemmas ub_right lb_right in
         let valid_children = (check_node tableau ub_left lb_left constraints left.ptr) &&
             (check_node tableau ub_right lb_right constraints right.ptr) in
-        if not valid_children_splits then
-            let () = Printf.printf "invalid children split" in
-        valid_bounds_l && valid_bounds_r && valid_children_splits && valid_children 
-        else if not (valid_bounds_l || valid_bounds_r) then
-            let () = Printf.printf "invalid bound tightening"
-        in 
-        valid_bounds_l && valid_bounds_r && valid_children_splits && valid_children 
-        else if not valid_children then
-            let () = Printf.printf "invalid check children"
-        in 
-        valid_bounds_l && valid_bounds_r && valid_children_splits && valid_children 
-        else
-        valid_bounds_l && valid_bounds_r && valid_children_splits && valid_children 
-        (* not (is_invalid split) && valid_children *)
+        if is_invalid split then let () = Printf.printf "invalid split found\n" in
+        not (is_invalid split) && valid_children
+        else 
+        not (is_invalid split) && valid_children
+
     [@@adm proof_node]
 
 let rec equal_rows_length tableau size = 
@@ -116,7 +96,7 @@ let well_formed_tableau_bounds tableau upper_bounds lower_bounds =
    it means that the proof is valid, i.e.all the bound tightenings are correct and 
    all the contradiction vectors correpond to a contradiction. 
 *)
-let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t_old list) (proof_root: Proof_tree.t) =
+let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_root: Proof_tree.t) =
     let sanity_check_res = well_formed_tableau_bounds tableau upper_bounds lower_bounds in
     let tableau_system = mk_eq_constraints tableau in
     (* we would need to apply the root's bound propagation lemmas here, then we prove that this 

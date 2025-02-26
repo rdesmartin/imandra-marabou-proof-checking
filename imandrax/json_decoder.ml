@@ -51,19 +51,19 @@ module JSON_decoder = struct
     let open D in
     int_decoder >>= (fun x -> succeed @@ Constraint.constraint_type_of_int x)
 
-  (* let constraint_decoder: Constraint.t D.decoder =
+  let constraint_decoder: Constraint.t D.decoder =
     let open D in
     let* t = field "constraintType" int_decoder in
     let* vars = field "vars" (list int_decoder) in
-    succeed (Constraint.parse_constraint t vars) *)
+    succeed (Constraint.parse_constraint t vars)
 
-  let constraint_decoder: Constraint.t_old D.decoder =
+  (* let constraint_decoder: Constraint.t_old D.decoder =
     let open D in
     let* t = field "constraintType" constraint_type_decoder in
     let* vars = field "vars" (list int_decoder) in
-    succeed (t, vars)
+    succeed (t, vars) *)
 
-  let constraints_decoder: (Constraint.t_old list) D.decoder =
+  let constraints_decoder: (Constraint.t list) D.decoder =
     let open D in
     list constraint_decoder
 

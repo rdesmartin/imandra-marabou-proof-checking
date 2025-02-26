@@ -138,7 +138,10 @@ let match_split (l_t: Tightening.t list) (r_t: Tightening.t list) (constraints: 
     | _ -> (
         match (match_relu_split l_t r_t constraints) with
         | ReluSplit (b, f, aux) -> ReluSplit (b, f, aux)
-        | _ -> Invalid
+        | _ -> 
+            let () = Printf.printf "left tightenings: %s" (Tightening.tightenings_to_string l_t) in
+            let () = Printf.printf "right tightenings: %s" (Tightening.tightenings_to_string r_t) in
+            Invalid
     )
 
 (* Match a given split with a constraint from a list of known ReLU constraints*)
@@ -162,7 +165,7 @@ let rec match_relu_constraint r_tightening l_tightening constraints =
     | (_::tl) -> match_relu_constraint r_tightening l_tightening tl
 
 (* find a constraint given two participating variables *)
-(* let rec match_constraint (var1: int) (var2: int) (constraints: Constraint.t_old list): (Constraint.t_old) =
+(* let rec match_constraint (var1: int) (var2: int) (constraints: Constraint.t list): (Constraint.t) =
     match constraints with
     | [] -> (UNDEFINED, [])
     (* | Relu (b,f,a)::tl-> *)
@@ -172,7 +175,9 @@ let rec match_relu_constraint r_tightening l_tightening constraints =
             else match_constraint var1 var2 tl
     | _ -> (UNDEFINED, [])
  *)
-let rec match_constraint (var1: int) (var2: int) constraints =
+
+(* function is obsolete *)
+let rec match_constraint (var1: int) (var2: int) (constraints: Constraint.t_old list) =
     match constraints with
     | [] -> (UNDEFINED, [])
     | (c, l)::tl->

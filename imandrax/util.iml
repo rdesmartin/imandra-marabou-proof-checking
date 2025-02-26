@@ -6,6 +6,10 @@ let bound_type_to_bool = function
     | UPPER -> true
     | LOWER -> false
 
+let bound_type_to_str = function
+    | UPPER -> "UPPER"
+    | LOWER -> "LOWER"
+
 type constraint_type =
     | RELU
     | MAX

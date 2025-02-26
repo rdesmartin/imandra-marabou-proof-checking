@@ -43,3 +43,12 @@ let update_bounds (tightenings: t list) (upper_bounds: Real.t list) (lower_bound
    let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in
    let updated_lower = update_bounds_by_tightenings lower_tightenings lower_bounds in
    (updated_upper, updated_lower)
+
+(* debugging function *)
+let tightening_to_string ((n,r,bt) :t) = 
+  Printf.sprintf "[ n: %d r: %f bt: %s ]" (Z.to_int n) (Real.to_float r)  (bound_type_to_str bt)
+
+let rec tightenings_to_string (l: t list) = 
+  match l with 
+  | [] -> ""
+  | x :: xs -> (tightening_to_string x) ^ " " ^ (tightenings_to_string xs)

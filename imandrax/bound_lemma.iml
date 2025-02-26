@@ -129,15 +129,16 @@ module BoundLemma = struct
         | (Short _)::_ -> (false, upper_bounds, lower_bounds)
 
     (** Update the bounds according to the dynamic tightenings lemmas (without checking validity of lemmas) *)
-    let update_bound_lemmas bound_lemmas upper_bounds lower_bounds constraints =
+    let update_bound_lemmas bound_lemmas upper_bounds lower_bounds =
         let tightenings = List.map to_tightening bound_lemmas in
         let (upper_bounds', lower_bounds') = Tightening.update_bounds tightenings upper_bounds lower_bounds in
-        (true, upper_bounds', lower_bounds')
+        (upper_bounds', lower_bounds')
 
     (** Apply complete lemma checking for full lemmas and simply updates the bounds in case of simple lemmas *)
     let check_bound_lemmas (bound_lemmas: 'b list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t_old list): (bool * Real.t list * Real.t list) =
         match bound_lemmas with
-        | (Short _)::tl -> update_bound_lemmas bound_lemmas upper_bounds lower_bounds constraints
+        | (Short _)::tl -> let (upper_bounds', lower_bounds') = update_bound_lemmas bound_lemmas upper_bounds lower_bounds in
+            (true, upper_bounds', lower_bounds')
         | (Full _)::tl -> check_full_lemmas bound_lemmas tableau upper_bounds lower_bounds constraints
         | [] -> (true, upper_bounds, lower_bounds)  
 end
