@@ -3,11 +3,13 @@
 [@@@import "arithmetic.iml"]
 [@@@import "split.iml"]
 [@@@import "constraint.iml"]
+[@@@import "sat.iml"]
 
 open Util
 open Leaf_soundness
 open Arithmetic
 open Split 
+open Sat
 
 lemma get_set_nth l n a =
     n >= 0 && n < List.length l
@@ -47,26 +49,26 @@ lemma sat_update_bounds tableau ubs lbs constraints x k i =
     ]
 
 lemma single_var_split_tightening (lbs: real list) (ubs: real list) (constraints: Constraint.t list)
-        (left: Tightening.t list) (right: Tightening.t list) (i: int) (k: real) =
-    match_split left right constraints = Single (i, k)
+        (split: Split.t) (i: int) (k: real) =
+    split = SingleSplit (i, k)
     ==>
-    update_bounds_from_split lbs ubs (match_split left right constraints) = 
-        (((set_nth lbs i k), ubs), (lbs, (set_nth ubs i k)))
+    update_bounds_from_split lbs ubs split = 
+        ((lbs, (set_nth ubs i k)), ((set_nth lbs i k), ubs))
     [@@by auto]
 
 lemma rewrite_single_var_split_updated_bounds tableau (ubs: real list) 
         (lbs: real list) (constraints: Constraint.t list) (x: real list) 
         (i: int) (k: real) =
-    let ((lbs_l, ubs_l), (lbs_r, ubs_r)) = update_bounds_from_split lbs ubs (Single (i, k)) in 
-    (lbs_l = (set_nth lbs i k)) 
-    && (ubs_l = ubs)
-    && (lbs_r = lbs)
-    && (ubs_r = (set_nth ubs i k))
+    let ((lbs_l, ubs_l), (lbs_r, ubs_r)) = update_bounds_from_split lbs ubs (SingleSplit (i, k)) in 
+    (lbs_r = (set_nth lbs i k)) 
+    && (ubs_r = ubs)
+    && (lbs_l = lbs)
+    && (ubs_l = (set_nth ubs i k))
     [@@by auto]
 
 lemma soundness_valid_single_var_split tableau ubs lbs constraints x 
         (i: int) (k: real) =
-    let (lbs_l, ubs_l), (lbs_r, ubs_r) = update_bounds_from_split lbs ubs (Single (i, k)) in
+    let (lbs_l, ubs_l), (lbs_r, ubs_r) = update_bounds_from_split lbs ubs (SingleSplit (i, k)) in
     sat tableau ubs lbs constraints x
     ==>
     sat tableau ubs_l lbs_l constraints x ||
@@ -76,30 +78,27 @@ lemma soundness_valid_single_var_split tableau ubs lbs constraints x
 ]
 
 lemma soundness_single_var_split_matching_helper tableau ubs lbs constraints x 
-        (left: Tightening.t list) (right: Tightening.t list) (i: int) (k: real) =
-    let (lbs_l, ubs_l), (lbs_r, ubs_r) = update_bounds_from_split lbs ubs (match_split left right constraints) in
-    match_split left right constraints = Single (i, k) &&
+        (split: Split.t) (i: int) (k: real) =
+    let (lbs_l, ubs_l), (lbs_r, ubs_r) = update_bounds_from_split lbs ubs split in
+    split = SingleSplit (i, k) &&
     sat tableau ubs lbs constraints x
     ==>
     sat tableau ubs_l lbs_l constraints x ||
     sat tableau ubs_r lbs_r constraints x
     [@@by 
         [%use rewrite_single_var_split_updated_bounds tableau ubs lbs constraints x i k] 
-        @> [%use single_var_split_tightening lbs ubs constraints left right i k] 
+        @> [%use single_var_split_tightening lbs ubs constraints split i k] 
         @> auto]
-    [@@disable Split.match_split]
     [@@fc]
 
-lemma soundness_single_var_split_matching tableau ubs lbs constraints x 
-        (left: Tightening.t list) (right: Tightening.t list) =
-    let (lbs_l, ubs_l), (lbs_r, ubs_r) = update_bounds_from_split lbs ubs (match_split left right constraints) in
-    match match_split left right constraints with
-    | Single (i, k) -> 
+lemma soundness_single_var_split_matching tableau ubs lbs constraints x split =
+    let (lbs_l, ubs_l), (lbs_r, ubs_r) = update_bounds_from_split lbs ubs split in
+    match split with
+    | SingleSplit (i, k) -> 
         sat tableau ubs lbs constraints x
         ==>
         sat tableau ubs_l lbs_l constraints x ||
         sat tableau ubs_r lbs_r constraints x
     | _ -> true
     [@@by auto]
-    [@@disable Split.update_bounds_from_split, Split.match_split]
  

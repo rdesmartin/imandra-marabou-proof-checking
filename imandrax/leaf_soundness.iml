@@ -31,12 +31,10 @@ open Tableau_reduction
 open Bound_reduction
 open Sat
 
-let check_relu_constraints = Constraint.check_relu_constraints
-
-lemma check_node_implies_check_cert tableau upper_bounds lower_bounds relu_constraints proof_tree =
+lemma check_node_implies_check_cert tableau upper_bounds lower_bounds relu_constraints (proof_tree: Proof_tree.t) =
     match proof_tree with
     | Node _ -> true
-    | (Leaf contradiction) ->
+    | (Leaf (contradiction, bound_lemmas)) ->
         let sys = mk_system_contradiction tableau upper_bounds lower_bounds in
         let certificate = mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
         check_node tableau upper_bounds lower_bounds relu_constraints proof_tree
@@ -59,7 +57,7 @@ lemma expand_well_formed_tableau_bounds tableau upper_bounds lower_bounds =
 lemma check_cert_implies_not_eval_system tableau upper_bounds lower_bounds x proof_tree certificate sys =
     match proof_tree with
     | Node _ -> true
-    | (Leaf contradiction) ->
+    | (Leaf (contradiction, bound_lemmas)) ->
         sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds &&
         well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
         List.length x = List.length (List.hd tableau) &&
@@ -165,8 +163,6 @@ lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_const
 [@@disable Checker.well_formed_tableau_bounds, Certificate.mk_system_contradiction, Arithmetic.is_bounded]
 [@@fc]
 
-let check_relu_constraints = Constraint.check_relu_constraints
-
 lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
@@ -182,7 +178,7 @@ lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints
 lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     match proof_tree with
     | Node _ -> true
-    | (Leaf contradiction) ->
+    | (Leaf (contradiction, bound_lemmas)) ->
         well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
         List.length x = List.length (List.hd tableau) &&
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree

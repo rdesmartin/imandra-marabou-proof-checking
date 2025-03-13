@@ -55,7 +55,9 @@ module JSON_decoder = struct
     let open D in
     let* t = field "constraintType" int_decoder in
     let* vars = field "vars" (list int_decoder) in
-    succeed (Constraint.parse_constraint t vars)
+    match (Constraint.parse_constraint t vars) with
+      | Some c -> succeed c 
+      | None -> fail "Parsing error: unknown constraint type"
 
   (* let constraint_decoder: Constraint.t_old D.decoder =
     let open D in

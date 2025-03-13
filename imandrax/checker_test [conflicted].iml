@@ -1,0 +1,37 @@
+[@@@import "proof_tree.iml"]
+[@@@import "split.iml"]
+[@@@import "checker.iml"]
+[@@@import "sat.iml"]
+
+open Proof_tree
+open Split
+open Checker
+open Sat
+
+let rec find_sat_leaf tableau ub lb constraints x t =
+    match t with 
+    | Leaf _ -> if sat tableau ub lb constraints x then Some t else None
+    | Node (split, _, left, right) ->
+        let valid_split = check_split split constraints in
+        if not valid_split then None
+        else
+            let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lb ub split in
+            let res_l = find_sat_leaf tableau ub_left lb_left constraints x left in
+            let res_r = find_sat_leaf tableau ub_right lb_right constraints x right in
+            (
+                match res_l, res_r with 
+                | Some t, _ | _, Some t -> Some t
+                | None, None -> None
+            )
+
+let rec is_in_tree a b = 
+    match a with 
+    | Leaf _ -> a = b 
+    | Node (_, _, left, right) ->
+        is_in_tree left b || is_in_tree right b
+
+lemma find_sat_leaf_is_in_tree tableau ub lb constraints x t l =
+        find_sat_leaf tableau ub lb constraints x t = Some l
+        ==> 
+        is_in_tree t l
+[@@by auto]

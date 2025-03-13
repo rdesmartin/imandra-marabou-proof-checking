@@ -20,10 +20,13 @@ let check_proof_file file_name =
     | Ok (tableau, upper_bounds, lower_bounds, constraints, proof_tree) -> 
         (* load_proof returns a Marabou proof tree, with tightening informations stored in parent nodes. We convert it
         to our formalisation with tightenings in the corresponding node *)
-      let proof_tree' = Proof_tree.of_marabou_tree proof_tree in
-      check_proof_tree tableau upper_bounds lower_bounds constraints proof_tree' 
+      let proof_tree' = Proof_tree.of_marabou_tree proof_tree constraints in
+      (match proof_tree' with
+        | Some tree -> check_proof_tree tableau upper_bounds lower_bounds constraints tree
+        | None -> false
+      )
       (*check_proof_tree = true means that the (tableau, bounds) is unsatisfiable *)
-    | Error e -> let () = Printf.printf "Error parsing proof file %s\n%s" file_name (Decoders_yojson.Basic.Decode. string_of_error e) in
+    | Error e -> let () = Printf.printf "Error parsing proof file %s\n%s" file_name (Decoders_yojson.Basic.Decode.string_of_error e) in
                  false
     [@@program]
 
