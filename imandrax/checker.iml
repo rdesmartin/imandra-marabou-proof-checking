@@ -48,9 +48,9 @@ let rec check_node (tableau: expr list) (upper_bounds: Real.t list) (lower_bound
         (* let (lower_bounds, upper_bounds) = BoundLemma.update_bound_lemmas bound_lemmas upper_bounds lower_bounds in *)
         let valid_split = check_split split constraints in
         let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
-        let valid_children = (check_node tableau ub_left lb_left constraints left) &&
-            (check_node tableau ub_right lb_right constraints right) in
-        valid_children
+        let valid_l_child = (check_node tableau ub_left lb_left constraints left) in
+        let valid_r_child =(check_node tableau ub_right lb_right constraints right) in
+        valid_split && valid_l_child && valid_r_child
     [@@adm proof_node]
 
 let rec equal_rows_length tableau size = 
