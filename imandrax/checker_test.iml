@@ -36,8 +36,8 @@ let rec find_sat_leaf tableau ub lb constraints x t =
     match t with 
     | Leaf _ -> if sat tableau ub lb constraints x then Some t else None
     | Node (split, _, left, right) ->
-        if not (check_split split constraints) then None
-        else
+        (* if not (check_split split constraints) then None *)
+        (* else *)
             let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lb ub split in
             let res_l = find_sat_leaf tableau ub_left lb_left constraints x left in
             let res_r = find_sat_leaf tableau ub_right lb_right constraints x right in
@@ -61,3 +61,15 @@ lemma find_sat_leaf_is_in_tree tableau ub lb constraints x t l =
         is_in_tree t l
 [@@by auto]
 [@@disable find_sat_leaf]
+
+(* problem: how do we characterise the bounds at the level of the leaf? *)
+lemma check_root_implies_check_leaves tableau ub lb ub' lb' constraints t l =
+    check_node tableau ub lb constraints t
+    && is_in_tree t l
+    ==>
+    check_node tableau ub' lb' constraints l
+
+lemma sat_root_implies_sat_leaves tableau ub lb ub' lb' constraints x =
+    sat tableau ub lb constraints x
+    ==>
+    sat tableau ub' lb' constraints x

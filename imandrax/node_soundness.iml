@@ -66,10 +66,6 @@ lemma soundness_split_helper tableau upper_bounds lower_bounds constraints x spl
     [@@by [%use split_matching tableau upper_bounds lower_bounds constraints x split] 
         @> auto]
 
-lemma contrapositive a b =
-    (a ==> b) = (not b ==> (not a))
-    [@@fc]
-
 lemma soundness_split tableau upper_bounds lower_bounds constraints x split =
     let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
     List.length x = List.length lower_bounds 
@@ -83,7 +79,7 @@ lemma soundness_split tableau upper_bounds lower_bounds constraints x split =
     @> auto]
 [@@fc]
 
-lemma soundness_split tableau upper_bounds lower_bounds constraints x split =
+lemma soundness_split_contra tableau upper_bounds lower_bounds constraints x split =
     let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
     List.length x = List.length lower_bounds 
     && List.length x = List.length upper_bounds
@@ -113,7 +109,7 @@ lemma soundness_split_matching tableau upper_bounds lower_bounds constraints x p
     [@@disable Split.update_bounds_from_split]
     [@@fc]
 
-lemma soundness_node_sat tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+(* lemma soundness_node_sat tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     match proof_tree with
     | Leaf _ -> true
     | Node (split, bound_lemmas, left, right) ->
@@ -123,4 +119,4 @@ lemma soundness_node_sat tableau upper_bounds lower_bounds relu_constraints x pr
     [@@by [%use unsat_not_sat tableau upper_bounds lower_bounds relu_constraints x]
        @> auto]
     [@@disable sat, Checker.check_node, Certificate.mk_eq_constraints]
-    [@@fc]
+    [@@fc] *)

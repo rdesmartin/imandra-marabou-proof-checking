@@ -1,0 +1,155 @@
+(* GP Status: Not Done! *)
+
+(* Prove the soundness of the main proof-checking algorithm
+    version with new version of splits checking, no bound tightening lemmas checking
+*)
+
+[@@@import "util.iml"]
+[@@@import "farkas.iml"]
+[@@@import "certificate.iml"]
+[@@@import "arithmetic.iml"]
+[@@@import "constraint.iml"]
+[@@@import "proof_tree.iml"]
+[@@@import "split.iml"]
+[@@@import "checker.iml"]
+[@@@import "tightening.iml"]
+[@@@import "mk_bound_poly.iml"]
+[@@@import "bound_reduct_g.iml"]
+[@@@import "bound_reduction.iml"]
+[@@@import "well_formed_reduction.iml"]
+[@@@import "tableau_reduction.iml"]
+[@@@import "tightening.iml"]
+[@@@import "leaf_soundness.iml"]
+[@@@import "node_soundness.iml"]
+[@@@import "sat.iml"]
+
+open Util
+open Constraint
+open Proof_tree
+open Split
+open Certificate
+open Checker
+open Arithmetic
+open Bound_lemma
+open Tightening
+open Leaf_soundness
+open Node_soundness
+open Sat
+
+(* lemma contrapositive a b =
+    (not b ==> not a) = (a ==> b)
+[@@rw] *)
+
+(* lemma not_check_node_children_imply_not_check_node_parent tableau upper_bounds lower_bounds constraints split left right bound_lemmas =
+    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
+    not ((check_node tableau ub_left lb_left constraints left) 
+        && (check_node tableau ub_right lb_right constraints right))
+    ==>
+    not (check_node tableau upper_bounds lower_bounds constraints (Node (split, bound_lemmas, left, right)))
+[@@by auto]
+[@@disable check_node, sat] *)
+
+(* lemma check_node_parent_imply_check_node_children tableau upper_bounds lower_bounds constraints split b_l left right =
+    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
+    check_node tableau upper_bounds lower_bounds constraints (Node (split, b_l, left, right))
+    ==>
+    (check_node tableau ub_left lb_left constraints left) 
+        && (check_node tableau ub_right lb_right constraints right)
+[@@by [%use not_check_node_children_imply_not_check_node_parent tableau upper_bounds lower_bounds constraints split left right b_l]
+    @> auto]
+[@@disable check_node, update_bounds_from_split]
+[@@fc] *)
+    
+lemma check_node_parent_imply_check_node_children tableau upper_bounds lower_bounds constraints tree =
+    match tree with 
+    | Leaf _ -> true
+    | Node (split, b_l, left, right) ->
+        let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
+        check_node tableau upper_bounds lower_bounds constraints tree 
+        ==>
+        (check_node tableau ub_left lb_left constraints left) 
+            && (check_node tableau ub_right lb_right constraints right)
+[@@by auto]
+[@@disable check_node, update_bounds_from_split]
+
+(* 
+1.b. lemma Node case, proof_tree = Node (left_child, right_child) 
+Induction Hypothesis:
+    check_node (mk_eq_constraints tableau) ub_left lb_left relu_constraints left_child.ptr
+    ==>
+    for all x, unsat tableau ub_left lb_left relu_constraints x
+
+    check_node (mk_eq_constraints tableau) ub_right lb_right relu_constraints left_child.ptr
+    ==>
+    for all x, unsat tableau ub_right lb_right relu_constraints x
+
+    Note 4/7/2024: proof of soundness_node didn't go through when using `#use checker_soundness.iml`
+    but it did when pasting lemmas one by one in CLI.
+    *)
+axiom soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    match proof_tree with
+    | Node _ -> true
+    | Leaf (contradiction, bound_lemmas) ->
+        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+        List.length x = List.length (List.hd tableau) &&
+        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+        ==> 
+        unsat tableau upper_bounds lower_bounds relu_constraints x
+[@@fc] 
+
+let rec check_all_splits t constraints =
+    match t with 
+    | Leaf _ -> true
+    | Node (split, _, left, right) -> 
+        check_split split constraints 
+        && check_all_splits left constraints
+        && check_all_splits right constraints
+
+axiom unsat_children_imply_unsat_parent tableau upper_bounds lower_bounds constraints split x =
+    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
+    check_split split constraints
+    && (unsat tableau ub_left lb_left constraints x) 
+    && (unsat tableau ub_left lb_left constraints x)
+    ==> 
+    unsat tableau upper_bounds lower_bounds constraints x
+    [@@fc]
+
+(* lemma soundness_node tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    match proof_tree with
+    | Leaf _ -> true
+    | Node (split, bound_lemmas, left, right) ->
+        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+        ==>
+        unsat tableau upper_bounds lower_bounds relu_constraints x
+    [@@by [%use unsat_not_sat tableau upper_bounds lower_bounds relu_constraints x]
+       @> auto]
+    [@@disable sat, Checker.check_node, Certificate.mk_eq_constraints]
+    [@@fc] *)
+
+(* 
+1. lemma check_node implies unsatisfiability
+    (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+    (relu_constraints: Constraint.t list) (proof_tree: ProofTree.t) =
+    check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+    ==>
+    for all x, unsat tableau upper_bounds lower_bounds relu_constraints x
+
+TODO: the root of the proof tree can have bound tightening, which will be applied in proof-tree pre-processing
+and should also be proved correct.
+*)
+lemma check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+        (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
+    (* this is a check performed in check_proof_tree, outside of check_node *)
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds
+    && List.length x = List.length (List.hd tableau)
+    && check_all_splits tree constraints
+    && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+    ==>
+    unsat tableau upper_bounds lower_bounds constraints x
+    [@@by [%use soundness_leaf tableau upper_bounds lower_bounds constraints x tree]
+       @> [%use check_node_parent_imply_check_node_children (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree]
+       @> induct ~on_fun:[%id check_node] ()]
+    [@@disable update_bounds, unsat, Checker.well_formed_tableau_bounds, List.length, Checker.check_node]
+    [@@timeout 30]
+
+
