@@ -233,6 +233,7 @@ lemma mk_cert_poly_well_formed cs es x =
 [@@by [%use sum_scale_well_formed cs es x] @> auto] [@@rw] [@@fc]
 
 (* Needs lots of rewriting -- TODO: speed up with some focused rules! *)
+
 lemma solution_is_not_neg cs es x =
    eval_system es x
    && well_formed es x

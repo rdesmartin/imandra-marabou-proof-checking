@@ -1,7 +1,7 @@
 [@@@import "util.iml"]
 [@@@import "relu.iml"]
-(* [@@@import "relu_case_1_bounded.iml"]
-[@@@import "relu_case_2_bounded.iml"] *)
+[@@@import "relu_case_1_bounded.iml"]
+[@@@import "relu_case_2_bounded.iml"]
 [@@@import "tightening.iml"]
 [@@@import "split.iml"]
 [@@@import "sat.iml"]
@@ -17,7 +17,7 @@ open Arithmetic
 open Constraint
 
 (* admitting main results from relu_case_1_bounded and relu_case_2_bounded to reduce overhead from imports *)
-axiom case_1_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
+(* axiom case_1_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
     let ls' = set_nth ls f_var 0. in 
     let us' = set_nth (set_nth us b_var 0.) f_var 0. in
     List.length xs = List.length ls 
@@ -26,9 +26,9 @@ axiom case_1_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
     && is_bounded xs us ls
     && inactive_relu b_var f_var a_var xs
     ==>
-    is_bounded xs us' ls'
+    is_bounded xs us' ls' *)
 
-axiom case_2_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
+(* axiom case_2_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
     let ls' = set_nth (set_nth ls b_var  0.) a_var 0. in
     let us' = set_nth us a_var  0. in 
     List.length xs = List.length ls 
@@ -38,7 +38,7 @@ axiom case_2_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var =
     && active_relu b_var f_var a_var xs
     ==>
     is_bounded xs us' ls'
-
+ *)
 lemma eval_relu_split b f a xs =
     eval_relu b f a xs
     ==> 
