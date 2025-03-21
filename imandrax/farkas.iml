@@ -1,7 +1,6 @@
 (* GP Status: PROVED! *)
 
 (* Correctness of a full Farkas lemma proof checker in Imandra. *)
-(* Updated to support `Gt 0` constraints on Nov 30th, 2023.     *)
 (* G.Passmore, Imandra *)
 
 (* A polynomial is a list of coefficients, one for each variable
@@ -20,13 +19,11 @@ type poly = Real.t list
 type expr =
   | Eq of poly  (*  = 0 *)
   | Geq of poly (* >= 0 *)
-  | Gt of poly  (*  > 0 *)
  
 let extract_poly (e: expr): Real.t list =
     match e with
     | Geq p -> p
     | Eq p -> p
-    | Gt p -> p
 
  (* A system is a collection of expressions *)
  
@@ -43,7 +40,6 @@ let eval_expr e x =
    match e with
    | Eq p -> Real.(eval_poly p x = 0.0)
    | Geq p -> Real.(eval_poly p x >= 0.0)
-   | Gt p -> Real.(eval_poly p x > 0.0)
  
 let rec eval_system (es:system) (x:Real.t list) : bool =
    match es with
@@ -89,15 +85,8 @@ let rec scale_exprs (cs:Real.t list) (es:system) : poly list =
      ) else (
        p :: scale_exprs cs es
      )
-   | c::cs, Gt p :: es ->
-     if Real.(c > 0.0) then (
-       p_scale p c :: scale_exprs cs es
-     ) else (
-       p :: scale_exprs cs es
-     )
    | [], Eq p :: es -> p :: scale_exprs cs es
    | [], Geq p :: es -> p :: scale_exprs cs es
-   | [], Gt p :: es -> p :: scale_exprs cs es
    | _ -> []
  [@@adm es]
  
@@ -212,7 +201,6 @@ let rec well_formed es x =
    | [] -> true
    | Eq p :: es -> good_poly_x_sizes p x && well_formed es x
    | Geq p :: es -> good_poly_x_sizes p x && well_formed es x
-   | Gt p :: es -> good_poly_x_sizes p x && well_formed es x
  
 lemma sum_scale_well_formed cs es x =
    well_formed es x && es <> []
@@ -239,27 +227,18 @@ lemma solution_is_not_neg cs es x =
    && es <> []
    ==>
    Real.(eval_poly (mk_cert_poly cs es) x >= 0.0)
- [@@by auto] [@@timeout 120]
- 
-lemma solution_cert_is_not_neg_poly cs es x =
+ [@@by auto]
+
+lemma cert_is_neg cs es x =
    well_formed es x
-   && eval_system es x
-   && es <> []
+   && check_cert es cs
    ==>
-   not (is_neg_const (mk_cert_poly cs es))
+   eval_poly (mk_cert_poly cs es) x <. 0.
  [@@by [%use solution_is_not_neg cs es x]
     @> [%use eval_const_neg (mk_cert_poly cs es) x]
     @> auto]
  [@@disable mk_cert_poly, eval_const_neg]
- 
-lemma check_cert_correct_ne es cs x =
-   well_formed es x
-   && check_cert es cs
-   && es <> []
-   ==>
-   eval_system es x = false
-[@@by [%use solution_cert_is_not_neg_poly cs es x] @> auto]
- 
+
  (* Final correctness theorem for our full Farkas proof checker!
  
     If our problem is well-formed and we have a valid algebraic
@@ -268,10 +247,12 @@ lemma check_cert_correct_ne es cs x =
     solutions for the problem!
  *)
  
-theorem check_cert_correct (es:system) (cs:Real.t list) (x:Real.t list) =
+theorem farkas_unsat (es:system) (cs:Real.t list) (x:Real.t list) =
    well_formed es x
    && check_cert es cs
+   && es <> []
    ==>
    eval_system es x = false
-[@@by [%use check_cert_correct_ne es cs x] @> auto]
+[@@by [%use solution_is_not_neg cs es x]
+@> [%use cert_is_neg cs es x] @> auto]
 [@@fc]

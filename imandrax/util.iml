@@ -58,13 +58,8 @@ lemma set_nth_unchanged l n m a =
   List.nth m (set_nth l n a) = List.nth m l
 [@@by auto] [@@rw]
 
-<<<<<<< HEAD
 lemma set_nth_length_preservation l n x = 
     List.length (set_nth l n x) = List.length l
-=======
-lemma len_set_nth x key value = 
-  List.length (set_nth x key value) = List.length x
->>>>>>> master
 [@@by auto] [@@rw]
 
 (* increment list element at given index by 1 *)
