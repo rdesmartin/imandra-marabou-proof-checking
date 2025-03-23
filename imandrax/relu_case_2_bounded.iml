@@ -60,31 +60,31 @@ lemma eval_relu_different_var xs f_var b_var a_var =
 (* Proof case_2_bounded_at_i *)
 
 lemma case_2_bounded_at_i_i1 xs ls us b_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && i <> a_var && i <> b_var
     && List.length xs = List.length ls 
     && List.length xs = List.length us
     && bounded xs us ls
     ==>
-    List.nth i ls' = List.nth i ls
-    && List.nth i us' = List.nth i us
+    List.nth i ls'' = List.nth i ls
+    && List.nth i us'' = List.nth i us
 [@@by [%use set_nth_unchanged us i a_var 0.]
     @> [%use set_nth_unchanged_2vars ls b_var a_var i 0. 0.]
     @> auto]
 [@@fc]
 
 lemma case_2_bounded_at_i_i xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && i <> a_var && i <> b_var
     && List.length xs = List.length ls 
     && List.length xs = List.length us
     && bounded xs us ls
     ==>
-    bounded_at_i i xs ls' us'
+    bounded_at_i i xs ls'' us''
 [@@by [%use bounded_implies_bounded_at_i i xs ls us]
     @> [%use case_2_bounded_at_i_i1 xs ls us b_var f_var i]
     @> auto]
@@ -92,16 +92,16 @@ lemma case_2_bounded_at_i_i xs ls us b_var f_var a_var i =
 let g i l = match List.nth i l with Some v -> v | None -> 0.0
 
 lemma case_2_bounded_at_i_a1 xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && i = a_var
     && List.length xs = List.length ls 
     && List.length xs = List.length us
     && bounded xs us ls
     ==>
-    List.nth i ls' = Some 0.
-    && List.nth i us' = Some 0.
+    List.nth i ls'' = Some 0.
+    && List.nth i us'' = Some 0.
 [@@by [%use get_set_nth us a_var 0.]
     @> [%use get_set_nth (set_nth ls b_var 0.) a_var 0.]
     @> auto]
@@ -113,8 +113,8 @@ lemma case_2_bounded_at_i_a2 xs b_var f_var a_var =
 [@@by auto]
 
 lemma case_2_bounded_at_i_a xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && i = a_var
     && List.length xs = List.length ls 
@@ -122,14 +122,14 @@ lemma case_2_bounded_at_i_a xs ls us b_var f_var a_var i =
     && active_relu b_var f_var a_var xs
     && bounded xs us ls
     ==>
-    bounded_at_i i xs ls' us'
+    bounded_at_i i xs ls'' us''
 [@@by [%use case_2_bounded_at_i_a1 xs ls us b_var f_var a_var i]
     @> [%use case_2_bounded_at_i_a2 xs b_var f_var a_var]
     @> auto]
 
 lemma case_2_bounded_at_i_b1 xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && i = b_var
     && List.length xs = List.length ls 
@@ -137,8 +137,24 @@ lemma case_2_bounded_at_i_b1 xs ls us b_var f_var a_var i =
     && bounded xs us ls
     && eval_relu b_var f_var a_var xs
     ==>
-    g i ls' = 0. 
-    && g i us = g i us'  
+    g i ls'' = 0. 
+    && g i us = g i us''  
+[@@by [%use eval_relu_different_var xs b_var f_var a_var]
+    @> [%use set_nth_unchanged ls b_var a_var 0.]
+    @> [%use get_set_nth (set_nth ls b_var 0.) a_var 0.]
+    @> auto]
+
+lemma case_2_bounded_at_i_b1' xs ls us b_var f_var a_var i =
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
+    0 <= i && (i < List.length xs) 
+    && i = b_var
+    && List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && bounded xs us ls
+    && eval_relu b_var f_var a_var xs
+    ==>
+    g i ls'' = 0. 
 [@@by [%use eval_relu_different_var xs b_var f_var a_var]
     @> [%use set_nth_unchanged ls b_var a_var 0.]
     @> [%use get_set_nth (set_nth ls b_var 0.) a_var 0.]
@@ -177,25 +193,26 @@ lemma nth_g_bounded_ls xs ls us i =
     g i ls <=. g i xs
 [@@by auto]
 
-lemma case_2_bounded_at_i_b3 xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
-    0 <= i && (i < List.length xs) 
-    && i = b_var
+lemma case_2_bounded_at_i_b3 xs ls us b_var f_var a_var =
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
+    0 <= b_var && (b_var < List.length xs) 
+    (* && i = b_var *)
     && List.length xs = List.length ls 
     && List.length xs = List.length us
     && active_relu b_var f_var a_var xs
     && bounded xs us ls
     ==>
-    g i ls' <=. g i xs
-[@@by [%use case_2_bounded_at_i_b1 xs ls us b_var f_var a_var i]
+    g b_var ls'' <=. g b_var xs
+[@@by [%use case_2_bounded_at_i_b1' xs ls us b_var f_var a_var b_var]
     @> [%use case_2_bounded_at_i_b2 xs b_var f_var a_var]
-    @> [%use nth_g_bounded_ls xs (set_nth (set_nth ls b_var 0.) a_var 0.) (set_nth us a_var 0.) i]
+    (* @> [%use nth_g_bounded_ls xs (set_nth (set_nth ls b_var 0.) a_var 0.) (set_nth us a_var 0.) i] *)
     @> auto]
+[@@disable bounded]
 
 lemma case_2_bounded_at_i_b4 xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && i = b_var
     && List.length xs = List.length ls 
@@ -203,29 +220,15 @@ lemma case_2_bounded_at_i_b4 xs ls us b_var f_var a_var i =
     && active_relu b_var f_var a_var xs
     && bounded xs us ls
     ==>
-    g i xs <=. g i us'
+    g i xs <=. g i us''
 [@@by [%use bounded_implies_bounded_at_i i xs ls us]
     @> [%use nth_g_bounded_us xs ls us i]
     @> auto]
-
-(* lemma case_2_bounded_at_i_b5 xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
-    0 <= i && (i < List.length xs) 
-    && i = b_var
-    && List.length xs = List.length ls 
-    && List.length xs = List.length us
-    && active_relu b_var f_var a_var xs
-    && bounded xs us ls
-    ==>
-    g i ls <=. g i xs
-[@@by [%use case_2_bounded_at_i_b4 xs ls us b_var f_var a_var i]
-    @> [%use case_2_bounded_at_i_b1 xs ls us b_var f_var a_var i]
-    @> auto] *)
+[@@disable bounded]
 
 lemma case_2_bounded_at_i_b xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && i = b_var
     && List.length xs = List.length ls 
@@ -233,7 +236,7 @@ lemma case_2_bounded_at_i_b xs ls us b_var f_var a_var i =
     && active_relu b_var f_var a_var xs
     && bounded xs us ls
     ==>
-    bounded_at_i i xs ls' us'
+    bounded_at_i i xs ls'' us''
 [@@by [%use case_2_bounded_at_i_b3 xs ls us b_var f_var a_var i]
     (* @> [%use case_2_bounded_at_i_b5 xs ls us b_var f_var a_var i] *)
     @> [%use g_nth_bounded xs (set_nth (set_nth ls b_var 0.) a_var 0.) (set_nth us a_var 0.) i]
@@ -241,8 +244,8 @@ lemma case_2_bounded_at_i_b xs ls us b_var f_var a_var i =
 [@@disable bounded_at_i, List.length, bounded, active_relu]
 
 lemma case_2_bounded_at_i xs ls us b_var f_var a_var i =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     0 <= i && (i < List.length xs) 
     && List.length xs = List.length ls 
     && List.length xs = List.length us
@@ -250,7 +253,7 @@ lemma case_2_bounded_at_i xs ls us b_var f_var a_var i =
     && bounded xs us ls
     && active_relu b_var f_var a_var xs
     ==>
-    bounded_at_i i xs ls' us'
+    bounded_at_i i xs ls'' us''
 [@@by [%use case_2_bounded_at_i_i xs ls us b_var f_var a_var i]
     @> [%use case_2_bounded_at_i_a xs ls us b_var f_var a_var i]
     @> [%use case_2_bounded_at_i_b xs ls us b_var f_var a_var i]
@@ -286,32 +289,32 @@ lemma witness_not_bounded_at_i xs ls us k =
 [@@by auto][@@fc]
 
 lemma case_2_witness_not_bounded xs ls us b_var f_var a_var =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     List.length xs = List.length ls 
     && List.length xs = List.length us
     && eval_relu b_var f_var a_var xs
     && bounded xs us ls
     && active_relu b_var f_var a_var xs
     ==>
-    match find_bad_bound xs ls' us' 0 with
+    match find_bad_bound xs ls'' us'' 0 with
     | None -> true
-    | Some j -> not (bounded_at_i j xs ls' us')
+    | Some j -> not (bounded_at_i j xs ls'' us'')
     [@@by [%use witness_not_bounded_at_i xs (set_nth (set_nth ls b_var 0.) a_var 0.) (set_nth us a_var 0.) 0]
         @> auto]
     [@@disable set_nth, bounded]
 
 lemma case_2_find_witness_helper xs ls us b_var f_var a_var j =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     List.length xs = List.length ls 
     && List.length xs = List.length us
     && eval_relu b_var f_var a_var xs
     && bounded xs us ls
     && active_relu b_var f_var a_var xs
-    && find_bad_bound xs ls' us' 0 = Some j
+    && find_bad_bound xs ls'' us'' 0 = Some j
     ==>
-    bounded_at_i j xs ls' us'
+    bounded_at_i j xs ls'' us''
     [@@by [%use case_2_bounded_at_i xs ls us b_var f_var a_var j]
         @> auto]
     [@@disable set_nth, bounded]
@@ -319,46 +322,46 @@ lemma case_2_find_witness_helper xs ls us b_var f_var a_var j =
 
 (* to prove the lemma above the helper lemma above is automatically applied *)
 lemma case_2_witness_bounded xs ls us b_var f_var a_var =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     List.length xs = List.length ls 
     && List.length xs = List.length us
     && eval_relu b_var f_var a_var xs
     && bounded xs us ls
     && active_relu b_var f_var a_var xs
     ==>
-    match find_bad_bound xs ls' us' 0 with
+    match find_bad_bound xs ls'' us'' 0 with
     | None -> true
-    | Some j -> bounded_at_i j xs ls' us'
+    | Some j -> bounded_at_i j xs ls'' us''
     [@@by auto]
     [@@disable set_nth, bounded]
 
 (* we prove that there cannot be witnesses by contradiction *)
 lemma case_2_no_witness xs ls us b_var f_var a_var =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     List.length xs = List.length ls 
     && List.length xs = List.length us
     && eval_relu b_var f_var a_var xs
     && bounded xs us ls
     && active_relu b_var f_var a_var xs
     ==>
-    find_bad_bound xs ls' us' 0 = None
+    find_bad_bound xs ls'' us'' 0 = None
     [@@by [%use case_2_witness_not_bounded xs ls us b_var f_var a_var]
     @> [%use case_2_witness_bounded xs ls us b_var f_var a_var]
     @> auto]
     [@@disable set_nth, bounded]
 
-lemma case_2_updating_bounds_preserves_bounded xs ls us b_var f_var a_var =
-    let ls' = set_nth (set_nth ls b_var 0.) a_var 0. in
-    let us' = set_nth us a_var 0. in 
+lemma case_2_updating_bounds_preserves_bounded xs us ls b_var f_var a_var =
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
     List.length xs = List.length ls 
     && List.length xs = List.length us
     && eval_relu b_var f_var a_var xs
     && bounded xs us ls
     && active_relu b_var f_var a_var xs
     ==>
-    bounded xs us' ls'
+    bounded xs us'' ls''
 [@@by [%use case_2_no_witness xs ls us b_var f_var a_var] 
 @> [%use no_witness_bounded xs (set_nth (set_nth ls b_var 0.) a_var 0.) (set_nth us a_var 0.) 0]
 @> auto]

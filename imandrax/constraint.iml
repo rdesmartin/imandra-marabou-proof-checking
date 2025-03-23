@@ -1,8 +1,10 @@
 (* GP Status: PROVED! *)
 
 [@@@import "util.iml"]
+[@@@import "relu.iml"]
 
 open Util
+open Relu
 
 type t = Relu of (int * int * int)
   (* | ABSOLUTE_VALUE
@@ -27,14 +29,6 @@ let parse_constraint (i: int) (vars: int list): t option =
   | _ -> None
 
 let relu x = if x >=. 0. then x else 0. 
-
-let eval_relu (b_var: int) (f_var: int) (aux_var: int) (x: real list) =
-    let b = List.nth b_var x in
-    let f = List.nth f_var x in
-    let aux = List.nth aux_var x in
-    match b, f, aux with
-    | Some b, Some f, Some aux -> f = relu b && aux +. b -. f = 0.
-    | _ -> false
 
 let rec check_relu_constraints (cs: t list) (x: real list) =
     match cs with

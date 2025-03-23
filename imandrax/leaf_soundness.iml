@@ -104,12 +104,12 @@ lemma eval_system_unsat tableau upper_bounds lower_bounds x =
     List.length x = List.length (List.hd tableau) &&
     (not (eval_system (mk_eq_constraints tableau) x) || not (eval_system (mk_geq_constraints upper_bounds lower_bounds) x))
     ==>
-    not (is_in_kernel tableau x) || not (is_bounded x upper_bounds lower_bounds)
+    not (is_in_kernel tableau x) || not (bounded x upper_bounds lower_bounds)
 [@@by [%use tableau_reduction_soundness_contra tableau x]
    @> [%use mk_geq_constraints_reduction_soundness_contra upper_bounds lower_bounds x]
    @> [%use mk_geq_constraints_reduction_soundness upper_bounds lower_bounds x]
    @> auto]
-[@@disable Arithmetic.is_bounded, List.length, Checker.well_formed_tableau_bounds, Arithmetic.is_in_kernel, 
+[@@disable Arithmetic.bounded, List.length, Checker.well_formed_tableau_bounds, Arithmetic.is_in_kernel, 
            Farkas.eval_system, Certificate.mk_eq_constraints, Certificate.mk_geq_constraints]
 [@@fc]
 
@@ -118,16 +118,16 @@ lemma eval_system_unsat_conjn tableau upper_bounds lower_bounds x =
     List.length x = List.length (List.hd tableau) &&
     not ((eval_system (mk_eq_constraints tableau) x) && (eval_system (mk_geq_constraints upper_bounds lower_bounds) x))
     ==>
-    not ((is_in_kernel tableau x) && (is_bounded x upper_bounds lower_bounds))
+    not ((is_in_kernel tableau x) && (bounded x upper_bounds lower_bounds))
 [@@by [%use eval_system_unsat tableau upper_bounds lower_bounds x]
    @> auto]
-[@@disable Checker.well_formed_tableau_bounds, Arithmetic.is_bounded]
+[@@disable Checker.well_formed_tableau_bounds, Arithmetic.bounded]
 [@@fc]
 
 lemma eval_system_unsat_contra tableau upper_bounds lower_bounds x =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
     List.length x = List.length (List.hd tableau) &&
-    (is_in_kernel tableau x) && (is_bounded x upper_bounds lower_bounds)
+    (is_in_kernel tableau x) && (bounded x upper_bounds lower_bounds)
     ==>
     (eval_system (mk_eq_constraints tableau) x) && (eval_system (mk_geq_constraints upper_bounds lower_bounds) x)
 [@@by [%use eval_system_unsat_conjn tableau upper_bounds lower_bounds x]
@@ -140,11 +140,11 @@ lemma soundness_check_cert_composition tableau upper_bounds lower_bounds x =
     List.length x = List.length (List.hd tableau) &&
     not (eval_system sys x)
     ==>
-    not (is_in_kernel tableau x) || not (is_bounded x upper_bounds lower_bounds)
+    not (is_in_kernel tableau x) || not (bounded x upper_bounds lower_bounds)
 [@@by [%use soundness_eval_sys_composition tableau upper_bounds lower_bounds x]
    @> [%use eval_system_unsat_contra tableau upper_bounds lower_bounds x]
    @> auto]
-[@@disable Certificate.mk_system_contradiction, Arithmetic.is_bounded,
+[@@disable Certificate.mk_system_contradiction, Arithmetic.bounded,
     List.length, Checker.well_formed_tableau_bounds, Arithmetic.is_in_kernel, 
     Farkas.eval_system, Certificate.mk_geq_constraints, 
     Certificate.mk_eq_constraints, Certificate.mk_lower_bounds_constraints,
@@ -160,7 +160,7 @@ lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_const
     unsat tableau upper_bounds lower_bounds relu_constraints x
 [@@by [%use soundness_check_cert_composition tableau upper_bounds lower_bounds x]
    @> auto]
-[@@disable Checker.well_formed_tableau_bounds, Certificate.mk_system_contradiction, Arithmetic.is_bounded]
+[@@disable Checker.well_formed_tableau_bounds, Certificate.mk_system_contradiction, Arithmetic.bounded]
 [@@fc]
 
 lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints x =
@@ -187,7 +187,7 @@ lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
 [@@by [%use check_node_implies_check_cert (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree]
    @> [%use not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x]
    @> auto]
-[@@disable Arithmetic.is_bounded, List.length, Checker.well_formed_tableau_bounds, Arithmetic.is_in_kernel, 
+[@@disable Arithmetic.bounded, List.length, Checker.well_formed_tableau_bounds, Arithmetic.is_in_kernel, 
            Farkas.eval_system, Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Farkas.check_cert, 
            Certificate.mk_system_contradiction]
 [@@fc] 

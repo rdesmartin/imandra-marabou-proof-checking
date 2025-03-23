@@ -1,7 +1,7 @@
 [@@@import "util.iml"]
 [@@@import "relu.iml"]
 [@@@import "relu_case_1_bounded.iml"]
-(* [@@@import "relu_case_2_bounded.iml"] *)
+[@@@import "relu_case_2_bounded.iml"]
 [@@@import "tightening.iml"]
 [@@@import "split.iml"]
 [@@@import "sat.iml"]
@@ -11,20 +11,19 @@
 open Util
 open Relu
 open Relu_case_1_bounded
-(* open Relu_case_2_bounded *)
+open Relu_case_2_bounded
 open Tightening
 open Split
 open Sat
 open Arithmetic
 open Constraint
 
-(* admitting main results from relu_case_1_bounded and relu_case_2_bounded to reduce overhead from imports *)
-
 lemma eval_relu_split b f a xs =
     eval_relu b f a xs
     ==> 
-    (active_relu b f a xs) || (inactive_relu b f a xs)
+    (inactive_relu b f a xs) || (active_relu b f a xs)
 [@@by auto]
+[@@fc]
 
 lemma relu_split x_b x_f x_a = 
     (x_f = relu x_b) && (x_a = x_f -. x_b)
@@ -40,12 +39,44 @@ lemma relu_split_soundness_bounds (xs: real list) (ls: real list) (us: real list
     && List.length xs = List.length us
     && eval_relu b_var f_var a_var xs
     && bounded xs us ls
+    && ((inactive_relu b_var f_var a_var xs) || (active_relu b_var f_var a_var xs))
+    ==>
+    (bounded xs us' ls')
+    || (bounded xs us'' ls'')
+[@@by
+    [%use case_1_updating_bounds_preserves_bounded xs us ls b_var f_var a_var]
+    @> [%use case_2_updating_bounds_preserves_bounded xs us ls b_var f_var a_var]
+    @> auto
+]
+(* [@@by 
+    [%cases (inactive_relu b_var f_var a_var xs), (active_relu b_var f_var a_var xs)]
+    @>| [
+        (intros
+            @> [%use case_1_updating_bounds_preserves_bounded xs us ls b_var f_var a_var]
+            @> auto);
+        (intros
+            @> [%use case_2_updating_bounds_preserves_bounded xs us ls b_var f_var a_var]
+            @> simp
+            @> auto);
+        (intros @> auto)
+    ]
+] *)
+
+lemma relu_split_soundness_bounds (xs: real list) (ls: real list) (us: real list) (b_var: int) (f_var: int) (a_var: int) =
+    let ls' = set_nth ls f_var 0. in
+    let us' = set_nth (set_nth us b_var 0.) f_var 0. in
+    let ls'' = set_nth (set_nth ls b_var 0.) a_var 0. in
+    let us'' = set_nth us a_var 0. in
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && eval_relu b_var f_var a_var xs
+    && bounded xs us ls
     ==>
     (bounded xs us' ls')
     || (bounded xs us'' ls'')
 [@@by [%use eval_relu_split b_var f_var a_var xs]
-    (* @> [%use case_2_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var] *)
-    @> [%use case_1_updating_bounds_preserves_is_bounded xs us ls b_var f_var a_var]
+    @> [%use case_2_updating_bounds_preserves_bounded xs us ls b_var f_var a_var]
+    @> [%use case_1_updating_bounds_preserves_bounded xs us ls b_var f_var a_var]
     @> auto]
 
 lemma sat_new_bounds tableau us ls constraints xs us' ls' =
@@ -97,7 +128,7 @@ theorem soundness_relu_split tableau us ls constraints xs b f aux split =
 [@@by [%use check_constraints_eval_relu constraints xs b f aux]
     @> [%use relu_split_soundness_sat xs tableau ls us constraints b f aux] 
     @> auto]
-[@@disable sat, update_bounds_from_split]
+[@@disable sat, update_bounds_from_split, List.length, List.mem]
 [@@fc]
 
 lemma soundness_relu_split_matching_helper split = 
