@@ -90,6 +90,7 @@ lemma unsat_children_imply_unsat_parent tableau upper_bounds lower_bounds constr
         unsat tableau upper_bounds lower_bounds constraints x
 [@@by [%use Node_soundness.soundness_split_contra tableau upper_bounds lower_bounds constraints x (split_of_node proof_tree)]
    @> auto]
+   [@@timeout 120]
 
 (* 
 1. lemma check_node implies unsatisfiability
@@ -138,6 +139,7 @@ lemma check_node_soundness_node (tableau: real list list) (upper_bounds: real li
 [@@by [%use check_node_parent_imply_check_node_children (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree]
    @> [%use unsat_children_imply_unsat_parent tableau upper_bounds lower_bounds constraints tree x]
    @> auto]
+   [@@timeout 120]
 
 (* It's convenient to have both cases we want in induction wrapped up into a single lemma. *)
 lemma check_node_soundness_full (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
@@ -201,7 +203,7 @@ theorem check_node_soundness (tableau: real list list) (upper_bounds: real list)
     unsat tableau upper_bounds lower_bounds constraints x
 [@@by [%expand "valid_proof"] 
    @> [%expand "well_formed_vector"] 
-   @> induction ~id:[%id check_node] ()
+   @> induct ~on_fun:[%id check_node] ()
       @>>| [%use check_node_soundness_full tableau upper_bounds lower_bounds constraints tree x]
              @> [%use check_node_parent_imply_check_node_children (mk_eq_constraints tableau) 
                       upper_bounds lower_bounds constraints tree]
@@ -210,3 +212,4 @@ theorem check_node_soundness (tableau: real list list) (upper_bounds: real list)
     ]
 [@@disable List.length, well_formed_tableau_bounds, check_node, mk_eq_constraints, unsat, set_nth, 
            update_bounds_from_split]
+[@@timeout 300]

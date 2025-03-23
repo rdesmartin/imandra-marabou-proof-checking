@@ -6,12 +6,12 @@ open Constraint
 
 let unsat tableau upper_bounds lower_bounds relu_constraints x =
     (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
+    bounded x upper_bounds lower_bounds &&
     check_relu_constraints relu_constraints x) = false
     
 let sat tableau upper_bounds lower_bounds relu_constraints x =
     (is_in_kernel tableau x &&
-    is_bounded x upper_bounds lower_bounds &&
+    bounded x upper_bounds lower_bounds &&
     check_relu_constraints relu_constraints x)
     
 lemma sat_not_unsat tableau upper_bounds lower_bounds relu_constraints x =

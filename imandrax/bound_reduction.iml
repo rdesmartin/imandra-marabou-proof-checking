@@ -431,7 +431,7 @@ lemma mk_lower_bounds_constraints_eval lbs xs =
 
 (* High-level proof goal *)
 lemma mk_geq_constraints_reduction_soundness ubs lbs xs =
-    is_bounded xs ubs lbs
+    bounded xs ubs lbs
     ==>
     eval_system (mk_geq_constraints ubs lbs) xs
 [@@by [%use eval_system_concat_invariant (mk_upper_bounds_constraints (List.length ubs) ubs) (mk_lower_bounds_constraints (List.length lbs) lbs) xs]
@@ -442,8 +442,8 @@ lemma mk_geq_constraints_reduction_soundness ubs lbs xs =
 lemma mk_geq_constraints_reduction_soundness_contra ubs lbs xs =
     not (eval_system (mk_geq_constraints ubs lbs) xs)
     ==>
-    not (is_bounded xs ubs lbs)
+    not (bounded xs ubs lbs)
 [@@by [%use mk_geq_constraints_reduction_soundness ubs lbs xs]
    @> simplify ()]
-[@@disable Farkas.eval_system, Arithmetic.is_bounded]
+[@@disable Farkas.eval_system, Arithmetic.bounded]
 [@@fc]
