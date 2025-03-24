@@ -107,13 +107,53 @@ lemma sat_check_constraints tableau us ls constraints xs =
     check_relu_constraints constraints xs
 [@@fc]
 
+lemma mem_not_empty l x =
+    List.mem x l ==> l <> []
+    [@@fc]
+
+lemma mem_tail l x =
+    l <> [] && List.mem x (List.tl l) 
+    ==> 
+    List.mem x l
+[@@fc]
+
+lemma check_constraints_ith constraints xs b f aux i = 
+    check_relu_constraints constraints xs
+    && List.nth i constraints = Some (Relu (b,f,aux))
+    ==> 
+    eval_relu b f aux xs
+[@@by auto]
+
 lemma check_constraints_eval_relu constraints xs b f aux =
     check_relu_constraints constraints xs
     && List.mem (Relu (b,f,aux)) constraints
     ==> 
     eval_relu b f aux xs
 [@@by auto]
+[@@disable eval_relu]
 [@@fc]
+
+lemma sat_eval_relu tableau us ls constraints xs b f aux =
+    List.length xs = List.length ls 
+    && List.length xs = List.length us
+    && List.mem (Relu (b,f,aux)) constraints
+    && sat tableau us ls constraints xs
+    ==>
+    eval_relu b f aux xs
+[@@by [%use sat_check_constraints tableau us ls constraints xs]
+@> [%use check_constraints_eval_relu constraints xs b f aux]
+@> intros
+@> auto]
+    
+lemma update_bounds_from_relu_split_expand ls us b f aux split =
+    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split ls us split in
+    split = ReluSplit (b,f,aux)
+    ==>
+    lb_left = set_nth ls f 0.
+    && ub_left = set_nth (set_nth us b 0.) f 0.
+    && lb_right = set_nth (set_nth ls b 0.) aux 0.
+    && ub_right = set_nth us aux 0.
+    [@@fc]
 
 theorem soundness_relu_split tableau us ls constraints xs b f aux split =
     let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split ls us split in
@@ -125,9 +165,11 @@ theorem soundness_relu_split tableau us ls constraints xs b f aux split =
     ==>
     sat tableau ub_left lb_left constraints xs 
     || sat tableau ub_right lb_right constraints xs
-[@@by [%use check_constraints_eval_relu constraints xs b f aux]
+[@@by [%use sat_eval_relu tableau us ls constraints xs b f aux]
     @> [%use relu_split_soundness_sat xs tableau ls us constraints b f aux] 
-    @> auto]
+    @> intros
+    @> auto
+    ]
 [@@disable sat, update_bounds_from_split, List.length, List.mem]
 [@@fc]
 

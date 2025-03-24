@@ -203,7 +203,7 @@ theorem check_node_soundness (tableau: real list list) (upper_bounds: real list)
     unsat tableau upper_bounds lower_bounds constraints x
 [@@by [%expand "valid_proof"] 
    @> [%expand "well_formed_vector"] 
-   @> induct ~on_fun:[%id check_node] ()
+   @> induction ()
       @>>| [%use check_node_soundness_full tableau upper_bounds lower_bounds constraints tree x]
              @> [%use check_node_parent_imply_check_node_children (mk_eq_constraints tableau) 
                       upper_bounds lower_bounds constraints tree]

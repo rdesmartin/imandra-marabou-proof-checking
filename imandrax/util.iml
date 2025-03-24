@@ -67,6 +67,14 @@ lemma set_nth_length_preservation l n x =
     List.length (set_nth l n x) = List.length l
 [@@by auto] [@@rw]
 
+lemma set_nth_unchanged_2vars (ls: real list) (i: int) (j: int) (k: int) (a: real) (b: real) =
+    let ls' = set_nth (set_nth ls i a) j b in
+    k <> i && k <> j
+    ==>
+    List.nth k ls' = List.nth k ls
+[@@by auto]
+[@@rw]
+
 (* increment list element at given index by 1 *)
 let increment_elem (l: Real.t list) (n: int): Real.t list =
     match List.nth n l with

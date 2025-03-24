@@ -23,18 +23,18 @@ lemma set_nth_unchanged l n m a =
   List.nth m (set_nth l n a) = List.nth m l
 [@@by auto] [@@rw]
 
-lemma is_bounded_set_nth xs us ls k i =
-    is_bounded xs us ls
+lemma bounded_set_nth xs us ls k i =
+    bounded xs us ls
     ==> 
-    is_bounded xs us (set_nth ls i k) ||
-    is_bounded xs (set_nth us i k) ls
+    bounded xs us (set_nth ls i k) ||
+    bounded xs (set_nth us i k) ls
 [@@by auto]
 
 lemma sat_update_bounds_helper tableau ubs lbs constraints x k i =
     sat tableau ubs lbs constraints x 
     ==>
-    is_bounded x ubs (set_nth lbs i k) ||
-    is_bounded x (set_nth ubs i k) lbs
+    bounded x ubs (set_nth lbs i k) ||
+    bounded x (set_nth ubs i k) lbs
 [@@by auto]
 
 lemma sat_update_bounds tableau ubs lbs constraints x k i = 
@@ -43,7 +43,7 @@ lemma sat_update_bounds tableau ubs lbs constraints x k i =
     sat tableau ubs (set_nth lbs i k) constraints x ||
     sat tableau (set_nth ubs i k) lbs constraints x
     [@@by 
-        [%use is_bounded_set_nth x lbs ubs k i]
+        [%use bounded_set_nth x lbs ubs k i]
         @> [%use sat_update_bounds_helper tableau ubs lbs constraints x k i]
         @> auto
     ]

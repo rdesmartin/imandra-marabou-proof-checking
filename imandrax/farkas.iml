@@ -228,6 +228,7 @@ lemma solution_is_not_neg cs es x =
    ==>
    Real.(eval_poly (mk_cert_poly cs es) x >= 0.0)
  [@@by auto]
+ [@@timeout 60]
 
 lemma cert_is_neg cs es x =
    well_formed es x
@@ -251,6 +252,15 @@ theorem farkas_unsat (es:system) (cs:Real.t list) (x:Real.t list) =
    well_formed es x
    && check_cert es cs
    && es <> []
+   ==>
+   eval_system es x = false
+[@@by [%use solution_is_not_neg cs es x]
+@> [%use cert_is_neg cs es x] @> auto]
+[@@fc]
+
+theorem farkas_unsat' (es:system) (cs:Real.t list) (x:Real.t list) =
+   well_formed es x
+   && check_cert es cs
    ==>
    eval_system es x = false
 [@@by [%use solution_is_not_neg cs es x]

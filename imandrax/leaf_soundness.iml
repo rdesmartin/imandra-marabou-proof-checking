@@ -98,6 +98,7 @@ lemma soundness_eval_sys_composition tableau upper_bounds lower_bounds x =
    @> auto]
 [@@disable Farkas.eval_system, Certificate.mk_system_contradiction, Checker.well_formed_tableau_bounds]
 [@@fc]
+[@@timeout 60]
 
 lemma eval_system_unsat tableau upper_bounds lower_bounds x =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&

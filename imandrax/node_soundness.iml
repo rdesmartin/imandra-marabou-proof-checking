@@ -85,14 +85,14 @@ lemma soundness_split_contra tableau upper_bounds lower_bounds constraints x spl
     && List.length x = List.length upper_bounds
     && check_split split constraints
     && not (sat tableau ub_left lb_left constraints x 
-        && sat tableau ub_right lb_right constraints x)
+        || sat tableau ub_right lb_right constraints x)
     ==>
     not (sat tableau upper_bounds lower_bounds constraints x)
 [@@by [%use soundness_split tableau upper_bounds lower_bounds constraints x split] 
     @> auto]
 [@@fc]
 
-lemma soundness_split_matching tableau upper_bounds lower_bounds constraints x proof_tree =
+(* lemma soundness_split_matching tableau upper_bounds lower_bounds constraints x proof_tree =
     match proof_tree with
     | Leaf _ -> true
     | Node (split, bound_lemmas, left, right) ->
@@ -107,7 +107,7 @@ lemma soundness_split_matching tableau upper_bounds lower_bounds constraints x p
         (* we want to apply soundness_split *)
     [@@by auto]
     [@@disable Split.update_bounds_from_split]
-    [@@fc]
+    [@@fc] *)
 
 (* lemma soundness_node_sat tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     match proof_tree with

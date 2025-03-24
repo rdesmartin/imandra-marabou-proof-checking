@@ -11,6 +11,12 @@ let eval_relu b_var f_var aux_var x =
         f = relu b && aux +. b -. f = 0.
     | _ -> false
 
+lemma eval_relu_different_var xs f_var b_var a_var =
+    eval_relu f_var b_var a_var xs
+    ==> 
+    (b_var <> f_var) && (b_var <> a_var) && (f_var <> a_var) 
+[@@fc]
+
 let active_relu b_var f_var aux_var x =
     match List.nth b_var x, List.nth f_var x, List.nth aux_var x with
     | Some b, Some f, Some aux -> 

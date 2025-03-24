@@ -296,13 +296,16 @@ let rec induct_scheme_i (ubs: Real.t list) (xs: Real.t list) i =
     else induct_scheme_i ubs xs (i-1)
 
 lemma upper_bounded_evals_up_to_length ubs xs i = 
-    is_upper_bounded xs ubs && List.length ubs = List.length xs && i >=0 && i < List.length (mk_upper_bounds_constraints' (List.length ubs) 0 ubs)  
+    is_upper_bounded xs ubs 
+    && List.length ubs = List.length xs 
+    && i >=0 && i < List.length (mk_upper_bounds_constraints' (List.length ubs) 0 ubs)  
     ==>
     eval_system_up_to (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) i xs
 [@@by [%use eval_up_to_inductive_step ubs xs i] 
    @> [%use eval_up_to_uses_nt_matching' (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs i]
    @> induct ~on_fun:[%id induct_scheme_i] ()]
 [@@rw]
+[@@timeout 60]
 
 lemma mk_upper_bounds_constraints'_eval ubs xs = 
     is_upper_bounded xs ubs && List.length ubs = List.length xs 

@@ -20,7 +20,6 @@ open Arithmetic
 open Constraint
 open Proof_tree
 open Checker
-(* open Check_splits *)
 open Certificate
 open Farkas
 open Tightening
@@ -425,7 +424,10 @@ lemma well_formed_conversion tableau upper_bounds lower_bounds eq_constraints ge
     well_formed (eq_constraints @ geq_constraints) (List.hd tableau)
 [@@by [%use well_formed_mk_geq_constraints'' upper_bounds lower_bounds geq_constraints]
    @> [%use well_formed_mk_eq_constraints tableau eq_constraints]
-   @> auto]
+   @> [%use well_formed_concat_invariant_rw eq_constraints geq_constraints (List.hd tableau)]
+   @> intros
+   @> auto
+   ]
 [@@disable Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Arithmetic.compute_combination, List.hd, Farkas.good_poly_x_sizes]
 [@@fc]
 
@@ -474,17 +476,20 @@ lemma contradiction_system_evaluation_false_helper tableau upper_bounds lower_bo
 [@@fc]
 
  lemma contradiction_system_evaluation_false  tableau upper_bounds lower_bounds system x c =
-    well_formed_tableau tableau &&
-    List.length x = List.length (List.hd tableau) &&
-    upper_bounds <> [] && lower_bounds <> [] &&
-    List.length upper_bounds = List.length (List.hd tableau) &&
-    List.length upper_bounds = List.length lower_bounds &&
-    system = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds &&
-    check_cert system c
+    well_formed_tableau tableau
+    && List.length x = List.length (List.hd tableau) 
+    && upper_bounds <> [] && lower_bounds <> [] 
+    && List.length upper_bounds = List.length (List.hd tableau) 
+    && List.length upper_bounds = List.length lower_bounds 
+    && system = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds 
+    (* && system <> []  *)
+    && check_cert system c
     ==>
     eval_system system x = false
 [@@by [%use contradiction_system_evaluation_false_helper tableau upper_bounds lower_bounds system x c]
-   @> [%use Farkas.check_cert_correct system x c]
-   @> auto]
+   @> [%use Farkas.farkas_unsat' system x c]
+   @> intros
+   @> auto
+   ]
 [@@disable Certificate.mk_system_contradiction, Farkas.check_cert]
 [@@fc]
