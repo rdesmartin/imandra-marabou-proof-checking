@@ -8,14 +8,9 @@ from datetime import datetime as dt
 import concurrent.futures
 from threading import Lock 
  
-DATE = dt.now().isoformat()
-# CMD = "dune exec -- ./imandrax/main_extract.exe".split(' ')
-CMD = "./_build/default/imandrax/main_extract.exe".split(' ')
-LOG_FILE = f"{DATE}_experiment.log"
-RESULT_FILE = f"{DATE}_timing.csv"
 
-TIMEOUT=5*3600  # in seconds
-TEST_DIR = "./json"
+
+CMD = "./_build/default/imandrax/main_extract.exe".split(' ')
 
 # Create a lock for thread-safe file writing
 log_lock = Lock()
@@ -26,22 +21,29 @@ def create_parser():
     parser.add_argument(
         "-d", "--directory",
         type=str,
-        default=TEST_DIR,
-        help=f"Path to the input directory (default: '{TEST_DIR}')"
+        required=True,
+        help=f"Path to the input directory (required)"
     )
 
     parser.add_argument(
         "-o", "--output",
         type=str,
-        default="./experiments/",
-        help="Path to the output directory (default: 'default_output_directory')"
+        default="./experiments",
+        help="Path to the output directory (default: ./experiments)"
     )
 
     parser.add_argument(
         "-t", "--timeout",
         type=int,
-        default=TIMEOUT,
-        help=f"Timeout value in seconds (default: {TIMEOUT})"
+        default=3600,
+        help=f"Timeout value in seconds (default: {3600})"
+    )
+
+    parser.add_argument(
+        "-p",
+        type=bool,
+        default=False,
+        help="Parallelise computations (default: false)"
     )
 
     return parser
@@ -67,6 +69,8 @@ def get_json_files(dir_path):
     return json_paths
 
 def process_file(file_path):
+    LOG_FILE = f"{DATE}_experiment.log"
+    RESULT_FILE = f"{DATE}_timing.csv"
     print(file_path)
     status = "OK"
     start = dt.now()
@@ -103,7 +107,8 @@ if __name__ == "__main__":
     num_threads = min(32, os.cpu_count() + 4)
 
     try:
-        # for file_path in files:
+        # parallelised run
+        if args["parallel"]:
             with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
             # Submit all files for processing
                 futures = {
@@ -120,6 +125,9 @@ if __name__ == "__main__":
                 except Exception as exc:
                     print(f"{futures[future]} generated an exception: {exc}")
 
+        # sequential run
+        for file_path in files:
+            process_file(file_path)            
     except KeyboardInterrupt:
         print('interrupted')
         sys.exit(1)

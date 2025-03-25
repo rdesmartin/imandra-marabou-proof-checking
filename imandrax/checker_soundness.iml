@@ -186,7 +186,7 @@ theorem check_tree_soundness (tableau: real list list) (upper_bounds: real list)
     unsat tableau upper_bounds lower_bounds constraints x
 [@@by [%expand "valid_proof"] 
    @> [%expand "well_formed_vector"] 
-   @> induction ()
+   @> induction ~id:[%id check_tree] ()
       @>>| [%use check_tree_soundness_full tableau upper_bounds lower_bounds constraints tree x]
              @> [%use check_tree_parent_imply_check_tree_children (mk_eq_constraints tableau) 
                       upper_bounds lower_bounds constraints tree]
