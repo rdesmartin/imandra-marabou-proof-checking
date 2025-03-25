@@ -1,3 +1,7 @@
+(* 
+    Definition of as satisfying assignment for a DNN verification query
+*)
+
 [@@@import "arithmetic.iml"]
 [@@@import "constraint.iml"]
 

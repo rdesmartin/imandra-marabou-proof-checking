@@ -1,3 +1,7 @@
+(* 
+    Proof that single var splits are covering
+*)
+
 [@@@import "util.iml"]
 [@@@import "leaf_soundness.iml"]
 [@@@import "arithmetic.iml"]
@@ -10,18 +14,6 @@ open Leaf_soundness
 open Arithmetic
 open Split 
 open Sat
-
-lemma get_set_nth l n a =
-    n >= 0 && n < List.length l
-     ==>
-     (List.nth n (set_nth l n a) = Some a)
-[@@by auto] [@@rw]
-
-lemma set_nth_unchanged l n m a =
-  n <> m
-  ==>
-  List.nth m (set_nth l n a) = List.nth m l
-[@@by auto] [@@rw]
 
 lemma bounded_set_nth xs us ls k i =
     bounded xs us ls

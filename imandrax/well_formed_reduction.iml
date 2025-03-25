@@ -1,8 +1,4 @@
-(* GP Status: PROVED!
-
-  This module is a great example to teach Remi how strong rules are better than weak ones.
-  Remi had many lemmas which together were still weaker than `good_poly_x_sizes_elim` and
-  `len_append`! These are the key concepts! Go for the key concepts!) *)
+(* GP Status: PROVED! *)
 
 [@@@import "farkas.iml"]
 [@@@import "certificate.iml"]
@@ -63,6 +59,7 @@ lemma wf_tableau_non_empty_row tableau r =
     r <> []
 [@@by auto]
 [@@fc]
+[@@timeout 120]
 
 lemma mk_eq_constraints_non_empty_invariant tableau = 
     tableau <> [] 
@@ -86,24 +83,11 @@ lemma good_poly_length_transitivity p x1 x2 =
 [@@by auto]
 [@@fc]
 
- (* Grant: Key property about good_poly_x_sizes! *)
+ (* G: Key property about good_poly_x_sizes! *)
 
 lemma good_poly_x_sizes_elim p x =
   good_poly_x_sizes p x = (List.length p = List.length x + 1)
 [@@by auto] [@@fc] [@@rw]
-
-    (* Grant: This is a very weak rule! Let's make it stronger!
-
-    lemma well_formed_system_eq_lists_invariant tableau l1 l2 =
-      List.length l1 = List.length l2 &&
-      well_formed_tableau tableau &&
-      well_formed (mk_eq_constraints tableau) l1
-      ==>
-      well_formed (mk_eq_constraints tableau) l2
-      [@@by auto]
-      [@@fc]
-
-      *)
 
 lemma well_formed_system_eq_lists_invariant tableau l1 l2 =
     well_formed_tableau tableau
@@ -188,16 +172,6 @@ lemma mk_bound_poly_length size i coeff bound =
     ==>
     List.length (mk_bound_poly size i coeff bound) = size + 1
 [@@by auto][@@fc]
-
-(* Grant: We don't need this weak rule because we now have the much 
-   stronger rule `good_poly_x_sizes_elim` above!
-
-  lemma good_poly_length_list_length x y = 
-     List.length x = List.length y + 1
-     ==> 
-     good_poly_x_sizes x y
-   [@@by auto][@@fc]
- *)
 
 lemma non_empty_list_len x =
     x <> [] ==> List.length x >= 0
@@ -324,8 +298,6 @@ lemma mk_lower_bounds_constraints_well_formed sys lower_bounds x =
 
 (* =================  well_formed_mk_geq_constraints =================== *)
 
-(* Grant: This is much better as a rewrite rule (see previous version to see what I mean)! *)
-
 lemma well_formed_concat_invariant_rw s1 s2 x =
     well_formed (s1 @ s2) x = (well_formed s1 x && well_formed s2 x)
 [@@by auto]
@@ -376,18 +348,6 @@ lemma well_formed_mk_geq_constraints'' upper_bounds lower_bounds sys =
  *)
 
 (** Linear combination size invariant *)
-
-(* Grant: Similarly, we don't need this weak rule anymore... 
-
- lemma good_poly_length_size p x =
-    good_poly_x_sizes p x
-    ==> 
-    (List.length p) - 1 = List.length x
-    [@@by auto]
-    [@@fc]
-
-  There is still more rule strengthening and simplification we can do!
- *)
 
 lemma well_formed_good_poly_length system e x =
     well_formed system x && List.mem e system

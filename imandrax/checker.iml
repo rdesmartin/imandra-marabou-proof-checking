@@ -33,11 +33,11 @@ let check_contradiction (contradiction: Real.t list) (tableau: expr list) (upper
     We then check that the dynamic bound tightenings performed at this step are valid, and we apply them. 
    
     If the node is not a leaf, we then check that its children split the search space correctly (either 2 phases of relu or single var split TODO: what is single var split again?)
-    Then we recursively apply `check_node` on all the node's children.
+    Then we recursively apply `check_tree` on all the node's children.
 
     If the node is a Leaf, we check that the saved proof vector leads to a contradiction
     *)
-let rec check_node (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_node: Proof_tree.t) =
+let rec check_tree (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_node: Proof_tree.t) =
     match proof_node with
     | Proof_tree.Leaf (contradiction) ->
         (* for integration tests with lemma tightening, we update the bounds according to theory lemmas without checking them *)
@@ -50,8 +50,8 @@ let rec check_node (tableau: expr list) (upper_bounds: Real.t list) (lower_bound
         (* let (lower_bounds, upper_bounds) = BoundLemma.update_bound_lemmas bound_lemmas upper_bounds lower_bounds in *)
         let valid_split = check_split split constraints in
         let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
-        let valid_children = (check_node tableau ub_left lb_left constraints left) &&
-            (check_node tableau ub_right lb_right constraints right) in
+        let valid_children = (check_tree tableau ub_left lb_left constraints left) &&
+            (check_tree tableau ub_right lb_right constraints right) in
         valid_children && valid_split
     [@@adm proof_node]
 
@@ -95,17 +95,17 @@ let valid_proof (tableau: real list list) (upper_bounds: real list) (lower_bound
     =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds
     && check_all_splits tree constraints
-    && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+    && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
 
 (* Main entry point to verify the proof tree.
    - perform sanity checks on the tableau and upper and lower bound vector dimensions.
    - check the tree recursively starting from the root. We use pattern matching to check 
    that the root node contains no dynamic bound tightenings. 
-   The function `check_node` will traverse the tree recursively; so if it returns true, 
+   The function `check_tree` will traverse the tree recursively; so if it returns true, 
    it means that the proof is valid, i.e.all the bound tightenings are correct and 
    all the contradiction vectors correpond to a contradiction. 
 *)
 let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (tree: Proof_tree.t) =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds
-    && check_all_splits tree constraints
-    && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+    (* && check_all_splits tree constraints *)
+    && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree

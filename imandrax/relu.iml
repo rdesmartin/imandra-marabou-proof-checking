@@ -1,5 +1,5 @@
 (* 
-    Relu function and 
+    ReLU activation function
 *)
 
 (* backwards variable, forward variable, auxilliary variable *)

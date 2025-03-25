@@ -1,4 +1,6 @@
-(* GP Status: PROVED! *)
+(* 
+  Proof tree structure
+*)
 
 [@@@import "tightening.iml"]
 [@@@import "util.iml"]
@@ -10,7 +12,7 @@ open Tightening
 open Constraint
 open Split
 
-(* `Old' proof tree *)
+(* Marabou proof tree type *)
 module MT = struct
       type t = 
         (* tightening, bounds lemmas, left child, right child *)
@@ -50,14 +52,9 @@ let rec of_marabou_tree (old_tree: MT.t) (constraints: Constraint.t list): t opt
         let right = of_marabou_tree child_r constraints in
         (match split, left, right with
         | Some split, Some left, Some right -> 
-          (* let () = if Split.is_single_var split then Printf.printf "single var split\n" else () in *)
-          if (Split.swap_split split (MT.get_tightening child_l) (MT.get_tightening child_r)) then 
-            Some (Node (split, right, left))
-          else 
             Some (Node (split, left, right))
         | None, Some _, Some _ -> 
-          (* let () = Printf.printf "Invalid split" in  *)
-          None
+            None
         | _ -> None)
     | MT.Leaf (tightenings, contradiction) ->
       Some (Leaf (contradiction))

@@ -27,17 +27,17 @@ open Tightening
 open Leaf_soundness
 open Sat
 
-lemma check_node_parent_imply_check_node_children tableau upper_bounds lower_bounds constraints tree =
+lemma check_tree_parent_imply_check_tree_children tableau upper_bounds lower_bounds constraints tree =
     match tree with 
     | Leaf _ -> true
     | Node (split, left, right) ->
         let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
-        (check_node tableau upper_bounds lower_bounds constraints tree) [@trigger]
+        (check_tree tableau upper_bounds lower_bounds constraints tree) [@trigger]
         ==>
-        (check_node tableau ub_left lb_left constraints left) 
-          && (check_node tableau ub_right lb_right constraints right)
+        (check_tree tableau ub_left lb_left constraints left) 
+          && (check_tree tableau ub_right lb_right constraints right)
 [@@by auto]
-[@@disable check_node, update_bounds_from_split]
+[@@disable check_tree, update_bounds_from_split]
 [@@fc]
 
 (* Imandra lemma 13, proven in split_soundness.iml *)
@@ -47,7 +47,7 @@ lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
     | Leaf (contradiction) ->
         well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
         List.length x = List.length (List.hd tableau) &&
-        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+        check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
         ==> 
         unsat tableau upper_bounds lower_bounds relu_constraints x
 [@@by [%use Leaf_soundness.soundness_leaf  tableau upper_bounds lower_bounds relu_constraints x proof_tree]
@@ -78,37 +78,37 @@ lemma unsat_children_imply_unsat_parent tableau upper_bounds lower_bounds constr
    [@@timeout 120]
 
 (* 
-1. lemma check_node implies unsatisfiability
-    check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+1. lemma check_tree implies unsatisfiability
+    check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
     ==>
     for all x, unsat tableau upper_bounds lower_bounds relu_constraints x
 
 *)
 
-lemma check_node_soundness_leaf (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+lemma check_tree_soundness_leaf (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
         (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
-    (* this is a check performed in check_proof_tree, outside of check_node *)
+    (* this is a check performed in check_proof_tree, outside of check_tree *)
     well_formed_tableau_bounds tableau upper_bounds lower_bounds
     && List.length x = List.length (List.hd tableau)
     && check_all_splits tree constraints
-    && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+    && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
     ==>
     match tree with 
     | Leaf _ -> unsat tableau upper_bounds lower_bounds constraints x
     | Node _ -> true
     [@@by [%use soundness_leaf tableau upper_bounds lower_bounds constraints x tree]
        @> auto]
-    [@@disable update_bounds, unsat, Checker.well_formed_tableau_bounds, List.length, Checker.check_node, check_split]
+    [@@disable update_bounds, unsat, Checker.well_formed_tableau_bounds, List.length, Checker.check_tree, check_split]
     [@@timeout 30]
 
-lemma check_node_soundness_node (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+lemma check_tree_soundness_node (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
     (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
-(* this is a check performed in check_proof_tree, outside of check_node *)
+(* this is a check performed in check_proof_tree, outside of check_tree *)
   well_formed_tableau_bounds tableau upper_bounds lower_bounds
   && List.length x = List.length (List.hd tableau)
   && List.length x = List.length upper_bounds
   && List.length x = List.length lower_bounds
-  && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+  && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
   ==>
   match tree with 
   | Leaf _ -> true
@@ -119,19 +119,19 @@ lemma check_node_soundness_node (tableau: real list list) (upper_bounds: real li
     && unsat tableau ub_right lb_right constraints x
     ==> 
     unsat tableau upper_bounds lower_bounds constraints x
-[@@by [%use check_node_parent_imply_check_node_children (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree]
+[@@by [%use check_tree_parent_imply_check_tree_children (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree]
    @> [%use unsat_children_imply_unsat_parent tableau upper_bounds lower_bounds constraints tree x]
    @> auto]
    [@@timeout 120]
 
 (* It's convenient to have both cases we want in induction wrapped up into a single lemma. *)
-lemma check_node_soundness_full (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+lemma check_tree_soundness_full (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
    (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
-(* this is a check performed in check_proof_tree, outside of check_node *)
+(* this is a check performed in check_proof_tree, outside of check_tree *)
  well_formed_tableau_bounds tableau upper_bounds lower_bounds
  && List.length x = List.length (List.hd tableau)
  && check_all_splits tree constraints
- && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+ && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
  ==>
  match tree with 
  | Leaf _ -> unsat tableau upper_bounds lower_bounds constraints x
@@ -141,12 +141,12 @@ lemma check_node_soundness_full (tableau: real list list) (upper_bounds: real li
    && unsat tableau ub_right lb_right constraints x
    ==> 
    unsat tableau upper_bounds lower_bounds constraints x
-[@@by [%use check_node_soundness_leaf tableau upper_bounds lower_bounds constraints tree x]
-   @> [%use check_node_soundness_node tableau upper_bounds lower_bounds constraints tree x]
+[@@by [%use check_tree_soundness_leaf tableau upper_bounds lower_bounds constraints tree x]
+   @> [%use check_tree_soundness_node tableau upper_bounds lower_bounds constraints tree x]
    @> unroll 50]
 
 (* This gives us the induction scheme we need for the main correctness theorem.
-   We can also derive it from `check_node`. *)
+   We can also derive it from `check_tree`. *)
 let rec split_proof_tree_induction (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
         (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
   match tree with
@@ -157,7 +157,7 @@ let rec split_proof_tree_induction (tableau: real list list) (upper_bounds: real
     && split_proof_tree_induction tableau ub_right lb_right constraints right x
 [@@adm tree]
 
-(* Important for our main induction to go through in `check_node_soundness`! *)
+(* Important for our main induction to go through in `check_tree_soundness`! *)
 lemma well_formed_preservation (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) split =
   well_formed_tableau_bounds tableau upper_bounds lower_bounds
   ==>
@@ -171,14 +171,14 @@ let valid_proof (tableau: real list list) (upper_bounds: real list) (lower_bound
     =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds
     && check_all_splits tree constraints
-    && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+    && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
 
 let well_formed_vector tableau x =
     List.length x = List.length (List.hd tableau)
 
 (* Our big finale! *)
 
-theorem check_node_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+theorem check_tree_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
         (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
     valid_proof tableau upper_bounds lower_bounds constraints tree
     && well_formed_vector tableau x
@@ -187,12 +187,12 @@ theorem check_node_soundness (tableau: real list list) (upper_bounds: real list)
 [@@by [%expand "valid_proof"] 
    @> [%expand "well_formed_vector"] 
    @> induction ()
-      @>>| [%use check_node_soundness_full tableau upper_bounds lower_bounds constraints tree x]
-             @> [%use check_node_parent_imply_check_node_children (mk_eq_constraints tableau) 
+      @>>| [%use check_tree_soundness_full tableau upper_bounds lower_bounds constraints tree x]
+             @> [%use check_tree_parent_imply_check_tree_children (mk_eq_constraints tableau) 
                       upper_bounds lower_bounds constraints tree]
              @> [%use well_formed_preservation tableau upper_bounds lower_bounds (split_of_node tree)]
              @> auto
     ]
-[@@disable List.length, well_formed_tableau_bounds, check_node, mk_eq_constraints, unsat, set_nth, 
+[@@disable List.length, well_formed_tableau_bounds, check_tree, mk_eq_constraints, unsat, set_nth, 
            update_bounds_from_split]
 [@@timeout 300]

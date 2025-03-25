@@ -1,4 +1,6 @@
-(* GP Status: PROVED! *)
+(* 
+    Split data type
+*)
 
 [@@@import "util.iml"]
 [@@@import "tightening.iml"]
@@ -158,18 +160,6 @@ let rec match_relu_constraint l_tightening r_tightening constraints =
         | _ -> match_relu_constraint l_tightening r_tightening tl
     )
     | (_::tl) -> match_relu_constraint l_tightening r_tightening tl
-
-(* find a constraint given two participating variables *)
-(* let rec match_constraint (var1: int) (var2: int) (constraints: Constraint.t list): (Constraint.t) =
-    match constraints with
-    | [] -> (UNDEFINED, [])
-    (* | Relu (b,f,a)::tl-> *)
-    | (RELU, [f;b;a]) :: tl ->
-            if (b = var1 && f = var2) || (f = var1 && b = var2)
-            then (RELU, [b;f;a])
-            else match_constraint var1 var2 tl
-    | _ -> (UNDEFINED, [])
- *)
 
 (* function is obsolete *)
 let rec match_constraint (var1: int) (var2: int) (constraints: Constraint.t_old list) =

@@ -30,17 +30,17 @@ open Tableau_reduction
 open Bound_reduction
 open Sat
 
-lemma check_node_implies_check_cert tableau upper_bounds lower_bounds relu_constraints (proof_tree: Proof_tree.t) =
+lemma check_tree_implies_check_cert tableau upper_bounds lower_bounds relu_constraints (proof_tree: Proof_tree.t) =
     match proof_tree with
     | Node _ -> true
     | Leaf contradiction ->
         let sys = mk_system_contradiction tableau upper_bounds lower_bounds in
         let certificate = mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
-        check_node tableau upper_bounds lower_bounds relu_constraints proof_tree
+        check_tree tableau upper_bounds lower_bounds relu_constraints proof_tree
         ==> 
         check_cert sys certificate
 [@@by auto]
-[@@disable Farkas.check_cert, Checker.check_node, Checker.mk_contradiction_certificate, Certificate.mk_system_contradiction]
+[@@disable Farkas.check_cert, Checker.check_tree, Checker.mk_contradiction_certificate, Certificate.mk_system_contradiction]
 [@@fc]
 
 lemma expand_well_formed_tableau_bounds tableau upper_bounds lower_bounds =
@@ -72,7 +72,7 @@ lemma destruct_mk_system tableau upper_bounds lower_bounds =
     mk_system_contradiction tableau upper_bounds lower_bounds = tableau @ (mk_geq_constraints upper_bounds lower_bounds)
 [@@by auto] [@@rw] [@@fc]
 
-(* Grant: I've added these key properties! Remember, go for the key properties, not their instances! *)
+(* G: I've added these key properties! Remember, go for the key properties, not their instances! *)
 
 lemma eval_system_append_rw l1 l2 x =
   well_formed l1 x && well_formed l2 x
@@ -183,10 +183,10 @@ lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
     | Leaf contradiction ->
         well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
         List.length x = List.length (List.hd tableau) &&
-        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+        check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
         ==> 
         unsat tableau upper_bounds lower_bounds relu_constraints x
-[@@by [%use check_node_implies_check_cert (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree]
+[@@by [%use check_tree_implies_check_cert (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree]
    @> [%use not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x]
    @> auto]
 [@@disable Arithmetic.bounded, List.length, Checker.well_formed_tableau_bounds, Arithmetic.is_in_kernel, 

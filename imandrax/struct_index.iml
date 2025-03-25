@@ -1,7 +1,7 @@
-(* The moral crux of our proof relating structural and index-based recursion.
-   Key idea: use a computable Skolem function witnessing failure!
-
-   G.Passmore, Imandra *)
+(* 
+  The moral crux of our proof relating structural and index-based recursion.
+  Key idea: use a computable Skolem function witnessing failure!
+*)
 
 let holds_at_i p i x =
   match List.nth i x with
