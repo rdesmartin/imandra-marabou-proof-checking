@@ -1,4 +1,6 @@
-(* GP Status: PROVED! *)
+(* 
+  Certificate
+*)
 
 [@@@import "util.iml"]
 [@@@import "farkas.iml"]

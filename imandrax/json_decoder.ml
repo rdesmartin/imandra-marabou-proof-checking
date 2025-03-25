@@ -2,7 +2,6 @@ open Util
 open Iter_map
 open Constraint
 open Tightening
-open Bound_lemma
 open Proof_tree
 open Result
 open Constraint
@@ -88,45 +87,22 @@ module JSON_decoder = struct
   let explanation_decoder (proof_size: int): Real.t list D.decoder =
     let open D in
     map (M.to_list (proof_size - (Z.of_int 1))) sparse_row_decoder
-  
-  let lemma_decoder (proof_size: int): BoundLemma.t D.decoder =
-    let open D in
-    one_of [
-      ( "full_lemma",
-        let* aff_var = field "affVar" int_decoder in
-        let* aff_bound = field "affBound" bound_decoder in
-        let* bound = field "bound" float_decoder in
-        let* caus_var = field "causVar" int_decoder in
-        let* caus_bound = field "causBound" bound_decoder in
-        let* constrnt = field "constraint" constraint_type_decoder in
-        let* expl = field "expl" (explanation_decoder proof_size) in
-        succeed @@ BoundLemma.Full (aff_var, aff_bound, bound, caus_var, caus_bound, constrnt, expl)
-      );
-      ( "short_lemma",
-        let* aff_var = field "affVar" int_decoder in
-        let* aff_bound = field "affBound" bound_decoder in
-        let* bound = field "bound" float_decoder in
-        succeed @@ BoundLemma.Short (aff_var, aff_bound, bound)
-      )
-    ]
-
+ 
   let rec proof_node_decoder (proof_size: int): Proof_tree.MT.t D.decoder =
     let open D in
     (* fix (fun proof_node_decoder -> *)
         one_of [
           ( "node",
             let* splits = field "split" (list split_decoder) in
-            let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
             let* children = field "children" (list (proof_node_decoder proof_size)) in
             let left_child = List.hd children in
             let right_child = List.hd (List.tl children) in
-            succeed (Proof_tree.MT.Node (splits, lemmas, left_child, right_child))
+            succeed (Proof_tree.MT.Node (splits, left_child, right_child))
           );
           ( "leaf",
             let* splits = field "split" (list split_decoder) in
-            let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
             let* contradiction = field "contradiction" (explanation_decoder proof_size) in
-            succeed (Proof_tree.MT.Leaf (splits, lemmas, contradiction))
+            succeed (Proof_tree.MT.Leaf (splits, contradiction))
           )
         ]
       (* ) *)
@@ -135,14 +111,12 @@ let proof_root_decoder (proof_size: int): Proof_tree.MT.t D.decoder =
     let open D in
     one_of [
       ( "node",
-        let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
         let* children = field "children" (list (proof_node_decoder proof_size)) in
-        succeed (Proof_tree.MT.Node ([], lemmas, List.hd children, List.hd (List.tl children)))
+        succeed (Proof_tree.MT.Node ([], List.hd children, List.hd (List.tl children)))
       );
       ( "leaf",
-        let* lemmas = field_opt_or ~default:[] "lemmas" (list (lemma_decoder proof_size)) in
         let* contradiction = field "contradiction" (explanation_decoder proof_size) in
-        succeed (Proof_tree.MT.Leaf ([], lemmas, contradiction))
+        succeed (Proof_tree.MT.Leaf ([], contradiction))
       )
     ]
 

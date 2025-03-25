@@ -1,4 +1,8 @@
-(* GP Status: PROVED! *)
+(* 
+    Define and reason about bound polynomials, i.e. 
+    for ith bound a polynomial with 0 indices except at
+    index i 
+*)
 
 [@@@import "farkas.iml"]
 [@@@import "certificate.iml"]

@@ -1,5 +1,3 @@
-(* GP Status: PROVED! *)
-
 [@@@import "farkas.iml"]
 [@@@import "certificate.iml"]
 [@@@import "checker.iml"]

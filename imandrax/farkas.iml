@@ -1,7 +1,6 @@
-(* GP Status: PROVED! *)
-
-(* Correctness of a full Farkas lemma proof checker in Imandra. *)
-(* G.Passmore, Imandra *)
+(* 
+   Correctness of a full Farkas lemma proof checker. 
+*)
 
 (* A polynomial is a list of coefficients, one for each variable
    X_1, ..., X_n as well as a final constant term.

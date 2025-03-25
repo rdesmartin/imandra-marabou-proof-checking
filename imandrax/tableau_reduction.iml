@@ -8,7 +8,7 @@
 [@@@import "checker.iml"]
 [@@@import "tightening.iml"]
 [@@@import "mk_bound_poly.iml"]
-[@@@import "bound_reduct_g.iml"]
+[@@@import "bound_reduct_aux.iml"]
 [@@@import "well_formed_reduction.iml"]
 [@@@import "util.iml"]
 

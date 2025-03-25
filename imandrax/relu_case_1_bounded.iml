@@ -1,3 +1,7 @@
+(*
+    Proof that Relu splits are covering - inactive case 
+*)
+
 [@@@import "util.iml"]
 [@@@import "relu.iml"]
 [@@@import "arithmetic.iml"]

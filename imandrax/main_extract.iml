@@ -22,7 +22,7 @@ let check_proof_file file_name =
         to our formalisation with tightenings in the corresponding node *)
       let proof_tree' = Proof_tree.of_marabou_tree proof_tree constraints in
       (match proof_tree' with
-        | Some tree -> check_proof_tree tableau upper_bounds lower_bounds constraints tree
+        | Some tree -> valid_proof tableau upper_bounds lower_bounds constraints tree
         | None -> false
       )
       (*check_proof_tree = true means that the (tableau, bounds) is unsatisfiable *)

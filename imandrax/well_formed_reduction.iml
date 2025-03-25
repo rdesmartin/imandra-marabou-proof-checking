@@ -12,7 +12,7 @@
 [@@@import "checker.iml"]
 [@@@import "tightening.iml"]
 [@@@import "mk_bound_poly.iml"]
-[@@@import "bound_reduct_g.iml"]
+[@@@import "bound_reduct_aux.iml"]
 [@@@import "util.iml"]
 
 open Util

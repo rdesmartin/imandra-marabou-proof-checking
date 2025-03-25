@@ -1,4 +1,6 @@
-(* GP Status: PROVED! *)
+(* 
+  Non-linear constraints (only ReLU are supported at present)
+*)
 
 [@@@import "util.iml"]
 [@@@import "relu.iml"]

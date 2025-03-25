@@ -1,4 +1,6 @@
-(* GP Status: PROVED! *)
+(* 
+    Matrix and bound arithmetic functions 
+*)
 
 [@@@import "util.iml"]
 [@@@import "farkas.iml"]

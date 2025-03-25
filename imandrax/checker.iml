@@ -1,4 +1,6 @@
-(* GP Status: PROVED! *)
+(* 
+    Main checking algorithm -- algorithm 1
+*)
 
 [@@@import "util.iml"]
 [@@@import "proof_tree.iml"]
@@ -80,6 +82,20 @@ let well_formed_tableau_bounds tableau upper_bounds lower_bounds =
     let tableau_well_formed = well_formed_tableau tableau in
     valid_bounds_sizes && tableau_well_formed && tableau_bounds_match
 
+let rec check_all_splits (tree: Proof_tree.t) (constraints: Constraint.t list): bool =
+    match tree with 
+    | Leaf _ -> true
+    | Node (split, left, right) -> 
+      check_split split constraints 
+      && check_all_splits left constraints
+      && check_all_splits right constraints
+
+let valid_proof (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list) 
+    (constraints: Constraint.t list) (tree: Proof_tree.t)
+    =
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds
+    && check_all_splits tree constraints
+    && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
 
 (* Main entry point to verify the proof tree.
    - perform sanity checks on the tableau and upper and lower bound vector dimensions.
@@ -89,10 +105,7 @@ let well_formed_tableau_bounds tableau upper_bounds lower_bounds =
    it means that the proof is valid, i.e.all the bound tightenings are correct and 
    all the contradiction vectors correpond to a contradiction. 
 *)
-let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_root: Proof_tree.t) =
-    let sanity_check_res = well_formed_tableau_bounds tableau upper_bounds lower_bounds in
-    let tableau_system = mk_eq_constraints tableau in
-    (* we would need to apply the root's bound propagation lemmas here, then we prove that this 
-    bound update does not change satisfiability *)
-    let check_tree = check_node tableau_system upper_bounds lower_bounds constraints proof_root in
-    sanity_check_res && check_tree
+let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (tree: Proof_tree.t) =
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds
+    && check_all_splits tree constraints
+    && check_node (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree

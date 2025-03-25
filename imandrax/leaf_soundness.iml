@@ -1,6 +1,6 @@
-(* GP Status: PROVED! *)
-
-(* Check the soundness of the proof checker for the Leaf constructor of Proof Trees. *)
+(* 
+    Check the soundness of the proof checker for the Leaf constructor of Proof Trees. 
+*)
 
 [@@@import "farkas.iml"]
 [@@@import "certificate.iml"]
@@ -11,7 +11,6 @@
 [@@@import "checker.iml"]
 [@@@import "tightening.iml"]
 [@@@import "mk_bound_poly.iml"]
-[@@@import "bound_reduct_g.iml"]
 [@@@import "bound_reduction.iml"]
 [@@@import "well_formed_reduction.iml"]
 [@@@import "tableau_reduction.iml"]

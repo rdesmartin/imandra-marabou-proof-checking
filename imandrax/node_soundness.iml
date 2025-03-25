@@ -1,3 +1,8 @@
+(* 
+    Check the soundness of the proof checker for the Node constructor of Proof Trees,
+    i.e. that the splits are covering. 
+*)
+
 [@@@import "util.iml"]
 [@@@import "relu.iml"]
 [@@@import "certificate.iml"]
@@ -91,32 +96,3 @@ lemma soundness_split_contra tableau upper_bounds lower_bounds constraints x spl
 [@@by [%use soundness_split tableau upper_bounds lower_bounds constraints x split] 
     @> auto]
 [@@fc]
-
-(* lemma soundness_split_matching tableau upper_bounds lower_bounds constraints x proof_tree =
-    match proof_tree with
-    | Leaf _ -> true
-    | Node (split, bound_lemmas, left, right) ->
-        let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
-        List.length x = List.length lower_bounds 
-        && List.length x = List.length upper_bounds
-        && check_split split constraints
-        && sat tableau upper_bounds lower_bounds constraints x
-        ==>
-        sat tableau ub_left lb_left constraints x 
-        || sat tableau ub_right lb_right constraints x
-        (* we want to apply soundness_split *)
-    [@@by auto]
-    [@@disable Split.update_bounds_from_split]
-    [@@fc] *)
-
-(* lemma soundness_node_sat tableau upper_bounds lower_bounds relu_constraints x proof_tree =
-    match proof_tree with
-    | Leaf _ -> true
-    | Node (split, bound_lemmas, left, right) ->
-        check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
-        ==>
-        unsat tableau upper_bounds lower_bounds relu_constraints x
-    [@@by [%use unsat_not_sat tableau upper_bounds lower_bounds relu_constraints x]
-       @> auto]
-    [@@disable sat, Checker.check_node, Certificate.mk_eq_constraints]
-    [@@fc] *)

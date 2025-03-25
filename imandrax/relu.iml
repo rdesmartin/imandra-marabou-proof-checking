@@ -1,4 +1,6 @@
-(* GP Status: PROVED! *)
+(* 
+    Relu function and 
+*)
 
 (* backwards variable, forward variable, auxilliary variable *)
 type t = (int * int * int)

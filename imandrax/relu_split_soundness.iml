@@ -1,3 +1,7 @@
+(* 
+    Proof that Relu splits are covering
+*)
+
 [@@@import "util.iml"]
 [@@@import "relu.iml"]
 [@@@import "relu_case_1_bounded.iml"]
@@ -123,6 +127,7 @@ lemma check_constraints_ith constraints xs b f aux i =
     ==> 
     eval_relu b f aux xs
 [@@by auto]
+[@@timeout 120]
 
 lemma check_constraints_eval_relu constraints xs b f aux =
     check_relu_constraints constraints xs
