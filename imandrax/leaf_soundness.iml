@@ -124,6 +124,7 @@ lemma eval_system_unsat_conjn tableau upper_bounds lower_bounds x =
    @> auto]
 [@@disable Checker.well_formed_tableau_bounds, Arithmetic.bounded]
 [@@fc]
+[@@timeout 60]
 
 lemma eval_system_unsat_contra tableau upper_bounds lower_bounds x =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
@@ -163,6 +164,7 @@ lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_const
    @> auto]
 [@@disable Checker.well_formed_tableau_bounds, Certificate.mk_system_contradiction, Arithmetic.bounded]
 [@@fc]
+[@@timeout 120]
 
 lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in

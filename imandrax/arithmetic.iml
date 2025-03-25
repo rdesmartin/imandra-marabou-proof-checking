@@ -21,6 +21,23 @@ let rec bounded xs us ls =
     | x::xs, u::us, l::ls -> l <=. x && x <=. u && bounded xs us ls
     | _, _, _ -> true
 
+lemma bounded_upper xs us ls = 
+    List.length xs = List.length us 
+    && List.length xs = List.length ls
+    && bounded xs us ls 
+    ==>
+    is_upper_bounded xs us 
+[@@by auto]
+[@@fc]
+
+lemma bounded_lower xs us ls = 
+    List.length xs = List.length us 
+    && List.length xs = List.length ls
+    && bounded xs us ls 
+    ==>
+    is_upper_bounded ls xs 
+[@@by auto]
+[@@fc]
 
 (** Helper function for {!compute_combination} *)
 let rec update_combination (lc: Real.t list) (expl: Real.t list) (tableau: expr list): Real.t list = 

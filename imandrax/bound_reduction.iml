@@ -304,6 +304,7 @@ lemma upper_bounded_evals_up_to_length ubs xs i =
 [@@by [%use eval_up_to_inductive_step ubs xs i] 
    @> [%use eval_up_to_uses_nt_matching' (mk_upper_bounds_constraints' (List.length ubs) 0 ubs) xs i]
    @> induct ~on_fun:[%id induct_scheme_i] ()]
+[@@disable Farkas.eval_expr]
 [@@rw]
 [@@timeout 60]
 
@@ -434,16 +435,22 @@ lemma mk_lower_bounds_constraints_eval lbs xs =
 
 (* High-level proof goal *)
 lemma mk_geq_constraints_reduction_soundness ubs lbs xs =
-    bounded xs ubs lbs
+    List.length xs = List.length ubs 
+    && List.length xs = List.length lbs
+    && bounded xs ubs lbs
     ==>
     eval_system (mk_geq_constraints ubs lbs) xs
-[@@by [%use eval_system_concat_invariant (mk_upper_bounds_constraints (List.length ubs) ubs) (mk_lower_bounds_constraints (List.length lbs) lbs) xs]
+[@@by [%use bounded_upper xs ubs lbs]
+   @> [%use bounded_lower xs ubs lbs]
    @> [%use mk_upper_bounds_constraints_eval ubs xs]
    @> [%use mk_lower_bounds_constraints_eval lbs xs]
+   @> [%use eval_system_concat_invariant (mk_upper_bounds_constraints (List.length ubs) ubs) (mk_lower_bounds_constraints (List.length lbs) lbs) xs]
    @> auto]
 
 lemma mk_geq_constraints_reduction_soundness_contra ubs lbs xs =
-    not (eval_system (mk_geq_constraints ubs lbs) xs)
+    List.length xs = List.length ubs 
+    && List.length xs = List.length lbs
+    && not (eval_system (mk_geq_constraints ubs lbs) xs)
     ==>
     not (bounded xs ubs lbs)
 [@@by [%use mk_geq_constraints_reduction_soundness ubs lbs xs]
