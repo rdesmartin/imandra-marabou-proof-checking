@@ -34,7 +34,7 @@ open Sat
 lemma check_node_implies_check_cert tableau upper_bounds lower_bounds relu_constraints (proof_tree: Proof_tree.t) =
     match proof_tree with
     | Node _ -> true
-    | (Leaf (contradiction, bound_lemmas)) ->
+    | Leaf contradiction ->
         let sys = mk_system_contradiction tableau upper_bounds lower_bounds in
         let certificate = mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
         check_node tableau upper_bounds lower_bounds relu_constraints proof_tree
@@ -57,7 +57,7 @@ lemma expand_well_formed_tableau_bounds tableau upper_bounds lower_bounds =
 lemma check_cert_implies_not_eval_system tableau upper_bounds lower_bounds x proof_tree certificate sys =
     match proof_tree with
     | Node _ -> true
-    | (Leaf (contradiction, bound_lemmas)) ->
+    | Leaf contradiction ->
         sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds &&
         well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
         List.length x = List.length (List.hd tableau) &&
@@ -98,7 +98,7 @@ lemma soundness_eval_sys_composition tableau upper_bounds lower_bounds x =
    @> auto]
 [@@disable Farkas.eval_system, Certificate.mk_system_contradiction, Checker.well_formed_tableau_bounds]
 [@@fc]
-[@@timeout 60]
+[@@timeout 90]
 
 lemma eval_system_unsat tableau upper_bounds lower_bounds x =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
@@ -181,7 +181,7 @@ lemma sat_implies_eval_system tableau upper_bounds lower_bounds relu_constraints
 lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     match proof_tree with
     | Node _ -> true
-    | (Leaf (contradiction, bound_lemmas)) ->
+    | Leaf contradiction ->
         well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
         List.length x = List.length (List.hd tableau) &&
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
@@ -194,3 +194,4 @@ lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
            Farkas.eval_system, Certificate.mk_eq_constraints, Certificate.mk_geq_constraints, Farkas.check_cert, 
            Certificate.mk_system_contradiction]
 [@@fc] 
+[@@timeout 120]

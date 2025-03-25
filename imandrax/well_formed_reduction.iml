@@ -23,7 +23,6 @@ open Checker
 open Certificate
 open Farkas
 open Tightening
-open Bound_lemma
 
 (** 
 =========== well_formed_mk_eq_constraints ================================

@@ -4,13 +4,13 @@
 [@@@import "proof_tree.iml"]
 [@@@import "arithmetic.iml"]
 [@@@import "split.iml"]
+[@@@import "certificate.iml"]
 
 open Util
 open Proof_tree
 open Arithmetic
 open Split
 open Tightening
-open Bound_lemma
 open Constraint
 open Farkas
 open Certificate
@@ -37,13 +37,13 @@ let check_contradiction (contradiction: Real.t list) (tableau: expr list) (upper
     *)
 let rec check_node (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (proof_node: Proof_tree.t) =
     match proof_node with
-    | Proof_tree.Leaf (contradiction, bound_lemmas) ->
+    | Proof_tree.Leaf (contradiction) ->
         (* for integration tests with lemma tightening, we update the bounds according to theory lemmas without checking them *)
         (* let (lower_bounds, upper_bounds) = BoundLemma.update_bound_lemmas bound_lemmas upper_bounds lower_bounds in *)
         let valid_contradiction = check_contradiction contradiction tableau upper_bounds lower_bounds in
         (* if not valid_contradiction then let () = Printf.printf "Invalid contradiction in leaf\n" in valid_contradiction else *)
         valid_contradiction
-    | Proof_tree.Node (split, bound_lemmas, left, right) ->
+    | Proof_tree.Node (split, left, right) ->
         (* for integration tests with lemma tightening, we update the bounds according to theory lemmas without checking them *)
         (* let (lower_bounds, upper_bounds) = BoundLemma.update_bound_lemmas bound_lemmas upper_bounds lower_bounds in *)
         let valid_split = check_split split constraints in

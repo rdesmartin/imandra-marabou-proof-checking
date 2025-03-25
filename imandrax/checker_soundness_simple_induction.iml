@@ -30,7 +30,6 @@ open Split
 open Certificate
 open Checker
 open Arithmetic
-open Bound_lemma
 open Tightening
 open Leaf_soundness
 open Sat
@@ -38,7 +37,7 @@ open Sat
 lemma check_node_parent_imply_check_node_children tableau upper_bounds lower_bounds constraints tree =
     match tree with 
     | Leaf _ -> true
-    | Node (split, b_l, left, right) ->
+    | Node (split, left, right) ->
         let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
         (check_node tableau upper_bounds lower_bounds constraints tree) [@trigger]
         ==>
@@ -52,7 +51,7 @@ lemma check_node_parent_imply_check_node_children tableau upper_bounds lower_bou
 lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
     match proof_tree with
     | Node _ -> true
-    | Leaf (contradiction, bound_lemmas) ->
+    | Leaf (contradiction) ->
         well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
         List.length x = List.length (List.hd tableau) &&
         check_node (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
@@ -64,7 +63,7 @@ lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_
 let rec check_all_splits t constraints =
     match t with 
     | Leaf _ -> true
-    | Node (split, _, left, right) -> 
+    | Node (split, left, right) -> 
       check_split split constraints 
       && check_all_splits left constraints
       && check_all_splits right constraints
@@ -73,13 +72,13 @@ let rec check_all_splits t constraints =
 
 let split_of_node tree =
     match tree with
-    | Node (split, _, _, _) -> split
+    | Node (split, _, _) -> split
     | Leaf _ -> Split.SingleSplit (0,0.0)
 
 lemma unsat_children_imply_unsat_parent tableau upper_bounds lower_bounds constraints proof_tree x =
     match proof_tree with
     | Leaf _ -> true
-    | Node (split, bound_lemmas, left, right) ->
+    | Node (split, left, right) ->
         let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
         List.length x = List.length lower_bounds 
         && List.length x = List.length upper_bounds
@@ -129,7 +128,7 @@ lemma check_node_soundness_node (tableau: real list list) (upper_bounds: real li
   ==>
   match tree with 
   | Leaf _ -> true
-  | Node (split, bound_lemmas, left, right)  -> 
+  | Node (split, left, right)  -> 
     let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
     check_split split constraints
     && unsat tableau ub_left lb_left constraints x 
@@ -152,7 +151,7 @@ lemma check_node_soundness_full (tableau: real list list) (upper_bounds: real li
  ==>
  match tree with 
  | Leaf _ -> unsat tableau upper_bounds lower_bounds constraints x
- | Node (split, bound_lemmas, left, right)  -> 
+ | Node (split, left, right)  -> 
    let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
    unsat tableau ub_left lb_left constraints x 
    && unsat tableau ub_right lb_right constraints x
@@ -168,7 +167,7 @@ let rec split_proof_tree_induction (tableau: real list list) (upper_bounds: real
         (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
   match tree with
   | Leaf _ -> true
-  | Node (split, bound_lemmas, left, right) ->
+  | Node (split, left, right) ->
     let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split lower_bounds upper_bounds split in
     split_proof_tree_induction tableau ub_left lb_left constraints left x 
     && split_proof_tree_induction tableau ub_right lb_right constraints right x
